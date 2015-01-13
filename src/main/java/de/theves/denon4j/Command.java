@@ -12,10 +12,16 @@ public class Command {
 
 	private final String command;
 	private final String parameter;
+	private final int timeToWait;
 
 	public Command(String command, String parameter) {
+		this(command, parameter, 200);
+	}
+
+	public Command(String command, String parameter, int timeToWait) {
 		this.command = command;
 		this.parameter = parameter;
+		this.timeToWait = timeToWait;
 	}
 
 	public Response send(InetAddress address, int port) throws IOException {
@@ -59,7 +65,7 @@ public class Command {
 
 	private void waitForAvr() {
 		try {
-			Thread.sleep(200); // as of specification
+			Thread.sleep(timeToWait); // as of specification
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		}

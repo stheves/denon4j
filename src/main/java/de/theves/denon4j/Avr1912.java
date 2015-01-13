@@ -17,7 +17,16 @@ public class Avr1912 {
 	}
 
 	public Response powerOn() throws IOException {
-		return PW_ON.send(this.avrAddress, this.port);
+		Response res = PW_ON.send(this.avrAddress, this.port);
+		// as specification - K) 1 seconds later, please
+		// transmit the next COMMAND after transmitting a
+		// power on COMMAND （ PWON ）
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
+		}
+		return res;
 	}
 
 	public Response powerOff() throws IOException {
