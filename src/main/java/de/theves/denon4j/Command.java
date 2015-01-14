@@ -1,32 +1,58 @@
 package de.theves.denon4j;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.nio.charset.Charset;
 
-public class Command {
-	public static final char CR = 0x0d; // \r character
+final class Command {
+	private static final char CR = 0x0d; // \r character
+	private static final Charset ENCODING = Charset.forName("US-ASCII");
 
 	private final String command;
 	private final String parameter;
 	private final int timeToWait;
 
-	public Command(String command, String parameter) {
-		this(command, parameter, 200);
+	Command(String fullCommand) {
+		this(fullCommand.substring(0, 2), fullCommand.substring(2,
+				fullCommand.length()));
 	}
 
-	public Command(String command, String parameter, int timeToWait) {
+	Command(String command, String parameter) {
+		this(command, parameter, 1000);
+	}
+
+	Command(String command, String parameter, int timeToWait) {
 		this.command = command;
 		this.parameter = parameter;
 		this.timeToWait = timeToWait;
 	}
 
-	public Response send(InetAddress address, int port) throws IOException {
+	Response send(InetAddress address, int port) throws IOException {
+		return send(address, port, null);
+	}
+
+	/**
+	 * Sends the command to the receiver and waits for a response (blocking).
+	 * 
+	 * @param address
+	 *            the inet address of the receiver (not <code>null</code>).
+	 * @param port
+	 *            the port (usually 23).
+	 * @param value
+	 *            the value of the command to send (can be <code>null</code>).
+	 * @return the response from the receiver. Only <code>null</code> if the
+	 *         command was a set command (value != null).
+	 * @throws IOException
+	 */
+	Response send(InetAddress address, int port, String value)
+			throws IOException {
 		Socket socket = new Socket();
-		socket.setSoTimeout(1000); // read timeout 1s
+		socket.setSoTimeout(timeToWait);
 		try {
 			// connect
 			socket.connect(new InetSocketAddress(address, port), 5 * 1000);
@@ -34,41 +60,33 @@ public class Command {
 			InputStream in = socket.getInputStream();
 
 			// send the command
-			String message = command + parameter + CR;
-			out.write(message.getBytes());
+			StringBuilder request = new StringBuilder();
+			request.append(command).append(parameter);
+			if (value != null) {
+				request.append(value);
+			}
+			request.append(CR);
+			out.write(request.toString().getBytes(ENCODING));
 			out.flush();
 
-			// wait for AVR to send a response (see specification)
-			waitForAvr();
-
-			// receive the response
-			byte[] buffer = new byte[512];
-			if (in.available() != 0) {
-				in.read(buffer);
-				int end = 0;
-				for (int i = 0; i < buffer.length; i++) {
-					byte b = buffer[i];
-					if (b == 0) {
-						end = i;
+			if (value == null) {
+				// receive the response
+				int n = 0;
+				ByteArrayOutputStream responseBuffer = new ByteArrayOutputStream(
+						64);
+				while (-1 != (n = in.read())) {
+					// CR marks the end of the response
+					if (CR == (char) n) {
 						break;
 					}
+					responseBuffer.write(n);
 				}
-				byte[] responseBuffer = new byte[end];
-				System.arraycopy(buffer, 0, responseBuffer, 0, end);
-				return new Response(responseBuffer);
+				return new Response(new String(responseBuffer.toByteArray(),
+						ENCODING));
 			}
-			throw new IllegalStateException();
+			return null;
 		} finally {
 			socket.close();
 		}
 	}
-
-	private void waitForAvr() {
-		try {
-			Thread.sleep(timeToWait); // as of specification
-		} catch (InterruptedException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
 }
