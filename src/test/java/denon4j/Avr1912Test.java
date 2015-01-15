@@ -4,13 +4,10 @@ import de.theves.denon4j.Avr1912;
 import de.theves.denon4j.InputSource;
 
 public class Avr1912Test {
-
 	private String address = "192.168.0.102";
 	private int port = 23;
 
 	public void demo() throws Exception {
-		String vol = "505";
-
 		Avr1912 avr = new Avr1912(address, port);
 		avr.connect(1000);
 		System.out.println("PWON: " + avr.isPowerOn());
@@ -21,7 +18,7 @@ public class Avr1912Test {
 		System.out.println("VOL: " + avr.getVolume());
 		System.out.println("VOLUP: " + avr.volumeUp());
 		System.out.println("VOLDOWN: " + avr.volumeDown());
-		System.out.println("VOLSET: " + avr.changeVolume(vol));
+		System.out.println("VOLSET: " + avr.changeVolume("505"));
 		System.out.println("VOL: " + avr.getVolume());
 		System.out.println("INPUT: " + avr.getInputSource());
 		System.out.println("INPUTSET: "
