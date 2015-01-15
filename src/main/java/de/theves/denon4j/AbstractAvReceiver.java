@@ -46,7 +46,7 @@ public abstract class AbstractAvReceiver {
 
 	private Response doSend(Commands command, String value)
 			throws ConnectionException {
-		if (!socket.isConnected()) {
+		if (null == socket || !socket.isConnected()) {
 			throw new ConnectionException("Not connected or connection lost.");
 		}
 		try {
@@ -56,5 +56,4 @@ public abstract class AbstractAvReceiver {
 			throw new ConnectionException(e);
 		}
 	}
-
 }
