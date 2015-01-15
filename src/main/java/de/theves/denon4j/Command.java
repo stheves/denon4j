@@ -4,10 +4,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.Socket;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 
 final class Command {
 	private static final char CR = 0x0d; // \r character
@@ -15,7 +14,6 @@ final class Command {
 
 	private final String command;
 	private final String parameter;
-	private final int timeToWait;
 
 	Command(String fullCommand) {
 		this(fullCommand.substring(0, 2), fullCommand.substring(2,
@@ -23,70 +21,75 @@ final class Command {
 	}
 
 	Command(String command, String parameter) {
-		this(command, parameter, 1000);
-	}
-
-	Command(String command, String parameter, int timeToWait) {
 		this.command = command;
 		this.parameter = parameter;
-		this.timeToWait = timeToWait;
-	}
-
-	Response send(InetAddress address, int port) throws IOException {
-		return send(address, port, null);
 	}
 
 	/**
 	 * Sends the command to the receiver and waits for a response (blocking).
 	 * 
-	 * @param address
-	 *            the inet address of the receiver (not <code>null</code>).
-	 * @param port
-	 *            the port (usually 23).
+	 * @param in
+	 *            the input stream to read the response (not <code>null</code>).
+	 * @param out
+	 *            the output stream to write the command string (not
+	 *            <code>null</code>).
 	 * @param value
 	 *            the value of the command to send (can be <code>null</code>).
 	 * @return the response from the receiver. Only <code>null</code> if the
-	 *         command was a set command (value != null).
+	 *         receiver didn`t sent a response for the command within the
+	 *         <code>timeToWait</code> period. This may happen if a
+	 *         <code>value</code> wasn`t changed actually.
 	 * @throws IOException
 	 */
-	Response send(InetAddress address, int port, String value)
+	Response send(InputStream in, OutputStream out, String value)
 			throws IOException {
-		Socket socket = new Socket();
-		socket.setSoTimeout(timeToWait);
+		// send the command
+		String request = buildRequest(value);
+		out.write(request.getBytes(ENCODING));
+		out.flush();
+
+		// receive the response
+		return receiveResponse(in);
+	}
+
+	private Response receiveResponse(InputStream in) throws IOException {
+		ByteArrayOutputStream responseBuffer = new ByteArrayOutputStream();
 		try {
-			// connect
-			socket.connect(new InetSocketAddress(address, port), 5 * 1000);
-			OutputStream out = socket.getOutputStream();
-			InputStream in = socket.getInputStream();
-
-			// send the command
-			StringBuilder request = new StringBuilder();
-			request.append(command).append(parameter);
-			if (value != null) {
-				request.append(value);
-			}
-			request.append(CR);
-			out.write(request.toString().getBytes(ENCODING));
-			out.flush();
-
-			if (value == null) {
-				// receive the response
-				int n = 0;
-				ByteArrayOutputStream responseBuffer = new ByteArrayOutputStream(
-						64);
-				while (-1 != (n = in.read())) {
-					// CR marks the end of the response
-					if (CR == (char) n) {
-						break;
-					}
-					responseBuffer.write(n);
-				}
-				return new Response(new String(responseBuffer.toByteArray(),
-						ENCODING));
-			}
+			// read the first byte - blocks until response is available
+			responseBuffer.write(in.read());
+		} catch (IOException e) {
+			// can happen if we do not get a response within the timeout
+			// interval
 			return null;
-		} finally {
-			socket.close();
 		}
+		// read the stream as long as input is available (we never really
+		// reach the end of the stream)
+		while (in.available() > 0) {
+			responseBuffer.write(in.read());
+		}
+
+		// convert to response
+		List<String> lines = new ArrayList<>();
+		byte[] byteArray = responseBuffer.toByteArray();
+		StringBuilder line = new StringBuilder();
+		for (byte b : byteArray) {
+			if (CR == (char) b) {
+				lines.add(line.toString());
+				line.delete(0, line.length());
+			} else {
+				line.append((char) b);
+			}
+		}
+		return new Response(lines);
+	}
+
+	private String buildRequest(String value) {
+		StringBuilder request = new StringBuilder();
+		request.append(command).append(parameter);
+		if (value != null) {
+			request.append(value);
+		}
+		request.append(CR);
+		return request.toString();
 	}
 }

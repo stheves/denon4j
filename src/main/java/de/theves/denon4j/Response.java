@@ -1,19 +1,21 @@
 package de.theves.denon4j;
 
+import java.util.Collections;
+import java.util.List;
 
 public class Response {
-	private String response;
+	private List<String> responseLines;
 
-	public Response(String response) {
-		this.response = response;
+	public Response(List<String> response) {
+		this.responseLines = response;
 	}
 
-	public String getResponse() {
-		return response;
+	public List<String> getResponse() {
+		return Collections.unmodifiableList(responseLines);
 	}
 
 	@Override
 	public String toString() {
-		return "Response [response=" + response + "]";
+		return responseLines.toString();
 	}
 }
