@@ -1,7 +1,5 @@
 package denon4j;
 
-import org.junit.Test;
-
 import de.theves.denon4j.Avr1912;
 import de.theves.denon4j.InputSource;
 
@@ -10,8 +8,7 @@ public class Avr1912Test {
 	private String address = "192.168.0.102";
 	private int port = 23;
 
-	@Test
-	public void test() throws Exception {
+	public void demo() throws Exception {
 		String vol = "505";
 
 		Avr1912 avr = new Avr1912(address, port);
@@ -36,7 +33,7 @@ public class Avr1912Test {
 	public static void main(String[] args) throws Exception {
 		System.out.println("Starting demo...");
 		Avr1912Test test = new Avr1912Test();
-		test.test();
+		test.demo();
 		System.out.println("Starting demo... Done.");
 	}
 }
