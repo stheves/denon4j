@@ -1,9 +1,7 @@
 package de.theves.denon4j;
 
 public enum Commands {
-	PWON("PWON"), PWOFF("PWSTANDBY"), PWSTATUS("PW?"), MUTE("MUON"), UNMUTE(
-			"MUOFF"), MUTESTATUS("MU?"), VOLUP("MVUP"), VOLDOWN("MVDOWN"), VOLSTATUS(
-			"MV?"), VOLSET("MV"), INPUTSET("SI"), INPUTSTATUS("SI?");
+	PW("PW"), MUTE("MU"), VOL("MV"), SELECT_INPUT("SI"), SELECT_VIDEO("SV");
 
 	private String command;
 

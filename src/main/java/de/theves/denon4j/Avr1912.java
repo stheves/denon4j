@@ -1,17 +1,16 @@
 package de.theves.denon4j;
 
-import static de.theves.denon4j.Commands.INPUTSET;
-import static de.theves.denon4j.Commands.INPUTSTATUS;
 import static de.theves.denon4j.Commands.MUTE;
-import static de.theves.denon4j.Commands.MUTESTATUS;
-import static de.theves.denon4j.Commands.PWOFF;
-import static de.theves.denon4j.Commands.PWON;
-import static de.theves.denon4j.Commands.PWSTATUS;
-import static de.theves.denon4j.Commands.UNMUTE;
-import static de.theves.denon4j.Commands.VOLDOWN;
-import static de.theves.denon4j.Commands.VOLSET;
-import static de.theves.denon4j.Commands.VOLSTATUS;
-import static de.theves.denon4j.Commands.VOLUP;
+import static de.theves.denon4j.Commands.PW;
+import static de.theves.denon4j.Commands.SELECT_INPUT;
+import static de.theves.denon4j.Commands.SELECT_VIDEO;
+import static de.theves.denon4j.Commands.VOL;
+import static de.theves.denon4j.Parameters.DOWN;
+import static de.theves.denon4j.Parameters.OFF;
+import static de.theves.denon4j.Parameters.ON;
+import static de.theves.denon4j.Parameters.STANDBY;
+import static de.theves.denon4j.Parameters.STATUS;
+import static de.theves.denon4j.Parameters.UP;
 
 public class Avr1912 extends AbstractAvReceiver {
 
@@ -24,7 +23,7 @@ public class Avr1912 extends AbstractAvReceiver {
 	}
 
 	public Response powerOn() {
-		Response res = send(PWON);
+		Response res = send(PW, ON);
 		// as specification - K) 1 seconds later, please
 		// transmit the next COMMAND after transmitting a
 		// power on COMMAND （ PWON ）
@@ -37,47 +36,55 @@ public class Avr1912 extends AbstractAvReceiver {
 	}
 
 	public Response powerOff() {
-		return send(PWOFF);
+		return send(PW, STANDBY);
 	}
 
 	public boolean isPowerOn() {
-		return send(PWSTATUS).getResponse().get(0).equals(PWON.toString());
+		return send(PW, STATUS).getResponse().get(0)
+				.equals(PW.toString() + ON.toString());
 	}
 
 	public Response mute() {
-		return send(MUTE);
+		return send(MUTE, ON);
 	}
 
 	public Response unmute() {
-		return send(UNMUTE);
+		return send(MUTE, OFF);
 	}
 
 	public boolean isMuted() {
-		return send(MUTESTATUS).equals(MUTE.toString());
+		return send(MUTE, STATUS).equals(MUTE.toString());
 	}
 
 	public Response getVolume() {
-		return send(VOLSTATUS);
+		return send(VOL, STATUS);
 	}
 
 	public Response volumeUp() {
-		return send(VOLUP);
+		return send(VOL, UP);
 	}
 
 	public Response volumeDown() {
-		return send(VOLDOWN);
+		return send(VOL, DOWN);
 	}
 
 	public Response changeVolume(String value) {
-		return send(VOLSET, value);
+		return send(VOL, value);
 	}
 
 	public Response getInputSource() {
-		// TODO parse response and return InputSource
-		return send(INPUTSTATUS);
+		return send(SELECT_INPUT, STATUS);
 	}
 
-	public Response changeInputSource(InputSource input) {
-		return send(INPUTSET, input.toString());
+	public Response selectInputSource(Sources source) {
+		return send(SELECT_INPUT, source.toString());
+	}
+
+	public Response selectVideoSource(Sources source) {
+		return send(SELECT_VIDEO, source.toString());
+	}
+
+	public Response play(Playback playback) {
+		return send(SELECT_INPUT, playback.toString());
 	}
 }

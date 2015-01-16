@@ -4,6 +4,9 @@ import java.util.Collections;
 import java.util.List;
 
 public class Response {
+	private Commands command;
+	private Parameters parameter;
+	private String value;
 	private List<String> responseLines;
 
 	public Response(List<String> response) {
