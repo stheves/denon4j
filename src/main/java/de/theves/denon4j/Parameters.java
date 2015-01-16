@@ -1,6 +1,6 @@
 package de.theves.denon4j;
 
-public enum Parameters {
+enum Parameters {
 	ON("ON"), STANDBY("STANDBY"), OFF("OFF"), STATUS("?"), UP("UP"), DOWN(
 			"DOWN");
 	private String name;

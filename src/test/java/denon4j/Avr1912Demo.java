@@ -25,7 +25,7 @@ public class Avr1912Demo {
 		Thread.sleep(2000);
 		System.out.println("INPUT?: " + avr.getInputSource());
 		System.out.println("PLAY IRADION: "
-				+ avr.play(Playback.NET_USB_INTERNET_RADIO_P));
+				+ avr.play(Playback.INTERNET_RADIO));
 		System.out.println("SLEEPTIMER?: " + avr.isSleepTimerSet());
 		System.out.println("SLEEPTIMERSET: " + avr.sleepTimer("010"));
 		System.out.println("SLEEPTIMEROFF:" + avr.sleepTimerOff());

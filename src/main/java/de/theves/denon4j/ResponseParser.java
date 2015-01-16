@@ -3,7 +3,7 @@ package de.theves.denon4j;
 import java.util.ArrayList;
 import java.util.List;
 
-class ResponseParser {
+final class ResponseParser {
 	private char delimiter;
 
 	ResponseParser(char delemiter) {
