@@ -87,4 +87,16 @@ public class Avr1912 extends AbstractAvReceiver {
 	public Response play(Playback playback) {
 		return send(SELECT_INPUT, playback.toString());
 	}
+
+	public Response isSleepTimerSet() {
+		return send(Commands.SLP, Parameters.STATUS);
+	}
+
+	public Response sleepTimer(String value) {
+		return send(Commands.SLP, value);
+	}
+
+	public Response sleepTimerOff() {
+		return send(Commands.SLP, OFF);
+	}
 }

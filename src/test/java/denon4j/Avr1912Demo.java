@@ -22,9 +22,13 @@ public class Avr1912Demo {
 		System.out.println("INPUT: " + avr.getInputSource());
 		System.out.println("INPUTSET: "
 				+ avr.selectInputSource(Sources.SAT_CBL));
+		Thread.sleep(2000);
 		System.out.println("INPUT?: " + avr.getInputSource());
 		System.out.println("PLAY IRADION: "
 				+ avr.play(Playback.NET_USB_INTERNET_RADIO_P));
+		System.out.println("SLEEPTIMER?: " + avr.isSleepTimerSet());
+		System.out.println("SLEEPTIMERSET: " + avr.sleepTimer("010"));
+		System.out.println("SLEEPTIMEROFF:" + avr.sleepTimerOff());
 		avr.disconnect();
 	}
 
@@ -33,10 +37,10 @@ public class Avr1912Demo {
 			System.err.println("Try java -jar $/path/to/jar $host $port");
 			System.exit(1);
 		}
-		System.out.println(String.format("Starting demo... Host: %s:%s",
+		System.out.println(String.format("Starting demo... Receiver: %s:%s",
 				args[0], args[1]));
 		Avr1912Demo test = new Avr1912Demo();
 		test.demo(args[0], Integer.parseInt(args[1]));
-		System.out.println("Demo... Done.");
+		System.out.println("Demo done.");
 	}
 }

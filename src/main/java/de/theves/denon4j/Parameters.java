@@ -1,7 +1,7 @@
 package de.theves.denon4j;
 
 public enum Parameters {
-	ON("ON"), STANDBY("STANDBY"), OFF("STANDBY"), STATUS("?"), UP("UP"), DOWN(
+	ON("ON"), STANDBY("STANDBY"), OFF("OFF"), STATUS("?"), UP("UP"), DOWN(
 			"DOWN");
 	private String name;
 
