@@ -10,6 +10,13 @@ via TCP/IP. The project is intended to be easily extended for those who want to 
 #Basic Usage
 -----
 
+'''
+Avr1912 avr = new Avr1912(host, port);
+avr.connect(1000);
+avr.volumeUp();
+avr.disconnect();
+'''
+
 #License
 ------------
 Apache License Version 2.0, January 2004 (see LICENSE file)
