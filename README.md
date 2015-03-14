@@ -1,4 +1,4 @@
-#JMeter Maven Plugin
+#denon4j Java API
 
 ---
 
