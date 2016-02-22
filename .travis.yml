@@ -16,6 +16,7 @@ deploy:
   file: "${ARTIFACT}"
   on:
     repo: sath1982/denon4j
+    tags: true
 
 jdk:
 - openjdk7
