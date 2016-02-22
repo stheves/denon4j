@@ -1,0 +1,19 @@
+---
+language: java
+
+sudo: false
+
+before_script:
+- export MAVEN_OPTS="-Xmx512m -XX:MaxPermSize=512m"
+  
+script: mvn -q -B -e install
+
+jdk:
+- openjdk7
+
+branches:
+  only:
+  - master
+notifications:
+  email:
+  - sascha.theves@gmail.com
