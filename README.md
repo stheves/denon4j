@@ -1,5 +1,7 @@
 #denon4j Java API
 
+[![Build Status](https://travis-ci.org/sath1982/denon4j.svg?branch=master)](https://travis-ci.org/sath1982/denon4j)
+
 ---
 
 The denon4j project provides a Java API for communicating with a Denon AVR (currently only AVR1912 is full supported)
