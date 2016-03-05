@@ -15,16 +15,35 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j;
+package denon4j;
 
-/**
- * Represents the command line interface.
- *
- * @author Sascha Theves
- */
-public class AvrCli {
-    public static void main(String[] args) {
-        System.err.println("The command line interface has not yet been implemented.");
-        System.exit(1);
+import de.theves.denon4j.Avr1912;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+public class Avr1912Test {
+    @Test
+    public void basics() throws Exception {
+        int port = 1337;
+
+        AvrMock mock = new AvrMock(port);
+        mock.start();
+
+        Avr1912 receiver = new Avr1912("localhost", port);
+        receiver.connect(1000);
+        receiver.mute();
+        String lastCommand = mock.getCommandString();
+        assertEquals("MUON", lastCommand);
+
+        receiver.volumeUp();
+        lastCommand = mock.getCommandString();
+        assertEquals("MVUP", lastCommand);
+
+        receiver.powerOff();
+        lastCommand = mock.getCommandString();
+        assertEquals("PWSTANDBY", lastCommand);
+
+        mock.stop();
     }
 }

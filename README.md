@@ -12,15 +12,18 @@ Contributions are welcome!
 - Java 8
 - Maven 3.2+ (only for building)
 - You must be connected to the same network as your AV receiver
+- Your receiver must be either turned on or you have to enable the network standby feature
 
-# Basic Usage
+# Basic API Usage
 
 ```
-Avr1912 avr = new Avr1912(host, port);
+Avr1912 avr = new Avr1912(192.168.0.102, 23);
 avr.connect(1000);
 avr.volumeUp();
 avr.disconnect();
 ```
+
+Take a look at the class Avr1912Demo.java in the test directory to view a complete example.
 
 # Building
 
@@ -28,6 +31,12 @@ This is a maven style project so `mvn` needs to be on your `$PATH`. To build
 from scratch just type:
 
 > mvn clean package
+
+This builds the executable JAR file that can be used on command line.
+
+# Command Line Usage
+
+NOT YET IMPLEMENTED
 
 # License
 
