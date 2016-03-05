@@ -2,15 +2,18 @@
 
 [![Build Status](https://travis-ci.org/sath1982/denon4j.svg?branch=master)](https://travis-ci.org/sath1982/denon4j)
 
----
-
-The denon4j project provides a Java API for communicating with a Denon AVR (currently only AVR1912 is full supported)
+The denon4j project provides a java API for communicating with a Denon AVR (currently only AVR1912 is supported and tested)
 via TCP/IP. The project is intended to be easily extended for those who want to write an API for their own AVR model.
 
----
+Contributions are welcome!
 
-#Basic Usage
------
+# Prerequisites
+
+- Java 8
+- Maven 3.2+ (only for building)
+- You must be connected to the same network as your AV receiver
+
+# Basic Usage
 
 ```
 Avr1912 avr = new Avr1912(host, port);
@@ -19,12 +22,18 @@ avr.volumeUp();
 avr.disconnect();
 ```
 
-#License
-------------
+# Building
+
+This is a maven style project so `mvn` needs to be on your `$PATH`. To build
+from scratch just type:
+
+> mvn clean package
+
+# License
+
 Apache License Version 2.0, January 2004 (see LICENSE file)
 
-#Contributing
-------------
+# Contributing
 
 1. Fork it.
 2. Create a branch (`git checkout -b my_plugin`)
