@@ -21,6 +21,10 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
+/**
+ * Abstract base class that implements the basic network protocol
+ * for working with Denon receivers.
+ */
 public abstract class AbstractAvReceiver {
 
     protected final String hostname;

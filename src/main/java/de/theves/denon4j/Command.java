@@ -25,6 +25,11 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.nio.charset.Charset;
 
+/**
+ * Sends the actual bytes of a command to the receiver.
+ *
+ * @author Sascha Theves
+ */
 final class Command {
     private static final char CR = 0x0d; // \r character
     private static final Charset ENCODING = Charset.forName("US-ASCII");

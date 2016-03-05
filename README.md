@@ -50,3 +50,7 @@ Apache License Version 2.0, January 2004 (see LICENSE file)
 4. Push to the branch (`git push origin my_plugin`)
 5. Create a new [Issue](https://github.com/sath1982/denon4j/issues/new) with a link to your branch, or just make a Pull Request.
 6. Enjoy a refreshing Diet Coke and wait
+
+# Denon AVR Control Protocol Specs
+
+- [AVR-2112CI/AVR-1912](file/denon-avr-1912-protokoll.pdf)
