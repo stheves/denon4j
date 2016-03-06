@@ -101,6 +101,10 @@ public class Avr1912 extends AbstractAvReceiver {
         return send(SELECT_INPUT, playback.toString());
     }
 
+    public DisplayInfo onscreenDisplayInfo() {
+        return new DisplayInfo(send(ONSCREEN_DISPLAY_INFO_UTF8, Parameters.NONE));
+    }
+
     public Response isSleepTimerSet() {
         return send(Commands.SLP, Parameters.STATUS);
     }

@@ -85,7 +85,7 @@ public abstract class AbstractAvReceiver {
         try {
             StringBuilder cmdBuilder = new StringBuilder();
             cmdBuilder.append(command.toString());
-            if (parameter != null) {
+            if (null != parameter && Parameters.NONE != parameter) {
                 cmdBuilder.append(parameter.toString());
             }
             return new Command(cmdBuilder.toString()).send(socket, value);

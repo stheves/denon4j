@@ -19,7 +19,7 @@ package de.theves.denon4j;
 
 enum Commands {
     PW("PW"), MUTE("MU"), VOL("MV"), SELECT_INPUT("SI"), SELECT_VIDEO("SV"), SLP(
-            "SLP");
+            "SLP"), ONSCREEN_DISPLAY_INFO_UTF8("NSE");
 
     private String command;
 
