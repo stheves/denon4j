@@ -53,4 +53,4 @@ Apache License Version 2.0, January 2004 (see LICENSE file)
 
 # Denon AVR Control Protocol Specs
 
-- [AVR-2112CI/AVR-1912](file/denon-avr-1912-protokoll.pdf)
+- [AVR-2112CI/AVR-1912](denon-avr-1912-protokoll.pdf)
