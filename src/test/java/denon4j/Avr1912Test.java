@@ -30,7 +30,7 @@ public class Avr1912Test {
         mock.start();
 
         // mock chooses host and a free port by itself
-        Avr1912 receiver = new Avr1912("127.0.0.1", mock.getPort());
+        Avr1912 receiver = new Avr1912("0.0.0.0", mock.getPort());
         receiver.connect(1000);
         receiver.mute();
         String lastCommand = mock.getCommandString();
