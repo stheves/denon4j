@@ -19,17 +19,20 @@ package denon4j;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Scanner;
 
 public class AvrMock implements Runnable {
+    private static final int RANDOM_PORT = 0;
+
     private Thread thread;
     private String commandString;
     private int port;
 
-    public AvrMock(int port) {
-        this.port = port;
+    public AvrMock() {
+        // default constructor
     }
 
 
@@ -48,7 +51,8 @@ public class AvrMock implements Runnable {
     public void run() {
         ServerSocket socket;
         try {
-            socket = new ServerSocket(port);
+            socket = new ServerSocket(RANDOM_PORT);
+            this.port = socket.getLocalPort();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -84,5 +88,9 @@ public class AvrMock implements Runnable {
 
     public String getCommandString() {
         return commandString;
+    }
+
+    public int getPort() {
+        return port;
     }
 }
