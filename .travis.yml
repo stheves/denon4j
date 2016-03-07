@@ -19,7 +19,7 @@ deploy:
     tags: true
 
 jdk:
-- openjdk8
+- oraclejdk8
 branches:
   only:
   - master
