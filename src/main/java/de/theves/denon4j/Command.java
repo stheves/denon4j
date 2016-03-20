@@ -54,19 +54,18 @@ final class Command {
      * (blocking).
      *
      * @param socket the socket (not <code>null</code>).
-     * @param value  the value of the command to send (can be <code>null</code>).
+     * @param value  the value of the command to sendAndReceive (can be <code>null</code>).
      * @return the response from the receiver. Only <code>null</code> if the
      * receiver didn`t sent a response for the command within the
      * <code>timeToWait</code> period. This may happen if a
      * <code>value</code> wasn`t changed actually.
      * @throws IOException
      */
-    Response send(Socket socket, String value) throws IOException {
-        OutputStream out = socket.getOutputStream();
-        InputStream in = socket.getInputStream();
-        // send the command
-        sendCommand(value, out);
+    Response sendAndReceive(Socket socket, String value) throws IOException {
+        //send
+        send(socket, value);
 
+        InputStream in = socket.getInputStream();
         try {
             // receive the response
             return receiveResponse(in);
@@ -74,6 +73,12 @@ final class Command {
             // no response within readTimeout
             return null;
         }
+    }
+
+    void send(Socket socket, String value) throws IOException {
+        OutputStream out = socket.getOutputStream();
+        // sendAndReceive the command
+        sendCommand(value, out);
     }
 
     private void sendCommand(String value, OutputStream out) throws IOException {

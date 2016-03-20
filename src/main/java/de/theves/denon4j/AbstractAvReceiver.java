@@ -79,16 +79,31 @@ public abstract class AbstractAvReceiver {
         return doSend(command, parameter, value);
     }
 
+    protected void sendOnly(Commands command, Parameters parameter, String value) {
+        checkConnection();
+        try {
+            StringBuilder cmdBuilder = prepareCommandString(command, parameter);
+            new Command(cmdBuilder.toString()).send(socket, value);
+        } catch (IOException e) {
+            throw new ConnectionException(e);
+        }
+    }
+
+    private StringBuilder prepareCommandString(Commands command, Parameters parameter) {
+        StringBuilder cmdBuilder = new StringBuilder();
+        cmdBuilder.append(command.toString());
+        if (null != parameter && Parameters.NONE != parameter) {
+            cmdBuilder.append(parameter.toString());
+        }
+        return cmdBuilder;
+    }
+
     private Response doSend(Commands command, Parameters parameter, String value)
             throws ConnectionException {
         checkConnection();
         try {
-            StringBuilder cmdBuilder = new StringBuilder();
-            cmdBuilder.append(command.toString());
-            if (null != parameter && Parameters.NONE != parameter) {
-                cmdBuilder.append(parameter.toString());
-            }
-            return new Command(cmdBuilder.toString()).send(socket, value);
+            StringBuilder cmdBuilder = prepareCommandString(command, parameter);
+            return new Command(cmdBuilder.toString()).sendAndReceive(socket, value);
         } catch (IOException e) {
             throw new ConnectionException(e);
         }

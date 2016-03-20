@@ -22,13 +22,19 @@ import java.util.List;
 
 public class Response {
     private List<String> responseLines;
+    private byte[] rawBytes;
 
-    public Response(List<String> response) {
+    public Response(byte[] raw, List<String> response) {
         this.responseLines = response;
+        this.rawBytes = raw;
     }
 
-    public List<String> getResponse() {
+    public List<String> getResponseLines() {
         return Collections.unmodifiableList(responseLines);
+    }
+
+    public byte[] getRawBytes() {
+        return rawBytes;
     }
 
     @Override

@@ -53,7 +53,7 @@ public class Avr1912 extends AbstractAvReceiver {
     }
 
     public boolean isPowerOn() {
-        return send(PW, STATUS).getResponse().get(0)
+        return send(PW, STATUS).getResponseLines().get(0)
                 .equals(PW.toString() + ON.toString());
     }
 
@@ -66,7 +66,7 @@ public class Avr1912 extends AbstractAvReceiver {
     }
 
     public boolean isMuted() {
-        return send(MUTE, STATUS).getResponse().get(0).equals(MUTE.toString());
+        return send(MUTE, STATUS).getResponseLines().get(0).equals(MUTE.toString());
     }
 
     public Response getVolume() {
@@ -101,8 +101,8 @@ public class Avr1912 extends AbstractAvReceiver {
         return send(SELECT_INPUT, playback.toString());
     }
 
-    public DisplayInfo onscreenDisplayInfo() {
-        return new DisplayInfo(send(ONSCREEN_DISPLAY_INFO_UTF8, Parameters.NONE));
+    public OSD createOSD() {
+        return new OSD(this);
     }
 
     public Response isSleepTimerSet() {

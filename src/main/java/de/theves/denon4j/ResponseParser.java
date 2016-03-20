@@ -39,6 +39,6 @@ final class ResponseParser {
                 line.append((char) b);
             }
         }
-        return new Response(lines);
+        return new Response(response, lines);
     }
 }

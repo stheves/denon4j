@@ -18,8 +18,11 @@
 package de.theves.denon4j;
 
 enum Parameters {
-    ON("ON"), STANDBY("STANDBY"), OFF("OFF"), STATUS("?"), UP("UP"), DOWN(
-            "DOWN"), NONE("");
+    ON("ON"), STANDBY("STANDBY"), OFF("OFF"), STATUS("?"), UP("UP"),
+    DOWN("DOWN"), CURSOR_UP("CUP"), CURSOR_DOWN("CDN"), CURSOR_LEFT("CLT"),
+    CURSOR_RIGHT("CRT"), ENTER("ENT"), RETURN("RTN"), GUI_MENU_ON("MEN ON"), GUI_MENU_OFF("MEN OFF"),
+    GUI_SOURCE_SELECT_ON("SRC ON"), GUI_SOURCE_SELECT_OFF("SRC OFF"), NONE("");
+
     private String name;
 
     Parameters(String name) {
