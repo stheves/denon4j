@@ -17,11 +17,14 @@
 
 package de.theves.denon4j.net;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
@@ -34,13 +37,14 @@ import static de.theves.denon4j.net.NetClient.ENCODING;
  * @author Sascha Theves
  */
 public class EventBus {
-    private final InputStream inputStream;
+    private final BufferedReader reader;
+    private final Logger logger = LoggerFactory.getLogger(EventBus.class);
     private Thread observerThread;
     private String lastEvent;
     private ReentrantLock lock = new ReentrantLock();
 
     public EventBus(Socket socket) throws IOException {
-        this.inputStream = socket.getInputStream();
+        this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), ENCODING));
         listen();
     }
 
@@ -58,18 +62,14 @@ public class EventBus {
     }
 
     private void doListen() {
-        try {
-            waitForMessage();
-        } catch (IOException e) {
-            throw new ConnectException("Could not read from socket.", e);
-        }
-    }
-
-    private void waitForMessage() throws IOException {
         lock.lock();
         try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, ENCODING));
             lastEvent = reader.readLine();
+        } catch (SocketException se) {
+            // siltently ignore
+            logger.debug("Failure while reading from socker (this is expected if the socket got closed).", se);
+        } catch (IOException e) {
+            throw new ConnectException("Could not read from socket.", e);
         } finally {
             lock.unlock();
         }
@@ -80,13 +80,10 @@ public class EventBus {
             lock.tryLock(200, TimeUnit.MILLISECONDS);
             return Optional.ofNullable(lastEvent);
         } catch (InterruptedException e) {
-            // no response within timeout
-            return Optional.empty();
+            throw new ConnectionException(e);
         } finally {
-            try {
+            if (lock.isHeldByCurrentThread()) {
                 lock.unlock();
-            } catch (Exception e) {
-
             }
         }
     }

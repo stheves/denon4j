@@ -62,6 +62,12 @@
             <artifactId>mockito-core</artifactId>
             <version>2.2.9</version>
         </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.21</version>
+        </dependency>
+
     </dependencies>
 
     <build>

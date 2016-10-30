@@ -54,7 +54,7 @@ public final class TcpClient implements NetClient {
             socket.connect(new InetSocketAddress(host, port), timeout);
             bus = new EventBus(socket);
         } catch (IOException e) {
-            throw new ConnectException(e);
+            throw new ConnectException("Cannot connect to host/ip " + host + " on port " + port, e);
         }
     }
 
