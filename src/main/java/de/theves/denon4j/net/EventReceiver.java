@@ -57,9 +57,7 @@ public class EventReceiver extends Thread {
     private void listen() {
         try {
             String lastEvent = reader.readLine();
-            System.out.println(lastEvent);
             eventQueue.put(lastEvent);
-
         } catch (SocketException se) {
             // siltently ignore
             logger.debug("Failure while reading from socker (this is expected if the socket got closed).", se);

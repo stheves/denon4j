@@ -58,7 +58,6 @@ public class Avr1912Demo {
             DisplayInfo displayInfo = osd.getDisplayInfo();
             System.out.println(displayInfo.humanReadable());
             osd.hide();
-            Thread.sleep(3000);
         } finally {
             avr.disconnect();
         }
