@@ -47,12 +47,12 @@ public abstract class AbstractAvReceiver {
         this.client = client;
     }
 
-    protected Response send(String command)
+    protected Optional<Response> send(String command)
             throws ConnectionException {
         return send(command, Optional.empty());
     }
 
-    protected Response send(String command, Optional<String> value)
+    protected Optional<Response> send(String command, Optional<String> value)
             throws ConnectionException {
         return client.sendAndReceive(command, value);
     }

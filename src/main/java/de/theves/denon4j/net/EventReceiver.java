@@ -26,65 +26,57 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.Optional;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantLock;
 
 import static de.theves.denon4j.net.NetClient.ENCODING;
 
 /**
- * Class description.
- *
  * @author Sascha Theves
  */
-public class EventBus {
+public class EventReceiver extends Thread {
     private final BufferedReader reader;
-    private final Logger logger = LoggerFactory.getLogger(EventBus.class);
-    private Thread observerThread;
+    private final Logger logger = LoggerFactory.getLogger(EventReceiver.class);
+    private final BlockingQueue<String> eventQueue;
     private String lastEvent;
-    private ReentrantLock lock = new ReentrantLock();
 
-    public EventBus(Socket socket) throws IOException {
+    public EventReceiver(Socket socket) throws IOException {
+        super("EventReceiver");
         this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), ENCODING));
-        listen();
+        this.eventQueue = new ArrayBlockingQueue<>(128);
     }
 
-    private void listen() throws ConnectException {
-        observerThread = new Thread(() -> {
-            while (!observerThread.isInterrupted()) {
-                doListen();
-            }
-        });
-        observerThread.start();
+    @Override
+    public void run() {
+        while (!isInterrupted()) {
+            listen();
+        }
     }
 
-    public void interrupt() {
-        observerThread.interrupt();
-    }
-
-    private void doListen() {
-        lock.lock();
+    private void listen() {
         try {
-            lastEvent = reader.readLine();
+            String lastEvent = reader.readLine();
+            System.out.println(lastEvent);
+            eventQueue.put(lastEvent);
+
         } catch (SocketException se) {
             // siltently ignore
             logger.debug("Failure while reading from socker (this is expected if the socket got closed).", se);
         } catch (IOException e) {
             throw new ConnectException("Could not read from socket.", e);
-        } finally {
-            lock.unlock();
+        } catch (InterruptedException e) {
+            // TODO other ex here!?
+            throw new RuntimeException("EventQueue communication failure.", e);
         }
     }
 
-    public Optional<String> get() {
+    public Optional<String> nextEvent() {
         try {
-            lock.tryLock(200, TimeUnit.MILLISECONDS);
-            return Optional.ofNullable(lastEvent);
+            // as of specification we should receive a response within 200ms
+            return Optional.ofNullable(eventQueue.poll(200, TimeUnit.MILLISECONDS));
         } catch (InterruptedException e) {
-            throw new ConnectionException(e);
-        } finally {
-            if (lock.isHeldByCurrentThread()) {
-                lock.unlock();
-            }
+            return Optional.empty();
         }
     }
 }

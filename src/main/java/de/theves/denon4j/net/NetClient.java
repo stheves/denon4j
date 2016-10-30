@@ -30,6 +30,7 @@ import java.util.Optional;
 public interface NetClient {
     char END = 0x0d; // \r character
     Charset ENCODING = Charset.forName("US-ASCII");
+
     /**
      * Sends the command to the receiver (socket) and waits for a response
      * (blocking).
@@ -39,7 +40,7 @@ public interface NetClient {
      * @return the response from the receiver (never <code>null</code>).
      * @throws ConnectionException if a communication failure occurs.
      */
-    Response sendAndReceive(String command, Optional<String> value);
+    Optional<Response> sendAndReceive(String command, Optional<String> value);
 
     void connect(int timeout) throws ConnectionException;
 

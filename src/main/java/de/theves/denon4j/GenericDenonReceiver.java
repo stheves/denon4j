@@ -39,7 +39,7 @@ public class GenericDenonReceiver extends AbstractAvReceiver {
      * @param value   the value to send (may be <code>null</code>).
      * @return the plain response bytes received within <code>readTimeout</code>.
      */
-    public Response send(String command, Optional<String> value) {
+    public Optional<Response> send(String command, Optional<String> value) {
         return super.send(command, value);
     }
 }

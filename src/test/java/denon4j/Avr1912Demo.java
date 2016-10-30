@@ -28,37 +28,41 @@ public class Avr1912Demo {
     public void demo(String host, int port) throws Exception {
         Avr1912 avr = new Avr1912(host, port);
         avr.connect(1000);
-        System.out.println("PWON: " + avr.isPowerOn());
-        if (!avr.isPowerOn()) {
-            System.out.println("POWERING ON: " + avr.powerOn());
+        try {
+            System.out.println("PWON: " + avr.isPowerOn());
+            if (!avr.isPowerOn()) {
+                System.out.println("POWERING ON: " + avr.powerOn());
+            }
+            System.out.println("MUTED?: " + avr.isMuted());
+            System.out.println("VOL?: " + avr.getVolume());
+            System.out.println("VOLUP: " + avr.volumeUp());
+            System.out.println("VOLDOWN: " + avr.volumeDown());
+            System.out.println("VOLSET505: " + avr.changeVolume("55"));
+            System.out.println("VOL?: " + avr.getVolume());
+            System.out.println("INPUT: " + avr.getInputSource());
+            System.out.println("INPUTSET: "
+                    + avr.selectInputSource(Sources.SAT_CBL));
+            Thread.sleep(2000);
+            System.out.println("INPUT?: " + avr.getInputSource());
+            System.out.println("PLAY IRADION: "
+                    + avr.play(Playback.INTERNET_RADIO));
+            System.out.println("SLEEPTIMER?: " + avr.isSleepTimerSet());
+            System.out.println("SLEEPTIMERSET: " + avr.sleepTimer("010"));
+            System.out.println("SLEEPTIMEROFF:" + avr.sleepTimerOff());
+
+            // OSD support
+            OSD osd = avr.createOSD();
+            osd.show();
+            osd.moveCursorDown();
+            osd.moveCursorUp();
+            DisplayInfo displayInfo = osd.getDisplayInfo();
+            System.out.println(displayInfo.humanReadable());
+            osd.hide();
+            Thread.sleep(3000);
+        } finally {
+            avr.disconnect();
         }
-        System.out.println("MUTED?: " + avr.isMuted());
-        System.out.println("VOL?: " + avr.getVolume());
-        System.out.println("VOLUP: " + avr.volumeUp());
-        System.out.println("VOLDOWN: " + avr.volumeDown());
-        System.out.println("VOLSET505: " + avr.changeVolume("55"));
-        System.out.println("VOL?: " + avr.getVolume());
-        System.out.println("INPUT: " + avr.getInputSource());
-        System.out.println("INPUTSET: "
-                + avr.selectInputSource(Sources.SAT_CBL));
-        Thread.sleep(2000);
-        System.out.println("INPUT?: " + avr.getInputSource());
-        System.out.println("PLAY IRADION: "
-                + avr.play(Playback.INTERNET_RADIO));
-        System.out.println("SLEEPTIMER?: " + avr.isSleepTimerSet());
-        System.out.println("SLEEPTIMERSET: " + avr.sleepTimer("010"));
-        System.out.println("SLEEPTIMEROFF:" + avr.sleepTimerOff());
 
-        // OSD support
-        OSD osd = avr.createOSD();
-        osd.show();
-        osd.moveCursorDown();
-        osd.moveCursorUp();
-        DisplayInfo displayInfo = osd.getDisplayInfo();
-        System.out.println(displayInfo.humanReadable());
-        osd.hide();
-
-        avr.disconnect();
     }
 
     public static void main(String[] args) throws Exception {

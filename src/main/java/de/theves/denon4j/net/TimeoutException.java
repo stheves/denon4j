@@ -15,49 +15,17 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j;
+package de.theves.denon4j.net;
+
+import de.theves.denon4j.net.ConnectionException;
 
 /**
  * Class description.
  *
  * @author Sascha Theves
  */
-public class OSD {
-    private AbstractAvReceiver receiver;
-
-    public OSD(AbstractAvReceiver receiver) {
-        this.receiver = receiver;
-    }
-
-    public DisplayInfo getDisplayInfo() {
-        return new DisplayInfo(this.receiver.send("NSE").get());
-    }
-
-    public void moveCursorDown() {
-        this.receiver.send("MNCDN");
-    }
-
-    public void moveCursorUp() {
-        this.receiver.send("MNCUP");
-    }
-
-    public void moveCursorLeft() {
-        this.receiver.send("MNCLT");
-    }
-
-    public void moveCursorRight() {
-        this.receiver.send("MNCRT");
-    }
-
-    public void enter() {
-        this.receiver.send("MNENT");
-    }
-
-    public void show() {
-        this.receiver.send("MNMEN ON");
-    }
-
-    public void hide() {
-        this.receiver.send("MNMEN OFF");
+public class TimeoutException extends ConnectionException {
+    public TimeoutException(String message) {
+        super(message);
     }
 }

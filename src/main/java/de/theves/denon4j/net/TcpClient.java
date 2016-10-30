@@ -36,7 +36,7 @@ public final class TcpClient implements NetClient {
     private final Integer port;
     private final String host;
     private Socket socket;
-    private EventBus bus;
+    private EventReceiver eventReceiver;
 
     public TcpClient(String host, Integer port) {
         this.host = Objects.requireNonNull(host);
@@ -52,7 +52,8 @@ public final class TcpClient implements NetClient {
             socket = new Socket();
             socket.setSoTimeout(0);
             socket.connect(new InetSocketAddress(host, port), timeout);
-            bus = new EventBus(socket);
+            eventReceiver = new EventReceiver(socket);
+            eventReceiver.start();
         } catch (IOException e) {
             throw new ConnectException("Cannot connect to host/ip " + host + " on port " + port, e);
         }
@@ -72,23 +73,22 @@ public final class TcpClient implements NetClient {
     @Override
     public void disconnect() {
         try {
-            bus.interrupt();
+            eventReceiver.interrupt();
             socket.close();
         } catch (IOException e) {
             // ignore
+        } finally {
+            socket = null;
+            eventReceiver = null;
         }
-        socket = null;
-        bus = null;
     }
 
 
     @Override
-    public Response sendAndReceive(String command, Optional<String> value) {
+    public Optional<Response> sendAndReceive(String command, Optional<String> value) {
         checkConnection();
         try {
-            //send
             sendCommand(command, value, socket.getOutputStream());
-            // receive the response
             return receiveResponse();
         } catch (Exception e) {
             throw new ConnectionException("Communication failure.", e);
@@ -101,8 +101,14 @@ public final class TcpClient implements NetClient {
         out.flush();
     }
 
-    private Response receiveResponse() throws IOException {
-        return new Response(Collections.singletonList(bus.get().get()));
+    private Optional<Response> receiveResponse() throws IOException {
+        // TODO receive the complete response and not only the first line
+        Optional<String> nextEvent = eventReceiver.nextEvent();
+        if (nextEvent.isPresent()) {
+            return Optional.of(new Response(Collections.singletonList(nextEvent.get())));
+        } else {
+            return Optional.empty();
+        }
     }
 
     private String buildRequest(String command, Optional<String> value) {
