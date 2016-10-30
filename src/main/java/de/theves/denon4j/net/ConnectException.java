@@ -15,12 +15,16 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j;
+package de.theves.denon4j.net;
 
 public class ConnectException extends RuntimeException {
     private static final long serialVersionUID = 1L;
 
     public ConnectException(Throwable t) {
         super(t);
+    }
+
+    public ConnectException(String message) {
+        super(message);
     }
 }

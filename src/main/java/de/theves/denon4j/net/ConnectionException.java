@@ -15,29 +15,20 @@
  *  limitations under the License.
  */
 
-package denon4j;
+package de.theves.denon4j.net;
 
-import de.theves.denon4j.Avr1912;
-import de.theves.denon4j.net.NetClient;
-import org.junit.Test;
+public class ConnectionException extends RuntimeException {
+    private static final long serialVersionUID = 1L;
 
-import java.util.Optional;
+    public ConnectionException(String message) {
+        super(message);
+    }
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+    public ConnectionException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-public class Avr1912Test {
-    @Test
-    public void basics() throws Exception {
-        NetClient netClient = mock(NetClient.class);
-        Avr1912 receiver = new Avr1912(netClient);
-
-        receiver.connect(1000);
-        verify(netClient).connect(1000);
-
-        receiver.mute();
-        verify(netClient).sendAndReceive(eq("MUTEON"), any(Optional.class));
+    public ConnectionException(Throwable cause) {
+        super(cause);
     }
 }

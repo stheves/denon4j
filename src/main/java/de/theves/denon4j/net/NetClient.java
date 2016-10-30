@@ -15,16 +15,32 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j;
+package de.theves.denon4j.net;
+
+import de.theves.denon4j.Response;
+
+import java.util.Optional;
 
 /**
- * Represents the command line interface.
+ * Class description.
  *
  * @author Sascha Theves
  */
-public class AvrCli {
-    public static void main(String[] args) {
-        System.err.println("The command line interface has not yet been implemented.");
-        System.exit(1);
-    }
+public interface NetClient {
+    /**
+     * Sends the command to the receiver (socket) and waits for a response
+     * (blocking).
+     *
+     * @param command the command to send (not <code>null</code>).
+     * @param value   the value to send with the command (e.g. volume).
+     * @return the response from the receiver (never <code>null</code>).
+     * @throws ConnectionException if a communication failure occurs.
+     */
+    Response sendAndReceive(String command, Optional<String> value);
+
+    void connect(int timeout) throws ConnectionException;
+
+    void disconnect() throws ConnectionException;
+
+    boolean isConnected() throws ConnectionException;
 }

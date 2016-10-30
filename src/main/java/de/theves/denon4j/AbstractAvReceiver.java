@@ -17,101 +17,54 @@
 
 package de.theves.denon4j;
 
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Socket;
+import de.theves.denon4j.net.ConnectionException;
+import de.theves.denon4j.net.NetClient;
+import de.theves.denon4j.net.TcpClient;
+
+import java.util.Optional;
 
 /**
  * Abstract base class that implements the basic network protocol
  * for working with Denon receivers.
+ *
+ * @author Sascha Theves
  */
 public abstract class AbstractAvReceiver {
 
-    protected final String hostname;
-    protected final int port;
-    protected Socket socket;
-    protected final int readTimeout;
+    protected NetClient client;
 
-    public AbstractAvReceiver(String hostname, int port, int readTimeout) {
-        this.hostname = hostname;
-        this.port = port;
-        this.readTimeout = readTimeout;
+    public AbstractAvReceiver(String hostname, Integer port, Integer readTimeout) {
+        this.client = new TcpClient(hostname, port, readTimeout);
     }
 
-    public void connect(int timeout) throws ConnectException {
-        if (isConnected()) {
-            throw new IllegalStateException("Already connected.");
-        }
-        try {
-            socket = new Socket();
-            socket.setSoTimeout(readTimeout);
-            socket.connect(new InetSocketAddress(hostname, port), timeout);
-        } catch (IOException e) {
-            throw new ConnectException(e);
-        }
+    /**
+     * Creates a receiver with the given net client. The client is used for the communication with the receiver.
+     *
+     * @param client the client to use.
+     */
+    public AbstractAvReceiver(NetClient client) {
+        this.client = client;
     }
 
-    public void disconnect() {
-        try {
-            socket.close();
-        } catch (IOException e) {
-            // ignore
-        }
-        socket = null;
-    }
-
-    public boolean isConnected() {
-        return null != socket && socket.isConnected();
-    }
-
-    protected Response send(Commands command, String value)
+    protected Response send(String command)
             throws ConnectionException {
-        return send(command, null, value);
+        return send(command, Optional.empty());
     }
 
-    protected Response send(Commands command, Parameters parameter)
+    protected Response send(String command, Optional<String> value)
             throws ConnectionException {
-        return send(command, parameter, null);
+        return client.sendAndReceive(command, value);
     }
 
-    protected Response send(Commands command, Parameters parameter, String value)
-            throws ConnectionException {
-        return doSend(command, parameter, value);
+    public void connect(int timeout) throws ConnectionException {
+        client.connect(timeout);
     }
 
-    protected void sendOnly(Commands command, Parameters parameter, String value) {
-        checkConnection();
-        try {
-            StringBuilder cmdBuilder = prepareCommandString(command, parameter);
-            new Command(cmdBuilder.toString()).send(socket, value);
-        } catch (IOException e) {
-            throw new ConnectionException(e);
-        }
+    public void disconnect() throws ConnectionException {
+        client.disconnect();
     }
 
-    private StringBuilder prepareCommandString(Commands command, Parameters parameter) {
-        StringBuilder cmdBuilder = new StringBuilder();
-        cmdBuilder.append(command.toString());
-        if (null != parameter && Parameters.NONE != parameter) {
-            cmdBuilder.append(parameter.toString());
-        }
-        return cmdBuilder;
-    }
-
-    private Response doSend(Commands command, Parameters parameter, String value)
-            throws ConnectionException {
-        checkConnection();
-        try {
-            StringBuilder cmdBuilder = prepareCommandString(command, parameter);
-            return new Command(cmdBuilder.toString()).sendAndReceive(socket, value);
-        } catch (IOException e) {
-            throw new ConnectionException(e);
-        }
-    }
-
-    private void checkConnection() {
-        if (!isConnected()) {
-            throw new ConnectionException("Not connected.");
-        }
+    public boolean isConnected() throws ConnectionException {
+        return client.isConnected();
     }
 }

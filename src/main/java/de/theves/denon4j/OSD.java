@@ -17,10 +17,6 @@
 
 package de.theves.denon4j;
 
-import static de.theves.denon4j.Commands.ONSCREEN_CONTROL;
-import static de.theves.denon4j.Commands.ONSCREEN_DISPLAY_INFO_UTF8;
-import static de.theves.denon4j.Parameters.*;
-
 /**
  * Class description.
  *
@@ -34,34 +30,34 @@ public class OSD {
     }
 
     public DisplayInfo getDisplayInfo() {
-        return new DisplayInfo(this.receiver.send(ONSCREEN_DISPLAY_INFO_UTF8, NONE));
+        return new DisplayInfo(this.receiver.send("NSE"));
     }
 
     public void moveCursorDown() {
-        this.receiver.sendOnly(ONSCREEN_CONTROL, CURSOR_DOWN, null);
+        this.receiver.send("MNCDN");
     }
 
     public void moveCursorUp() {
-        this.receiver.sendOnly(ONSCREEN_CONTROL, CURSOR_UP, null);
+        this.receiver.send("MNCUP");
     }
 
     public void moveCursorLeft() {
-        this.receiver.sendOnly(ONSCREEN_CONTROL, CURSOR_LEFT, null);
+        this.receiver.send("MNCLT");
     }
 
     public void moveCursorRight() {
-        this.receiver.sendOnly(ONSCREEN_CONTROL, CURSOR_RIGHT, null);
+        this.receiver.send("MNCRT");
     }
 
     public void enter() {
-        this.receiver.sendOnly(ONSCREEN_CONTROL, ENTER, null);
+        this.receiver.send("MNENT");
     }
 
     public void show() {
-        this.receiver.sendOnly(ONSCREEN_CONTROL, GUI_MENU_ON, null);
+        this.receiver.send("MNMEN ON");
     }
 
     public void hide() {
-        this.receiver.sendOnly(ONSCREEN_CONTROL, GUI_MENU_OFF, null);
+        this.receiver.send("MNMEN OFF");
     }
 }

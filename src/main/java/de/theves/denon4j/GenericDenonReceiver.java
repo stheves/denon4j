@@ -17,18 +17,27 @@
 
 package de.theves.denon4j;
 
-public class ConnectionException extends RuntimeException {
-    private static final long serialVersionUID = 1L;
+import java.util.Optional;
 
-    public ConnectionException(String message) {
-        super(message);
+/**
+ * Generic receiver class.
+ *
+ * @author Sascha Theves
+ */
+public class GenericDenonReceiver extends AbstractAvReceiver {
+    public GenericDenonReceiver(String hostname, int port, int readTimeout) {
+        super(hostname, port, readTimeout);
     }
 
-    public ConnectionException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public ConnectionException(Throwable cause) {
-        super(cause);
+    /**
+     * Sends the <code>command</code> with <code>parameter</code> and <code>value</code> to the receiver.
+     * Waits <code>readTimeout</code> ms for receiving the response.
+     *
+     * @param command the command (not <code>null</code>).
+     * @param value   the value to send (may be <code>null</code>).
+     * @return the plain response bytes received within <code>readTimeout</code>.
+     */
+    public Response send(String command, Optional<String> value) {
+        return super.send(command, value);
     }
 }

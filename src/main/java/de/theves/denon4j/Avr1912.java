@@ -17,8 +17,9 @@
 
 package de.theves.denon4j;
 
-import static de.theves.denon4j.Commands.*;
-import static de.theves.denon4j.Parameters.*;
+import de.theves.denon4j.net.NetClient;
+
+import java.util.Optional;
 
 /**
  * This class implements the control protocol for the Denon AVR 1912.
@@ -26,6 +27,10 @@ import static de.theves.denon4j.Parameters.*;
  * @author Sascha Theves
  */
 public class Avr1912 extends AbstractAvReceiver {
+
+    public Avr1912(NetClient client) {
+        super(client);
+    }
 
     public Avr1912(String hostname, int port) {
         this(hostname, port, 3000);
@@ -36,7 +41,7 @@ public class Avr1912 extends AbstractAvReceiver {
     }
 
     public Response powerOn() {
-        Response res = send(PW, ON);
+        Response res = send("PWON");
         // as specification - K) 1 seconds later, please
         // transmit the next COMMAND after transmitting a
         // power on COMMAND （ PWON ）
@@ -49,56 +54,55 @@ public class Avr1912 extends AbstractAvReceiver {
     }
 
     public Response powerOff() {
-        return send(PW, STANDBY);
+        return send("PWSTANDBY");
     }
 
     public boolean isPowerOn() {
-        return send(PW, STATUS).getResponseLines().get(0)
-                .equals(PW.toString() + ON.toString());
+        return send("PW?").getResponseLines().get(0).equals("PWON");
     }
 
     public Response mute() {
-        return send(MUTE, ON);
+        return send("MUTEON");
     }
 
     public Response unmute() {
-        return send(MUTE, OFF);
+        return send("MUTEOFF");
     }
 
     public boolean isMuted() {
-        return send(MUTE, STATUS).getResponseLines().get(0).equals(MUTE.toString());
+        return send("MUTE?").getResponseLines().get(0).equals("MUTE");
     }
 
     public Response getVolume() {
-        return send(VOL, STATUS);
+        return send("MV?");
     }
 
     public Response volumeUp() {
-        return send(VOL, UP);
+        return send("MVUP");
     }
 
     public Response volumeDown() {
-        return send(VOL, DOWN);
+        return send("MVDOWN");
     }
 
     public Response changeVolume(String value) {
-        return send(VOL, value);
+        return send("MV", Optional.of(value));
     }
 
     public Response getInputSource() {
-        return send(SELECT_INPUT, STATUS);
+        return send("SI?");
     }
 
     public Response selectInputSource(Sources source) {
-        return send(SELECT_INPUT, source.toString());
+        return send("SI", Optional.of(source.name()));
     }
 
     public Response selectVideoSource(Sources source) {
-        return send(SELECT_VIDEO, source.toString());
+        return send("SV", Optional.of(source.name()));
     }
 
     public Response play(Playback playback) {
-        return send(SELECT_INPUT, playback.toString());
+        return send("SI", Optional.of(playback.name()));
     }
 
     public OSD createOSD() {
@@ -106,14 +110,14 @@ public class Avr1912 extends AbstractAvReceiver {
     }
 
     public Response isSleepTimerSet() {
-        return send(Commands.SLP, Parameters.STATUS);
+        return send("SLP?");
     }
 
     public Response sleepTimer(String value) {
-        return send(Commands.SLP, value);
+        return send("SLP", Optional.of(value));
     }
 
     public Response sleepTimerOff() {
-        return send(Commands.SLP, OFF);
+        return send("SLPOFF");
     }
 }

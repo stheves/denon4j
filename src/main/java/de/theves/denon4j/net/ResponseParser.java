@@ -15,7 +15,9 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j;
+package de.theves.denon4j.net;
+
+import de.theves.denon4j.Response;
 
 import java.util.ArrayList;
 import java.util.List;
