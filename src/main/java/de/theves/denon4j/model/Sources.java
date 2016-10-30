@@ -15,30 +15,24 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j;
+package de.theves.denon4j.model;
 
-import java.util.Collections;
-import java.util.List;
+public enum Sources {
+    CD("CD"), TUNER("TUNER"), DVD("DVD"), BD("BD"), TV("TV"), SAT_CBL("SAT/CBL"), GAME(
+            "GAME"), GAME2("GAME2"), AUX("V.AUX"), DOCK("DOCK"), SOURCE(
+            "SOURCE"), IPOD("IPOD"), NET_UBS("NET/USB"), RHAPSODY("RHAPSODY"), NAPSTER(
+            "NAPSTER"), PANDORA("PANDORA"), LASTFM("LASTFM"), FLICKR("FLICKR"), FAVORITES(
+            "FAVORITES"), IRADIO("IRADIO"), UPNP_SERVER("SERVER"), USB_IPOD(
+            "USB/IPOD");
 
-public class Response {
-    private List<String> responseLines;
-    private byte[] rawBytes;
+    private String inputSource;
 
-    public Response(byte[] raw, List<String> response) {
-        this.responseLines = response;
-        this.rawBytes = raw;
-    }
-
-    public List<String> getResponseLines() {
-        return Collections.unmodifiableList(responseLines);
-    }
-
-    public byte[] getRawBytes() {
-        return rawBytes;
+    Sources(String source) {
+        this.inputSource = source;
     }
 
     @Override
     public String toString() {
-        return responseLines.toString();
+        return inputSource;
     }
 }

@@ -17,7 +17,11 @@
 
 package denon4j;
 
-import de.theves.denon4j.*;
+import de.theves.denon4j.Avr1912;
+import de.theves.denon4j.DisplayInfo;
+import de.theves.denon4j.OSD;
+import de.theves.denon4j.model.Playback;
+import de.theves.denon4j.model.Sources;
 
 public class Avr1912Demo {
 

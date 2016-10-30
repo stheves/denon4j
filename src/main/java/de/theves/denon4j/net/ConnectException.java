@@ -27,4 +27,8 @@ public class ConnectException extends RuntimeException {
     public ConnectException(String message) {
         super(message);
     }
+
+    public ConnectException(String message, Throwable e) {
+        super(message, e);
+    }
 }

@@ -17,6 +17,9 @@
 
 package de.theves.denon4j;
 
+import de.theves.denon4j.model.Playback;
+import de.theves.denon4j.model.Response;
+import de.theves.denon4j.model.Sources;
 import de.theves.denon4j.net.NetClient;
 
 import java.util.Optional;
@@ -33,11 +36,7 @@ public class Avr1912 extends AbstractAvReceiver {
     }
 
     public Avr1912(String hostname, int port) {
-        this(hostname, port, 3000);
-    }
-
-    public Avr1912(String hostname, int port, int timeToWait) {
-        super(hostname, port, timeToWait);
+        super(hostname, port);
     }
 
     public Response powerOn() {

@@ -17,15 +17,13 @@
 
 package de.theves.denon4j.net;
 
-import de.theves.denon4j.Response;
+import de.theves.denon4j.model.Response;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.nio.charset.Charset;
+import java.util.Collections;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -35,18 +33,14 @@ import java.util.Optional;
  * @author Sascha Theves
  */
 public final class TcpClient implements NetClient {
-    private static final char CR = 0x0d; // \r character
-    private static final Charset ENCODING = Charset.forName("US-ASCII");
-
-    private final Integer readTimeout;
     private final Integer port;
     private final String host;
     private Socket socket;
+    private EventBus bus;
 
-    public TcpClient(String host, Integer port, Integer readTimeout) {
+    public TcpClient(String host, Integer port) {
         this.host = Objects.requireNonNull(host);
         this.port = Objects.requireNonNull(port);
-        this.readTimeout = Objects.requireNonNull(readTimeout);
     }
 
     @Override
@@ -56,8 +50,9 @@ public final class TcpClient implements NetClient {
         }
         try {
             socket = new Socket();
-            socket.setSoTimeout(readTimeout);
+            socket.setSoTimeout(0);
             socket.connect(new InetSocketAddress(host, port), timeout);
+            bus = new EventBus(socket);
         } catch (IOException e) {
             throw new ConnectException(e);
         }
@@ -77,11 +72,13 @@ public final class TcpClient implements NetClient {
     @Override
     public void disconnect() {
         try {
+            bus.interrupt();
             socket.close();
         } catch (IOException e) {
             // ignore
         }
         socket = null;
+        bus = null;
     }
 
 
@@ -89,11 +86,10 @@ public final class TcpClient implements NetClient {
     public Response sendAndReceive(String command, Optional<String> value) {
         checkConnection();
         try {
-            InputStream in = socket.getInputStream();
             //send
             sendCommand(command, value, socket.getOutputStream());
             // receive the response
-            return receiveResponse(in);
+            return receiveResponse();
         } catch (Exception e) {
             throw new ConnectionException("Communication failure.", e);
         }
@@ -105,31 +101,8 @@ public final class TcpClient implements NetClient {
         out.flush();
     }
 
-    private Response receiveResponse(InputStream in) throws IOException {
-        ByteArrayOutputStream responseBuffer = new ByteArrayOutputStream(128);
-        // read the stream as long as input is available (we never really
-        // reach the end of the stream)
-        byte[] buffer = new byte[128];
-        int n;
-        while (-1 != (n = in.read(buffer))) {
-            responseBuffer.write(buffer, 0, n);
-            // as of specification
-            waitForAvr();
-            if (in.available() == 0) {
-                break;
-            }
-        }
-
-        return new ResponseParser(CR).parseResponse(responseBuffer
-                .toByteArray());
-    }
-
-    private void waitForAvr() {
-        try {
-            Thread.sleep(250);
-        } catch (InterruptedException e) {
-            // ignore
-        }
+    private Response receiveResponse() throws IOException {
+        return new Response(Collections.singletonList(bus.get().get()));
     }
 
     private String buildRequest(String command, Optional<String> value) {
@@ -137,6 +110,6 @@ public final class TcpClient implements NetClient {
         if (value.isPresent()) {
             request += value.get();
         }
-        return request + CR;
+        return request + END;
     }
 }

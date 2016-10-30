@@ -39,5 +39,11 @@ public class Avr1912Test {
 
         receiver.mute();
         verify(netClient).sendAndReceive(eq("MUTEON"), any(Optional.class));
+
+        receiver.powerOff();
+        verify(netClient).sendAndReceive(eq("PWSTANDBY"), any(Optional.class));
+
+        receiver.disconnect();
+        verify(netClient).disconnect();
     }
 }

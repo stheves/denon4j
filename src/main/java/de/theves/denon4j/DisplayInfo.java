@@ -17,6 +17,8 @@
 
 package de.theves.denon4j;
 
+import de.theves.denon4j.model.Response;
+
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;

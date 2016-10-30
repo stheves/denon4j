@@ -17,6 +17,8 @@
 
 package de.theves.denon4j;
 
+import de.theves.denon4j.model.Response;
+
 import java.util.Optional;
 
 /**
@@ -25,8 +27,8 @@ import java.util.Optional;
  * @author Sascha Theves
  */
 public class GenericDenonReceiver extends AbstractAvReceiver {
-    public GenericDenonReceiver(String hostname, int port, int readTimeout) {
-        super(hostname, port, readTimeout);
+    public GenericDenonReceiver(String hostname, int port) {
+        super(hostname, port);
     }
 
     /**

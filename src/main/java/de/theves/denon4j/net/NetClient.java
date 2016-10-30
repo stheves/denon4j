@@ -17,8 +17,9 @@
 
 package de.theves.denon4j.net;
 
-import de.theves.denon4j.Response;
+import de.theves.denon4j.model.Response;
 
+import java.nio.charset.Charset;
 import java.util.Optional;
 
 /**
@@ -27,6 +28,8 @@ import java.util.Optional;
  * @author Sascha Theves
  */
 public interface NetClient {
+    char END = 0x0d; // \r character
+    Charset ENCODING = Charset.forName("US-ASCII");
     /**
      * Sends the command to the receiver (socket) and waits for a response
      * (blocking).

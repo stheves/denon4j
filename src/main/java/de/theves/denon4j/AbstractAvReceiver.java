@@ -17,6 +17,7 @@
 
 package de.theves.denon4j;
 
+import de.theves.denon4j.model.Response;
 import de.theves.denon4j.net.ConnectionException;
 import de.theves.denon4j.net.NetClient;
 import de.theves.denon4j.net.TcpClient;
@@ -33,8 +34,8 @@ public abstract class AbstractAvReceiver {
 
     protected NetClient client;
 
-    public AbstractAvReceiver(String hostname, Integer port, Integer readTimeout) {
-        this.client = new TcpClient(hostname, port, readTimeout);
+    public AbstractAvReceiver(String hostname, Integer port) {
+        this.client = new TcpClient(hostname, port);
     }
 
     /**
