@@ -17,76 +17,53 @@
 
 package de.theves.denon4j.net;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.Socket;
-import java.net.SocketException;
-import java.nio.charset.Charset;
+import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 /**
+ * Receiver is the low level class for receiving events.
+ *
  * @author Sascha Theves
  */
-public class EventReceiver extends Thread {
-    private final Logger logger = LoggerFactory.getLogger(EventReceiver.class);
-    private final BlockingQueue<String> eventQueue;
-    private final Socket socket;
-    private BufferedReader reader;
+public interface EventReceiver extends Runnable {
+    /**
+     * Starts listening for events.
+     * This method is non-blocking when waiting for events to come in.
+     */
+    void startListening();
 
-    public EventReceiver(Socket socket) {
-        super("EventReceiver");
-        this.socket = socket;
-        this.eventQueue = new ArrayBlockingQueue<>(256);
-        openStream();
-    }
+    /**
+     * Read the next available event from the even stream.
+     * Blocks until an element arrives or the timeout is reached.
+     *
+     * @param timeout the read timeout in millis.
+     * @return the next event or an empty result if the timeout has been reached.
+     */
+    Optional<String> nextEvent(int timeout);
 
-    @Override
-    public void run() {
-        logger.debug("EventReceiver started. Listening for events...");
-        while (!isInterrupted()) {
-            poll();
-        }
-        logger.debug("EventReceiver stopped.");
-    }
+    /**
+     * Adds a consumer to the queue.
+     *
+     * @param consumer the consumer (not <code>null</code>).
+     */
+    void addConsumer(EventConsumer consumer);
 
-    private void openStream() {
-        try {
-            this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), Charset.forName("UTF-8")));
-        } catch (IOException e) {
-            throw new ConnectionException(e);
-        }
-    }
+    /**
+     * Removes the consumer from the queue.
+     *
+     * @param consumer the consumer to remove (not <code>null</code>).
+     */
+    void removeConsumer(EventConsumer consumer);
 
-    private void poll() {
-        try {
-            String lastEvent = reader.readLine();
-            if (logger.isDebugEnabled()) {
-                logger.debug("Event received: " + lastEvent);
-            }
-            eventQueue.put(lastEvent);
-        } catch (SocketException se) {
-            if (socket.isClosed() || socket.isInputShutdown()) {
-                // silently ignore
-            } else {
-                throw new ConnectionException("Socket error.", se);
-            }
-        } catch (Exception e) {
-            throw new ConnectException("Socket error.", e);
-        }
-    }
+    /**
+     * Returns a unmodifiable list view of all consumers.
+     *
+     * @return the list of all consumers (not <code>null</code>).
+     */
+    List<EventConsumer> getEventConsumers();
 
-    public Optional<String> nextEvent(int timeout) {
-        try {
-            return Optional.ofNullable(eventQueue.poll(timeout, TimeUnit.MILLISECONDS));
-        } catch (InterruptedException e) {
-            return Optional.empty();
-        }
-    }
+    /**
+     * Interrupts listening for events.
+     */
+    void interrupt();
 }

@@ -34,16 +34,16 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
-public class Avr1912Test {
+public class AVR1912Test {
 
     @Mock
     private NetClient netClient;
 
-    private Avr1912 receiver;
+    private AVR1912 receiver;
 
     @Before
     public void setup() {
-        receiver = new Avr1912(netClient);
+        receiver = new AVR1912(netClient);
     }
 
     @Test

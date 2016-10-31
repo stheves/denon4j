@@ -17,45 +17,28 @@
 
 package de.theves.denon4j;
 
-import de.theves.denon4j.model.Command;
-
 /**
- * Represents the on screen display.
+ * Class description.
  *
  * @author Sascha Theves
  */
-public class OSD {
-    private GenericDenonReceiver receiver;
-
-    public OSD(GenericDenonReceiver receiver) {
-        this.receiver = receiver;
+public class EmptyResponseException extends RuntimeException {
+    public EmptyResponseException() {
     }
 
-    public void moveCursorDown() {
-        this.receiver.send(new Command("MNCDN"));
+    public EmptyResponseException(String message) {
+        super(message);
     }
 
-    public void moveCursorUp() {
-        this.receiver.send(new Command("MNCUP"));
+    public EmptyResponseException(String message, Throwable cause) {
+        super(message, cause);
     }
 
-    public void moveCursorLeft() {
-        this.receiver.send(new Command("MNCLT"));
+    public EmptyResponseException(Throwable cause) {
+        super(cause);
     }
 
-    public void moveCursorRight() {
-        this.receiver.send(new Command("MNCRT"));
-    }
-
-    public void enter() {
-        this.receiver.send(new Command("MNENT"));
-    }
-
-    public void show() {
-        this.receiver.send(new Command("MNMEN ON"));
-    }
-
-    public void hide() {
-        this.receiver.send(new Command("MNMEN OFF"));
+    public EmptyResponseException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
     }
 }

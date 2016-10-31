@@ -17,8 +17,10 @@
 
 package de.theves.denon4j.net;
 
+import de.theves.denon4j.StateChangeListener;
 import de.theves.denon4j.model.Command;
 import de.theves.denon4j.model.Event;
+import de.theves.denon4j.model.ReceiverState;
 import de.theves.denon4j.model.Response;
 
 import java.io.IOException;
@@ -44,9 +46,12 @@ public final class TcpClient implements NetClient {
     private Socket socket;
     private EventReceiver eventReceiver;
 
-    public TcpClient(String host, Integer port) {
+    public TcpClient(String host, Integer port, Optional<EventReceiver> receiver) {
         this.host = Optional.ofNullable(host).orElse("192.168.1.105");
         this.port = Optional.ofNullable(port).orElse(23);
+        if (receiver.isPresent()) {
+            this.eventReceiver = receiver.get();
+        }
     }
 
     @Override
@@ -58,13 +63,27 @@ public final class TcpClient implements NetClient {
             socket = new Socket();
             socket.setSoTimeout(0);
             socket.connect(new InetSocketAddress(host, port), timeout);
-            eventReceiver = new EventReceiver(socket);
-            eventReceiver.start();
+            eventReceiver = getEventReceiver();
+            eventReceiver.addConsumer(new StateChangeListener(new ReceiverState()));
+            eventReceiver.startListening();
         } catch (SocketTimeoutException ste) {
             throw new TimeoutException("Could not establish connection within timeout of " + timeout + " ms.", ste);
         } catch (IOException e) {
             throw new ConnectException("Cannot connect to host/ip " + host + " on port " + port, e);
         }
+    }
+
+    private EventReceiver getEventReceiver() {
+        if (null != eventReceiver) {
+            return eventReceiver;
+        } else {
+            return fallbackReceiver();
+        }
+
+    }
+
+    protected EventReceiver fallbackReceiver() {
+        return new PollingEventReceiver(socket);
     }
 
     private void checkConnection() {

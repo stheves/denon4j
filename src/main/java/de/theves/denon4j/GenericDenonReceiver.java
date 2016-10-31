@@ -19,10 +19,7 @@ package de.theves.denon4j;
 
 import de.theves.denon4j.model.Command;
 import de.theves.denon4j.model.Response;
-import de.theves.denon4j.net.ConnectionException;
-import de.theves.denon4j.net.NetClient;
-import de.theves.denon4j.net.TcpClient;
-import de.theves.denon4j.net.TimeoutException;
+import de.theves.denon4j.net.*;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -34,7 +31,7 @@ import java.util.Optional;
  * This class is intended to be subclassed by clients who want to implement their own receiver model.
  *
  * @author Sascha Theves
- * @see Avr1912
+ * @see AVR1912
  */
 public class GenericDenonReceiver {
 
@@ -48,7 +45,7 @@ public class GenericDenonReceiver {
      * @param port     the port of the receiver (standard is 23).
      */
     public GenericDenonReceiver(String hostname, Integer port) {
-        this(new TcpClient(hostname, port));
+        this(new TcpClient(hostname, port, Optional.empty()));
     }
 
     /**

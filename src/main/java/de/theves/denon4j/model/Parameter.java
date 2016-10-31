@@ -15,47 +15,46 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j;
+package de.theves.denon4j.model;
 
-import de.theves.denon4j.model.Command;
+import java.util.Objects;
 
 /**
- * Represents the on screen display.
+ * Class description.
  *
  * @author Sascha Theves
  */
-public class OSD {
-    private GenericDenonReceiver receiver;
+public class Parameter {
+    private String value;
 
-    public OSD(GenericDenonReceiver receiver) {
-        this.receiver = receiver;
+    public Parameter(String value) {
+        this.value = Objects.requireNonNull(value);
     }
 
-    public void moveCursorDown() {
-        this.receiver.send(new Command("MNCDN"));
+    public String getValue() {
+        return value;
     }
 
-    public void moveCursorUp() {
-        this.receiver.send(new Command("MNCUP"));
+    @Override
+    public String toString() {
+        return "Parameter{" +
+                "value='" + value + '\'' +
+                '}';
     }
 
-    public void moveCursorLeft() {
-        this.receiver.send(new Command("MNCLT"));
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Parameter parameter = (Parameter) o;
+
+        return value != null ? value.equals(parameter.value) : parameter.value == null;
+
     }
 
-    public void moveCursorRight() {
-        this.receiver.send(new Command("MNCRT"));
-    }
-
-    public void enter() {
-        this.receiver.send(new Command("MNENT"));
-    }
-
-    public void show() {
-        this.receiver.send(new Command("MNMEN ON"));
-    }
-
-    public void hide() {
-        this.receiver.send(new Command("MNMEN OFF"));
+    @Override
+    public int hashCode() {
+        return value != null ? value.hashCode() : 0;
     }
 }
