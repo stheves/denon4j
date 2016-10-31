@@ -1,9 +1,11 @@
 language: java
+jdk:
+  - oraclejdk8
 
 sudo: false
 
 before_script:
-- export MAVEN_OPTS="-Xmx512m -XX:MaxPermSize=512m"
+- export MAVEN_OPTS="-Xmx512m -XX:MaxMetspaceSize=512m"
 script: mvn -q -B -e clean package
 
 before_deploy:
@@ -15,14 +17,13 @@ deploy:
     secure: dFEB9+TDas3quKuSVDfX4vPfU+964rjglGP1+GJAfq99k3NIvuYFwDOOV5L4TH0ucrtoc64fN5rqC7PSRmXuwhwkI0QrvdIyq5PEHzhS70i14/bbKvATpSE9ZdhnyLQU3ySbP81+ErUsI+Zmm0eNSy9JOSfdjIjNFVP/dcTnSrolnUR3mYqEgB5kANqh3U6BVh4Zdis8Fjbyk8HYxPwEf6F1i7AoGs0hIJM5jtG2IrNA+vo7lPZ4p6NnYGXZN0Qkzgpv9P7UxK+e9Oyg326dHiAaxVZY1fQyOyH8Ew2y+D0lQIcNJ9Cc/KCFR4zL0qiVyy8OJn7whjtvQUFItJsxuVxVs5dNlXuos5dicwAuFfwBHA5r9aJxGq1+Yrfmkg0L0GpyWm2oh+7Mz49WfehdMw4mtytJqMubCymxJHr6LoedLvjpPas4spcgMbpJKUAESx0tONV46UL9hsB4MJyt1UJ4Q3vyhdBADYxlq6d+k34CCcgMuCE8B6ZKQbGKtjk5gDlGbJvAAAyf7tcPZWv+1AVbcd9YA1hY892rBiG7dkZGTTjwlVkoGCkgHxf1tOMB9ZUS26r+BFKPdXX9J5E+z/R9WTwrJ+9YTlkQPFwmGiUQfnqxcvwbiGKHGToojSdmkWSCAIg5IXYvrskec9Kj4kCXkwsyQzHdENJ/pWGGxXk=
   file: "${ARTIFACT}"
   on:
-    repo: sath1982/denon4j
+    repo: stheves/denon4j
     tags: true
 
-jdk:
-- oraclejdk8
 branches:
   only:
   - master
+
 notifications:
   email:
   - sascha.theves@gmail.com
