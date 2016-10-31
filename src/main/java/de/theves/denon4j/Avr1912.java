@@ -28,19 +28,26 @@ import java.util.Optional;
  *
  * @author Sascha Theves
  */
-public class Avr1912 extends GenericDenonReceiver {
-
-    public Avr1912(NetClient client) {
+public class AVR1912 extends GenericDenonReceiver {
+    public AVR1912(NetClient client) {
         super(client);
     }
 
-    public Avr1912(String host, int port) {
+    public AVR1912(String host, int port) {
         super(host, port);
     }
 
-    public Optional<Response> powerOn() {
+    /**
+     * Power on the receiver. Returns <code>true</code> if the receiver was shut down before and <code>false</code>
+     * otherwise.
+     *
+     * @return <code>true</code> only if the receiver was powered off.
+     */
+    public boolean powerOn() {
         Optional<Response> res = send(new Command("PWON"));
-        // as specification - K) 1 seconds later, please
+        // as of specification:
+        //
+        // - K) 1 seconds later, please
         // transmit the next COMMAND after transmitting a
         // power on COMMAND （ PWON ）
         try {
@@ -48,11 +55,17 @@ public class Avr1912 extends GenericDenonReceiver {
         } catch (InterruptedException e) {
             // ignore
         }
-        return res;
+        return res.isPresent();
     }
 
-    public Optional<Response> powerOff() {
-        return send(new Command("PWSTANDBY"));
+    public boolean powerOff() {
+        Optional<Response> pwstandby = send(new Command("PWSTANDBY"));
+        if (pwstandby.isPresent()) {
+            Optional<Event> result = pwstandby.get().getEvents().stream().filter(
+                    event -> event.getMessage().equals("PWSTANDBY")).findFirst();
+            return result.isPresent();
+        }
+        return false;
     }
 
     public boolean isPowerOn() {
@@ -71,23 +84,27 @@ public class Avr1912 extends GenericDenonReceiver {
         return send(new Command("MUTE?")).get().getEvents().get(0).equals("MUTE");
     }
 
-    public Response getVolume() {
-        return send(new Command("MV?")).orElseThrow(() -> new TimeoutException("No response within received."));
+    public Volume volume() {
+        Optional<Response> response = send(new Command("MV?"));
+        return responseParser.parseVolume(response);
     }
 
-    public Optional<Response> volumeUp() {
-        return send(new Command("MVUP"));
+    public Volume volumeUp() {
+        Optional<Response> vol = send(new Command("MVUP"));
+        return responseParser.parseVolume(vol);
     }
 
-    public Optional<Response> volumeDown() {
-        return send(new Command("MVDOWN"));
+    public Volume volumeDown() {
+        Optional<Response> vol = send(new Command("MVDOWN"));
+        return responseParser.parseVolume(vol);
     }
 
-    public Optional<Response> changeVolume(String value) {
-        return send(new Command("MV", Optional.of(value)));
+    public Volume changeVolume(Volume vol) {
+        send(new Command("MV", Optional.of(vol.getValue())));
+        return volume();
     }
 
-    public Response getInputSource() {
+    public Response inputSource() {
         return send(new Command("SI?")).orElseThrow(() -> new TimeoutException("No response within received."));
     }
 
@@ -121,9 +138,8 @@ public class Avr1912 extends GenericDenonReceiver {
     }
 
     public DigitalInputMode getDigitalInputMode() {
-        // TODO handle exceptions in an other way
-        Response response = send(new Command(("DC?"))).orElseThrow(() -> new TimeoutException());
-        return responseParser.pDC(response).orElseThrow(() -> new IllegalStateException());
+        Optional<Response> response = send(new Command(("DC?")));
+        return responseParser.parseDigitalInputMode(response);
     }
 
     public Optional<Response> digitalInputModeAuto() {
@@ -139,9 +155,8 @@ public class Avr1912 extends GenericDenonReceiver {
     }
 
     public SurroundMode surroundMode() {
-        Response response = send(new Command("MS?")).orElseThrow(() -> new TimeoutException());
-        return responseParser.pMS(response).orElseThrow(() ->
-                new IllegalStateException("Receiver responded unexpectaly."));
+        Optional<Response> response = send(new Command("MS?"));
+        return responseParser.parseSurroundMode(response);
     }
 
     public OSD createOSD() {
