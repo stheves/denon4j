@@ -31,7 +31,7 @@ import java.util.Optional;
  * This class is intended to be subclassed by clients who want to implement their own receiver model.
  *
  * @author Sascha Theves
- * @see AVR1912
+ * @see Avr1912
  */
 public class GenericDenonReceiver {
 

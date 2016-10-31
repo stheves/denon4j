@@ -28,12 +28,12 @@ import java.util.Optional;
  *
  * @author Sascha Theves
  */
-public class AVR1912 extends GenericDenonReceiver {
-    public AVR1912(NetClient client) {
+public class Avr1912 extends GenericDenonReceiver {
+    public Avr1912(NetClient client) {
         super(client);
     }
 
-    public AVR1912(String host, int port) {
+    public Avr1912(String host, int port) {
         super(host, port);
     }
 

@@ -24,7 +24,7 @@ import de.theves.denon4j.model.Volume;
 public class Avr1912Demo {
 
     public void demo(String host, int port) throws Exception {
-        AVR1912 avr = new AVR1912(host, port);
+        Avr1912 avr = new Avr1912(host, port);
         avr.connect(1000);
 
 
