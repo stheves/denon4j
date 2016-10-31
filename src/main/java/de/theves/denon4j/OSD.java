@@ -18,6 +18,9 @@
 package de.theves.denon4j;
 
 import de.theves.denon4j.model.Command;
+import de.theves.denon4j.model.Response;
+
+import java.util.Optional;
 
 /**
  * Represents the on screen display.
@@ -57,5 +60,23 @@ public class OSD {
 
     public void hide() {
         this.receiver.send(new Command("MNMEN OFF"));
+    }
+
+    public String getArtist() {
+        // TODO find out which source is currently playing and return the display info from that source
+        Optional<Response> response = receiver.send(new Command("NSA"));
+        if (response.isPresent()) {
+            return response.get().getEvents().get(3).getMessage();
+        }
+        return null;
+    }
+
+    public String getTrack() {
+        // TODO find out which source is currently playing and return the display info from that source
+        Optional<Response> response = receiver.send(new Command("NSA"));
+        if (response.isPresent()) {
+            return response.get().getEvents().get(2).getMessage();
+        }
+        return null;
     }
 }

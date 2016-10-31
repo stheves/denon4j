@@ -56,6 +56,8 @@ public class Avr1912Demo {
             osd.moveCursorDown();
             osd.moveCursorUp();
             osd.hide();
+
+            System.out.println("Now Playing: " + osd.getArtist());
         } finally {
             avr.disconnect();
         }
