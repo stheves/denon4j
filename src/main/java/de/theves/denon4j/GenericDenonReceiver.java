@@ -17,7 +17,11 @@
 
 package de.theves.denon4j;
 
+import de.theves.denon4j.model.Command;
 import de.theves.denon4j.model.Response;
+import de.theves.denon4j.net.ConnectionException;
+import de.theves.denon4j.net.NetClient;
+import de.theves.denon4j.net.TcpClient;
 
 import java.util.Optional;
 
@@ -26,20 +30,49 @@ import java.util.Optional;
  *
  * @author Sascha Theves
  */
-public class GenericDenonReceiver extends AbstractAvReceiver {
-    public GenericDenonReceiver(String hostname, int port) {
-        super(hostname, port);
+public class GenericDenonReceiver {
+
+    protected NetClient client;
+
+    public GenericDenonReceiver(String hostname, Integer port) {
+        this.client = new TcpClient(hostname, port);
     }
 
     /**
-     * Sends the <code>command</code> with <code>parameter</code> and <code>value</code> to the receiver.
+     * Creates a receiver with the given net client. The client is used for the communication with the receiver.
+     *
+     * @param client the client to use.
+     */
+    public GenericDenonReceiver(NetClient client) {
+        this.client = client;
+    }
+
+    protected Optional<Response> send(Command command)
+            throws ConnectionException {
+        return send(command, Optional.empty());
+    }
+
+    public void connect(int timeout) throws ConnectionException {
+        client.connect(timeout);
+    }
+
+    public void disconnect() throws ConnectionException {
+        client.disconnect();
+    }
+
+    public boolean isConnected() throws ConnectionException {
+        return client.isConnected();
+    }
+
+    /**
+     * Sends the <code>command</code> with <code>parameter</code> and <code>paramter</code> to the receiver.
      * Waits <code>readTimeout</code> ms for receiving the response.
      *
-     * @param command the command (not <code>null</code>).
-     * @param value   the value to send (may be <code>null</code>).
-     * @return the plain response bytes received within <code>readTimeout</code>.
+     * @param command  the command (not <code>null</code>).
+     * @param paramter the paramter to send (may be <code>empty</code>).
+     * @return the plain response..
      */
-    public Optional<Response> send(String command, Optional<String> value) {
-        return super.send(command, value);
+    public Optional<Response> send(Command command, Optional<String> paramter) {
+        return client.sendAndReceive(command, paramter);
     }
 }

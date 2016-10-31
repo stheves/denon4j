@@ -15,24 +15,23 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.model;
+package de.theves.denon4j.net;
 
-import java.util.Collections;
-import java.util.List;
-
-public class Response {
-    private List<String> events;
-
-    public Response(List<String> events) {
-        this.events = events;
+/**
+ * Base exception for net i/o.
+ *
+ * @author Sascha Theves
+ */
+public class NetException extends RuntimeException {
+    public NetException(String message, Throwable cause) {
+        super(message, cause);
     }
 
-    public List<String> getEvents() {
-        return Collections.unmodifiableList(events);
+    public NetException(String message) {
+        super(message);
     }
 
-    @Override
-    public String toString() {
-        return events.toString();
+    public NetException(Throwable cause) {
+        super(cause);
     }
 }

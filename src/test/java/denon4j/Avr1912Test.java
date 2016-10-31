@@ -18,6 +18,7 @@
 package denon4j;
 
 import de.theves.denon4j.Avr1912;
+import de.theves.denon4j.model.Command;
 import de.theves.denon4j.net.NetClient;
 import org.junit.Test;
 
@@ -38,10 +39,10 @@ public class Avr1912Test {
         verify(netClient).connect(1000);
 
         receiver.mute();
-        verify(netClient).sendAndReceive(eq("MUTEON"), any(Optional.class));
+        verify(netClient).sendAndReceive(eq(new Command("MUTEON")), any(Optional.class));
 
         receiver.powerOff();
-        verify(netClient).sendAndReceive(eq("PWSTANDBY"), any(Optional.class));
+        verify(netClient).sendAndReceive(eq(new Command("PWSTANDBY")), any(Optional.class));
 
         receiver.disconnect();
         verify(netClient).disconnect();

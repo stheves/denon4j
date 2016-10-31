@@ -17,12 +17,14 @@
 
 package de.theves.denon4j.net;
 
+import de.theves.denon4j.model.Command;
 import de.theves.denon4j.model.Response;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Optional;
@@ -33,6 +35,8 @@ import java.util.Optional;
  * @author Sascha Theves
  */
 public final class TcpClient implements NetClient {
+    char END = 0x0d; // \r character
+    Charset ENCODING = Charset.forName("US-ASCII");
     private final Integer port;
     private final String host;
     private Socket socket;
@@ -85,10 +89,10 @@ public final class TcpClient implements NetClient {
 
 
     @Override
-    public Optional<Response> sendAndReceive(String command, Optional<String> value) {
+    public Optional<Response> sendAndReceive(Command command, Optional<String> parameter) {
         checkConnection();
         try {
-            sendCommand(command, value, socket.getOutputStream());
+            sendCommand(command.getCommand(), parameter, socket.getOutputStream());
             return receiveResponse();
         } catch (Exception e) {
             throw new ConnectionException("Communication failure.", e);

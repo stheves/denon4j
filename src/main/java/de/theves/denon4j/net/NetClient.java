@@ -17,6 +17,7 @@
 
 package de.theves.denon4j.net;
 
+import de.theves.denon4j.model.Command;
 import de.theves.denon4j.model.Response;
 
 import java.nio.charset.Charset;
@@ -28,19 +29,16 @@ import java.util.Optional;
  * @author Sascha Theves
  */
 public interface NetClient {
-    char END = 0x0d; // \r character
-    Charset ENCODING = Charset.forName("US-ASCII");
-
     /**
      * Sends the command to the receiver (socket) and waits for a response
      * (blocking).
      *
-     * @param command the command to send (not <code>null</code>).
-     * @param value   the value to send with the command (e.g. volume).
+     * @param command   the command to send (not <code>null</code>).
+     * @param parameter the parameter to send with the command (e.g. volume).
      * @return the response from the receiver (never <code>null</code>).
      * @throws ConnectionException if a communication failure occurs.
      */
-    Optional<Response> sendAndReceive(String command, Optional<String> value);
+    Optional<Response> sendAndReceive(Command command, Optional<String> parameter);
 
     void connect(int timeout) throws ConnectionException;
 

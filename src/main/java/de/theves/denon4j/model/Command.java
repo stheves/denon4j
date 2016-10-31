@@ -17,22 +17,35 @@
 
 package de.theves.denon4j.model;
 
-import java.util.Collections;
-import java.util.List;
+/**
+ * Class description.
+ *
+ * @author Sascha Theves
+ */
+public class Command {
+    private String command;
 
-public class Response {
-    private List<String> events;
-
-    public Response(List<String> events) {
-        this.events = events;
+    public Command(String command) {
+        this.command = command;
     }
 
-    public List<String> getEvents() {
-        return Collections.unmodifiableList(events);
+    public String getCommand() {
+        return command;
     }
 
     @Override
-    public String toString() {
-        return events.toString();
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Command command1 = (Command) o;
+
+        return command != null ? command.equals(command1.command) : command1.command == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return command != null ? command.hashCode() : 0;
     }
 }

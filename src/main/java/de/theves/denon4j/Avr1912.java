@@ -17,6 +17,7 @@
 
 package de.theves.denon4j;
 
+import de.theves.denon4j.model.Command;
 import de.theves.denon4j.model.Playback;
 import de.theves.denon4j.model.Response;
 import de.theves.denon4j.model.Sources;
@@ -30,7 +31,7 @@ import java.util.Optional;
  *
  * @author Sascha Theves
  */
-public class Avr1912 extends AbstractAvReceiver {
+public class Avr1912 extends GenericDenonReceiver {
 
     public Avr1912(NetClient client) {
         super(client);
@@ -41,7 +42,7 @@ public class Avr1912 extends AbstractAvReceiver {
     }
 
     public Optional<Response> powerOn() {
-        Optional<Response> res = send("PWON");
+        Optional<Response> res = send(new Command("PWON"));
         // as specification - K) 1 seconds later, please
         // transmit the next COMMAND after transmitting a
         // power on COMMAND （ PWON ）
@@ -54,55 +55,55 @@ public class Avr1912 extends AbstractAvReceiver {
     }
 
     public Optional<Response> powerOff() {
-        return send("PWSTANDBY");
+        return send(new Command("PWSTANDBY"));
     }
 
     public boolean isPowerOn() {
-        return send("PW?").get().getResponseLines().get(0).equals("PWON");
+        return send(new Command("PW?")).get().getEvents().get(0).equals("PWON");
     }
 
     public Optional<Response> mute() {
-        return send("MUTEON");
+        return send(new Command("MUTEON"));
     }
 
     public Optional<Response> unmute() {
-        return send("MUTEOFF");
+        return send(new Command("MUTEOFF"));
     }
 
     public boolean isMuted() {
-        return send("MUTE?").get().getResponseLines().get(0).equals("MUTE");
+        return send(new Command("MUTE?")).get().getEvents().get(0).equals("MUTE");
     }
 
     public Response getVolume() {
-        return send("MV?").orElseThrow(() -> new TimeoutException("No response within 200ms received."));
+        return send(new Command("MV?")).orElseThrow(() -> new TimeoutException("No response within 200ms received."));
     }
 
     public Optional<Response> volumeUp() {
-        return send("MVUP");
+        return send(new Command("MVUP"));
     }
 
     public Optional<Response> volumeDown() {
-        return send("MVDOWN");
+        return send(new Command("MVDOWN"));
     }
 
     public Optional<Response> changeVolume(String value) {
-        return send("MV", Optional.of(value));
+        return send(new Command("MV"), Optional.of(value));
     }
 
     public Response getInputSource() {
-        return send("SI?").orElseThrow(() -> new TimeoutException("No response within 200ms received."));
+        return send(new Command("SI?")).orElseThrow(() -> new TimeoutException("No response within 200ms received."));
     }
 
     public Optional<Response> selectInputSource(Sources source) {
-        return send("SI", Optional.of(source.name()));
+        return send(new Command("SI"), Optional.of(source.name()));
     }
 
     public Optional<Response> selectVideoSource(Sources source) {
-        return send("SV", Optional.of(source.name()));
+        return send(new Command("SV"), Optional.of(source.name()));
     }
 
     public Optional<Response> play(Playback playback) {
-        return send("SI", Optional.of(playback.name()));
+        return send(new Command("SI"), Optional.of(playback.name()));
     }
 
     public OSD createOSD() {
@@ -110,14 +111,14 @@ public class Avr1912 extends AbstractAvReceiver {
     }
 
     public Response isSleepTimerSet() {
-        return send("SLP?").orElseThrow(() -> new TimeoutException("No response within 200ms received."));
+        return send(new Command("SLP?")).orElseThrow(() -> new TimeoutException("No response within 200ms received."));
     }
 
     public Optional<Response> sleepTimer(String value) {
-        return send("SLP", Optional.of(value));
+        return send(new Command("SLP"), Optional.of(value));
     }
 
     public Optional<Response> sleepTimerOff() {
-        return send("SLPOFF");
+        return send(new Command("SLPOFF"));
     }
 }

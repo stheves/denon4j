@@ -47,7 +47,7 @@ public class DisplayInfo {
     public String humanReadable() {
         if (null == humandReadable) {
             StringBuilder builder = new StringBuilder();
-            this.rawResponse.getResponseLines().stream().forEach(s -> {
+            this.rawResponse.getEvents().stream().forEach(s -> {
                 IntStream chars = s.chars();
                 chars.skip(SKIP_ELEMENTS).filter(chr -> chr != 0).forEach(filtered -> builder.append((char) filtered));
                 builder.append(System.lineSeparator());
@@ -58,7 +58,7 @@ public class DisplayInfo {
     }
 
     private void parseDataByte() {
-        this.rawResponse.getResponseLines().stream().forEach(line -> {
+        this.rawResponse.getEvents().stream().forEach(line -> {
             String lineValue = getValue(line);
             byte dataByte = line.getBytes()[4]; // 5th byte is the data byte
             final BitSet set = BitSet.valueOf(new byte[]{dataByte}); // read the bits

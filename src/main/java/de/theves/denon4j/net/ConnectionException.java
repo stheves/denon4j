@@ -17,7 +17,7 @@
 
 package de.theves.denon4j.net;
 
-public class ConnectionException extends RuntimeException {
+public class ConnectionException extends NetException {
     private static final long serialVersionUID = 1L;
 
     public ConnectionException(String message) {

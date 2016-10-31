@@ -30,8 +30,6 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import static de.theves.denon4j.net.NetClient.ENCODING;
-
 /**
  * @author Sascha Theves
  */
@@ -39,11 +37,10 @@ public class EventReceiver extends Thread {
     private final BufferedReader reader;
     private final Logger logger = LoggerFactory.getLogger(EventReceiver.class);
     private final BlockingQueue<String> eventQueue;
-    private String lastEvent;
 
     public EventReceiver(Socket socket) throws IOException {
         super("EventReceiver");
-        this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), ENCODING));
+        this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         this.eventQueue = new ArrayBlockingQueue<>(128);
     }
 

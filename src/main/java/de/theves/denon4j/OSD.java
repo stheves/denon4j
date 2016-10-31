@@ -17,47 +17,49 @@
 
 package de.theves.denon4j;
 
+import de.theves.denon4j.model.Command;
+
 /**
- * Class description.
+ * Represents the on screen display.
  *
  * @author Sascha Theves
  */
 public class OSD {
-    private AbstractAvReceiver receiver;
+    private GenericDenonReceiver receiver;
 
-    public OSD(AbstractAvReceiver receiver) {
+    public OSD(GenericDenonReceiver receiver) {
         this.receiver = receiver;
     }
 
     public DisplayInfo getDisplayInfo() {
-        return new DisplayInfo(this.receiver.send("NSE").get());
+        return new DisplayInfo(this.receiver.send(new Command("NSE")).get());
     }
 
     public void moveCursorDown() {
-        this.receiver.send("MNCDN");
+        this.receiver.send(new Command("MNCDN"));
     }
 
     public void moveCursorUp() {
-        this.receiver.send("MNCUP");
+        this.receiver.send(new Command("MNCUP"));
     }
 
     public void moveCursorLeft() {
-        this.receiver.send("MNCLT");
+        this.receiver.send(new Command("MNCLT"));
     }
 
     public void moveCursorRight() {
-        this.receiver.send("MNCRT");
+        this.receiver.send(new Command("MNCRT"));
     }
 
     public void enter() {
-        this.receiver.send("MNENT");
+        this.receiver.send(new Command("MNENT"));
     }
 
     public void show() {
-        this.receiver.send("MNMEN ON");
+        this.receiver.send(new Command("MNMEN ON"));
     }
 
     public void hide() {
-        this.receiver.send("MNMEN OFF");
+        this.receiver.send(new Command("MNMEN OFF"));
     }
 }

@@ -17,14 +17,12 @@
 
 package de.theves.denon4j.net;
 
-import de.theves.denon4j.net.ConnectionException;
-
 /**
  * Class description.
  *
  * @author Sascha Theves
  */
-public class TimeoutException extends ConnectionException {
+public class TimeoutException extends NetException {
     public TimeoutException(String message) {
         super(message);
     }

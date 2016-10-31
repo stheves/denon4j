@@ -17,22 +17,18 @@
 
 package de.theves.denon4j.model;
 
-import java.util.Collections;
-import java.util.List;
-
-public class Response {
-    private List<String> events;
-
-    public Response(List<String> events) {
-        this.events = events;
+/**
+ * Class description.
+ *
+ * @author Sascha Theves
+ */
+public class Event {
+    private String message;
+    public Event(String message) {
+        this.message = message;
     }
 
-    public List<String> getEvents() {
-        return Collections.unmodifiableList(events);
-    }
-
-    @Override
-    public String toString() {
-        return events.toString();
+    public String getMessage() {
+        return message;
     }
 }
