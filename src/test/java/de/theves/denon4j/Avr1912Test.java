@@ -15,7 +15,7 @@
  *  limitations under the License.
  */
 
-package denon4j;
+package de.theves.denon4j;
 
 import de.theves.denon4j.Avr1912;
 import de.theves.denon4j.model.Command;

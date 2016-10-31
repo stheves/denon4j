@@ -23,6 +23,14 @@ package de.theves.denon4j.net;
  * @author Sascha Theves
  */
 public class TimeoutException extends NetException {
+    public TimeoutException() {
+        super();
+    }
+
+    public TimeoutException(Throwable cause) {
+        super(cause);
+    }
+
     public TimeoutException(String message) {
         super(message);
     }

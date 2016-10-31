@@ -29,6 +29,7 @@ import java.util.stream.IntStream;
  *
  * @author Sascha Theves
  */
+// TODO extract parser logic
 public class DisplayInfo {
     private static final int SKIP_ELEMENTS = 4;
     private final Response rawResponse;
@@ -48,7 +49,7 @@ public class DisplayInfo {
         if (null == humandReadable) {
             StringBuilder builder = new StringBuilder();
             this.rawResponse.getEvents().stream().forEach(s -> {
-                IntStream chars = s.chars();
+                IntStream chars = s.getMessage().chars();
                 chars.skip(SKIP_ELEMENTS).filter(chr -> chr != 0).forEach(filtered -> builder.append((char) filtered));
                 builder.append(System.lineSeparator());
             });
@@ -58,9 +59,9 @@ public class DisplayInfo {
     }
 
     private void parseDataByte() {
-        this.rawResponse.getEvents().stream().forEach(line -> {
-            String lineValue = getValue(line);
-            byte dataByte = line.getBytes()[4]; // 5th byte is the data byte
+        this.rawResponse.getEvents().stream().forEach(event -> {
+            String lineValue = getValue(event.getMessage());
+            byte dataByte = event.getMessage().getBytes()[4]; // 5th byte is the data byte
             final BitSet set = BitSet.valueOf(new byte[]{dataByte}); // read the bits
             if (set.get(3)) {
                 this.cursorPosition = lineValue;

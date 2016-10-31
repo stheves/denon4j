@@ -32,10 +32,17 @@ import java.util.Optional;
  */
 public class GenericDenonReceiver {
 
-    protected NetClient client;
+    protected final NetClient client;
+    protected final ResponseParser eventParser;
 
+    /**
+     * Creates a receiver for the given host and port.
+     *
+     * @param hostname the hostname or ip address of the avr receiver (e.g. 192.168.1.105)
+     * @param port     the port of the receiver (standard is 23).
+     */
     public GenericDenonReceiver(String hostname, Integer port) {
-        this.client = new TcpClient(hostname, port);
+        this(new TcpClient(hostname, port));
     }
 
     /**
@@ -45,6 +52,7 @@ public class GenericDenonReceiver {
      */
     public GenericDenonReceiver(NetClient client) {
         this.client = client;
+        this.eventParser = new ResponseParser();
     }
 
     protected Optional<Response> send(Command command)
@@ -74,5 +82,15 @@ public class GenericDenonReceiver {
      */
     public Optional<Response> send(Command command, Optional<String> paramter) {
         return client.sendAndReceive(command, paramter);
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        super.finalize();
+        if (client.isConnected()) {
+            // try to clean up if not already done
+            client.disconnect();
+        }
+
     }
 }

@@ -17,10 +17,7 @@
 
 package de.theves.denon4j;
 
-import de.theves.denon4j.model.Command;
-import de.theves.denon4j.model.Playback;
-import de.theves.denon4j.model.Response;
-import de.theves.denon4j.model.Sources;
+import de.theves.denon4j.model.*;
 import de.theves.denon4j.net.NetClient;
 import de.theves.denon4j.net.TimeoutException;
 
@@ -37,8 +34,8 @@ public class Avr1912 extends GenericDenonReceiver {
         super(client);
     }
 
-    public Avr1912(String hostname, int port) {
-        super(hostname, port);
+    public Avr1912(String host, int port) {
+        super(host, port);
     }
 
     public Optional<Response> powerOn() {
@@ -75,7 +72,7 @@ public class Avr1912 extends GenericDenonReceiver {
     }
 
     public Response getVolume() {
-        return send(new Command("MV?")).orElseThrow(() -> new TimeoutException("No response within 200ms received."));
+        return send(new Command("MV?")).orElseThrow(() -> new TimeoutException("No response within received."));
     }
 
     public Optional<Response> volumeUp() {
@@ -91,7 +88,7 @@ public class Avr1912 extends GenericDenonReceiver {
     }
 
     public Response getInputSource() {
-        return send(new Command("SI?")).orElseThrow(() -> new TimeoutException("No response within 200ms received."));
+        return send(new Command("SI?")).orElseThrow(() -> new TimeoutException("No response within received."));
     }
 
     public Optional<Response> selectInputSource(Sources source) {
@@ -102,8 +99,49 @@ public class Avr1912 extends GenericDenonReceiver {
         return send(new Command("SV"), Optional.of(source.name()));
     }
 
+    public Optional<Response> mainZoneOff() {
+        return send(new Command("ZMOFF"));
+    }
+
+    public Optional<Response> mainZoneOn() {
+        return send(new Command("ZMON"));
+    }
+
+    public boolean mainZoneEnabled() {
+        Optional<Response> response = send(new Command("ZM?"));
+        if (response.isPresent()) {
+            return response.get().getEvents().get(0).getMessage().equals("ZMON");
+        } else {
+            throw new TimeoutException();
+        }
+    }
+
     public Optional<Response> play(Playback playback) {
         return send(new Command("SI"), Optional.of(playback.name()));
+    }
+
+    public DigitalInputMode getDigitalInputMode() {
+        // TODO handle exceptions in an other way
+        Response response = send(new Command(("DC?"))).orElseThrow(() -> new TimeoutException());
+        return eventParser.pDC(response).orElseThrow(new IllegalStateException());
+    }
+
+    public Optional<Response> digitalInputModeAuto() {
+        return send(new Command("DC"), Optional.of("AUTO"));
+    }
+
+    public Optional<Response> dolbyModePCM() {
+        return send(new Command("DC"), Optional.of("PCM"));
+    }
+
+    public Optional<Response> dolbyModeDts() {
+        return send(new Command("DC"), Optional.of("DTS"));
+    }
+
+    public SurroundMode surroundMode() {
+        Response response = send(new Command("MS?")).orElseThrow(() -> new TimeoutException());
+        return eventParser.pMS(response).orElseThrow(() ->
+                new IllegalStateException("Receiver responded unexpectaly."));
     }
 
     public OSD createOSD() {
@@ -111,7 +149,7 @@ public class Avr1912 extends GenericDenonReceiver {
     }
 
     public Response isSleepTimerSet() {
-        return send(new Command("SLP?")).orElseThrow(() -> new TimeoutException("No response within 200ms received."));
+        return send(new Command("SLP?")).orElseThrow(() -> new TimeoutException("No response within received."));
     }
 
     public Optional<Response> sleepTimer(String value) {

@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.net.SocketException;
+import java.nio.charset.Charset;
 import java.util.Optional;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -34,42 +35,56 @@ import java.util.concurrent.TimeUnit;
  * @author Sascha Theves
  */
 public class EventReceiver extends Thread {
-    private final BufferedReader reader;
     private final Logger logger = LoggerFactory.getLogger(EventReceiver.class);
     private final BlockingQueue<String> eventQueue;
+    private final Socket socket;
+    private BufferedReader reader;
 
-    public EventReceiver(Socket socket) throws IOException {
+    public EventReceiver(Socket socket) {
         super("EventReceiver");
-        this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        this.eventQueue = new ArrayBlockingQueue<>(128);
+        this.socket = socket;
+        this.eventQueue = new ArrayBlockingQueue<>(256);
+        openStream();
     }
 
     @Override
     public void run() {
+        logger.debug("EventReceiver started. Listening for events...");
         while (!isInterrupted()) {
-            listen();
+            poll();
+        }
+        logger.debug("EventReceiver stopped.");
+    }
+
+    private void openStream() {
+        try {
+            this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), Charset.forName("UTF-8")));
+        } catch (IOException e) {
+            throw new ConnectionException(e);
         }
     }
 
-    private void listen() {
+    private void poll() {
         try {
             String lastEvent = reader.readLine();
+            if (logger.isDebugEnabled()) {
+                logger.debug("Event received: " + lastEvent);
+            }
             eventQueue.put(lastEvent);
         } catch (SocketException se) {
-            // siltently ignore
-            logger.debug("Failure while reading from socker (this is expected if the socket got closed).", se);
-        } catch (IOException e) {
-            throw new ConnectException("Could not read from socket.", e);
-        } catch (InterruptedException e) {
-            // TODO other ex here!?
-            throw new RuntimeException("EventQueue communication failure.", e);
+            if (socket.isClosed() || socket.isInputShutdown()) {
+                // silently ignore
+            } else {
+                throw new ConnectionException("Socket error.", se);
+            }
+        } catch (Exception e) {
+            throw new ConnectException("Socket error.", e);
         }
     }
 
-    public Optional<String> nextEvent() {
+    public Optional<String> nextEvent(int timeout) {
         try {
-            // as of specification we should receive a response within 200ms
-            return Optional.ofNullable(eventQueue.poll(200, TimeUnit.MILLISECONDS));
+            return Optional.ofNullable(eventQueue.poll(timeout, TimeUnit.MILLISECONDS));
         } catch (InterruptedException e) {
             return Optional.empty();
         }

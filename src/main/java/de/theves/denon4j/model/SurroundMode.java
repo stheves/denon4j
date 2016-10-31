@@ -15,26 +15,38 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.net;
+package de.theves.denon4j.model;
 
 /**
- * Base exception for net i/o.
+ * Class description.
  *
  * @author Sascha Theves
  */
-public class NetException extends RuntimeException {
-    public NetException() {
-        super();
-    }
-    public NetException(String message, Throwable cause) {
-        super(message, cause);
+public enum SurroundMode {
+    MOVIE("MOVIE"),
+    MUSIC("MUSIC"),
+    GAME("GAME"),
+    DIRECT("DIRECT"),
+    PURE_DIRECT("PURE DIRECT"),
+    STEREO("STEREO"),
+    STANDARD("STANDARD"),
+    DOLBY_DIGITAL("DOLBY DIGITAL"),
+    DTS("DTS SURROUND"),
+    MULTI_CHANNEL_STEREO("MCH STEREO"),
+    ROCK_ARENA("ROCK ARENA"),
+    JAZZ_CLUB("JAZZ CLUB"),
+    MONO_MOVIE("MONO MOVIE"),
+    MATRIX("MATRIX"),
+    VIDEO_GAME("VIDEO GAME"),
+    VIRTUAL("VIRTUAL");
+
+    private String mode;
+
+    SurroundMode(String mode) {
+        this.mode = mode;
     }
 
-    public NetException(String message) {
-        super(message);
-    }
-
-    public NetException(Throwable cause) {
-        super(cause);
+    public String getMode() {
+        return mode;
     }
 }

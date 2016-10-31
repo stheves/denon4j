@@ -31,6 +31,10 @@ public enum Sources {
         this.inputSource = source;
     }
 
+    public String getInputSource() {
+        return inputSource;
+    }
+
     @Override
     public String toString() {
         return inputSource;

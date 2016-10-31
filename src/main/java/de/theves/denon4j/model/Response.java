@@ -19,15 +19,17 @@ package de.theves.denon4j.model;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 public class Response {
-    private List<String> events;
+    private List<Event> events;
 
-    public Response(List<String> events) {
-        this.events = events;
+    public Response(List<Event> events) {
+        this.events = Objects.requireNonNull(events);
     }
 
-    public List<String> getEvents() {
+    public List<Event> getEvents() {
         return Collections.unmodifiableList(events);
     }
 

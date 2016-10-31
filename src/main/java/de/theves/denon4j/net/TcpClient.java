@@ -18,6 +18,7 @@
 package de.theves.denon4j.net;
 
 import de.theves.denon4j.model.Command;
+import de.theves.denon4j.model.Event;
 import de.theves.denon4j.model.Response;
 
 import java.io.IOException;
@@ -25,8 +26,8 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.charset.Charset;
-import java.util.Collections;
-import java.util.Objects;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -43,8 +44,8 @@ public final class TcpClient implements NetClient {
     private EventReceiver eventReceiver;
 
     public TcpClient(String host, Integer port) {
-        this.host = Objects.requireNonNull(host);
-        this.port = Objects.requireNonNull(port);
+        this.host = Optional.ofNullable(host).orElse("192.168.1.105");
+        this.port = Optional.ofNullable(port).orElse(23);
     }
 
     @Override
@@ -99,19 +100,22 @@ public final class TcpClient implements NetClient {
         }
     }
 
-    private void sendCommand(String command, Optional<String> value, OutputStream out) throws IOException {
-        String request = buildRequest(command, value);
+    private void sendCommand(String command, Optional<String> parameter, OutputStream out) throws IOException {
+        String request = buildRequest(command, parameter);
         out.write(request.getBytes(ENCODING));
         out.flush();
     }
 
-    private Optional<Response> receiveResponse() throws IOException {
-        // TODO receive the complete response and not only the first line
-        Optional<String> nextEvent = eventReceiver.nextEvent();
-        if (nextEvent.isPresent()) {
-            return Optional.of(new Response(Collections.singletonList(nextEvent.get())));
-        } else {
+    private Optional<Response> receiveResponse() {
+        List<Event> events = new ArrayList<>();
+        Optional<String> nextEvent;
+        while ((nextEvent = eventReceiver.nextEvent(200)).isPresent()) {
+            events.add(new Event(nextEvent.get()));
+        }
+        if (events.isEmpty()) {
             return Optional.empty();
+        } else {
+            return Optional.of(new Response(events));
         }
     }
 
