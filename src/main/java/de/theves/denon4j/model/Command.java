@@ -17,6 +17,8 @@
 
 package de.theves.denon4j.model;
 
+import java.util.Optional;
+
 /**
  * Class description.
  *
@@ -24,13 +26,23 @@ package de.theves.denon4j.model;
  */
 public class Command {
     private String command;
+    private Optional<String> paramter;
 
     public Command(String command) {
+        this(command, Optional.empty());
+    }
+
+    public Command(String command, Optional<String>paramter) {
         this.command = command;
+        this.paramter = paramter;
     }
 
     public String getCommand() {
         return command;
+    }
+
+    public Optional<String> getParamter() {
+        return paramter;
     }
 
     @Override

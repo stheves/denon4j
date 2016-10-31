@@ -22,18 +22,24 @@ import de.theves.denon4j.model.Response;
 import de.theves.denon4j.net.ConnectionException;
 import de.theves.denon4j.net.NetClient;
 import de.theves.denon4j.net.TcpClient;
+import de.theves.denon4j.net.TimeoutException;
 
+import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Generic receiver class.
+ * Immutable generic receiver class that acts as the base class for all receiver implementations.
+ * Offers the basic connection handling as well as a generic method to send commands to the receiver.
+ * <p>
+ * This class is intended to be subclassed by clients who want to implement their own receiver model.
  *
  * @author Sascha Theves
+ * @see Avr1912
  */
 public class GenericDenonReceiver {
 
     protected final NetClient client;
-    protected final ResponseParser eventParser;
+    protected final ResponseParser responseParser;
 
     /**
      * Creates a receiver for the given host and port.
@@ -51,23 +57,37 @@ public class GenericDenonReceiver {
      * @param client the client to use.
      */
     public GenericDenonReceiver(NetClient client) {
-        this.client = client;
-        this.eventParser = new ResponseParser();
+        this.client = Objects.requireNonNull(client);
+        this.responseParser = new ResponseParser();
     }
 
-    protected Optional<Response> send(Command command)
-            throws ConnectionException {
-        return send(command, Optional.empty());
-    }
-
+    /**
+     * Connects the client to the receiver. Call this method first before executing any commands.
+     *
+     * @param timeout the time to wait for connection establishment.
+     * @throws TimeoutException                       if the connection timeout is reached.
+     * @throws de.theves.denon4j.net.ConnectException if the client is already connected.
+     * @throws ConnectionException                    if an error occurs connecting to the receiver.
+     */
     public void connect(int timeout) throws ConnectionException {
         client.connect(timeout);
     }
 
+    /**
+     * Disconnect from receiver. Make sure to call this method when finished otherwise the connection relies open.
+     *
+     * @throws ConnectionException if an error occurs when disconnecting.
+     */
     public void disconnect() throws ConnectionException {
         client.disconnect();
     }
 
+    /**
+     * Returns <code>true</code> if the client is connected to the receiver.
+     *
+     * @return <code>true</code> if connected.
+     * @throws ConnectionException if the connection state cannot be determined.
+     */
     public boolean isConnected() throws ConnectionException {
         return client.isConnected();
     }
@@ -76,17 +96,18 @@ public class GenericDenonReceiver {
      * Sends the <code>command</code> with <code>parameter</code> and <code>paramter</code> to the receiver.
      * Waits <code>readTimeout</code> ms for receiving the response.
      *
-     * @param command  the command (not <code>null</code>).
-     * @param paramter the paramter to send (may be <code>empty</code>).
+     * @param command the command (not <code>null</code>).
      * @return the plain response..
      */
-    public Optional<Response> send(Command command, Optional<String> paramter) {
-        return client.sendAndReceive(command, paramter);
+    public Optional<Response> send(Command command) {
+        return client.sendAndReceive(command);
     }
 
     @Override
     protected void finalize() throws Throwable {
         super.finalize();
+        // seems that somebody has forgotton to his/her housekeeping.
+        // try to clean up now.
         if (client.isConnected()) {
             // try to clean up if not already done
             client.disconnect();

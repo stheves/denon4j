@@ -34,11 +34,10 @@ public interface NetClient {
      * (blocking).
      *
      * @param command   the command to send (not <code>null</code>).
-     * @param parameter the parameter to send with the command (e.g. volume).
      * @return the response from the receiver (never <code>null</code>).
      * @throws ConnectionException if a communication failure occurs.
      */
-    Optional<Response> sendAndReceive(Command command, Optional<String> parameter);
+    Optional<Response> sendAndReceive(Command command);
 
     void connect(int timeout) throws ConnectionException;
 

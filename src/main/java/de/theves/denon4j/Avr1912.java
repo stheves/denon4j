@@ -84,7 +84,7 @@ public class Avr1912 extends GenericDenonReceiver {
     }
 
     public Optional<Response> changeVolume(String value) {
-        return send(new Command("MV"), Optional.of(value));
+        return send(new Command("MV", Optional.of(value)));
     }
 
     public Response getInputSource() {
@@ -92,11 +92,11 @@ public class Avr1912 extends GenericDenonReceiver {
     }
 
     public Optional<Response> selectInputSource(Sources source) {
-        return send(new Command("SI"), Optional.of(source.name()));
+        return send(new Command("SI", Optional.of(source.name())));
     }
 
     public Optional<Response> selectVideoSource(Sources source) {
-        return send(new Command("SV"), Optional.of(source.name()));
+        return send(new Command("SV", Optional.of(source.name())));
     }
 
     public Optional<Response> mainZoneOff() {
@@ -117,30 +117,30 @@ public class Avr1912 extends GenericDenonReceiver {
     }
 
     public Optional<Response> play(Playback playback) {
-        return send(new Command("SI"), Optional.of(playback.name()));
+        return send(new Command("SI", Optional.of(playback.name())));
     }
 
     public DigitalInputMode getDigitalInputMode() {
         // TODO handle exceptions in an other way
         Response response = send(new Command(("DC?"))).orElseThrow(() -> new TimeoutException());
-        return eventParser.pDC(response).orElseThrow(new IllegalStateException());
+        return responseParser.pDC(response).orElseThrow(() -> new IllegalStateException());
     }
 
     public Optional<Response> digitalInputModeAuto() {
-        return send(new Command("DC"), Optional.of("AUTO"));
+        return send(new Command("DC", Optional.of("AUTO")));
     }
 
     public Optional<Response> dolbyModePCM() {
-        return send(new Command("DC"), Optional.of("PCM"));
+        return send(new Command("DC", Optional.of("PCM")));
     }
 
     public Optional<Response> dolbyModeDts() {
-        return send(new Command("DC"), Optional.of("DTS"));
+        return send(new Command("DC", Optional.of("DTS")));
     }
 
     public SurroundMode surroundMode() {
         Response response = send(new Command("MS?")).orElseThrow(() -> new TimeoutException());
-        return eventParser.pMS(response).orElseThrow(() ->
+        return responseParser.pMS(response).orElseThrow(() ->
                 new IllegalStateException("Receiver responded unexpectaly."));
     }
 
@@ -153,7 +153,7 @@ public class Avr1912 extends GenericDenonReceiver {
     }
 
     public Optional<Response> sleepTimer(String value) {
-        return send(new Command("SLP"), Optional.of(value));
+        return send(new Command("SLP", Optional.of(value)));
     }
 
     public Optional<Response> sleepTimerOff() {

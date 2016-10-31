@@ -17,34 +17,63 @@
 
 package de.theves.denon4j;
 
-import de.theves.denon4j.Avr1912;
 import de.theves.denon4j.model.Command;
 import de.theves.denon4j.net.NetClient;
+import de.theves.denon4j.net.TimeoutException;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
+import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 
+@RunWith(MockitoJUnitRunner.class)
 public class Avr1912Test {
+
+    @Mock
+    private NetClient netClient;
+
+    private Avr1912 receiver;
+
+    @Before
+    public void setup() {
+        receiver = new Avr1912(netClient);
+    }
+
     @Test
     public void basics() throws Exception {
-        NetClient netClient = mock(NetClient.class);
-        Avr1912 receiver = new Avr1912(netClient);
-
         receiver.connect(1000);
         verify(netClient).connect(1000);
 
+        receiver.isConnected();
+        verify(netClient).isConnected();
+
         receiver.mute();
-        verify(netClient).sendAndReceive(eq(new Command("MUTEON")), any(Optional.class));
+        verify(netClient).sendAndReceive(eq(new Command("MUTEON")));
 
         receiver.powerOff();
-        verify(netClient).sendAndReceive(eq(new Command("PWSTANDBY")), any(Optional.class));
+        verify(netClient).sendAndReceive(eq(new Command("PWSTANDBY")));
 
         receiver.disconnect();
         verify(netClient).disconnect();
+    }
+
+    @Test(expected = TimeoutException.class)
+    public void testConnectShouldThrowATimeoutException() throws Exception {
+        doThrow(TimeoutException.class).when(netClient).connect(1000);
+        receiver.connect(1000);
+    }
+
+    @Test
+    public void testSendGenericCommand() {
+        Command command = new Command("FOO", Optional.of("BAR"));
+        receiver.send(command);
+        verify(netClient).sendAndReceive(same(command));
     }
 }

@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,6 +60,8 @@ public final class TcpClient implements NetClient {
             socket.connect(new InetSocketAddress(host, port), timeout);
             eventReceiver = new EventReceiver(socket);
             eventReceiver.start();
+        } catch (SocketTimeoutException ste) {
+            throw new TimeoutException("Could not establish connection within timeout of " + timeout + " ms.", ste);
         } catch (IOException e) {
             throw new ConnectException("Cannot connect to host/ip " + host + " on port " + port, e);
         }
@@ -90,10 +93,10 @@ public final class TcpClient implements NetClient {
 
 
     @Override
-    public Optional<Response> sendAndReceive(Command command, Optional<String> parameter) {
+    public Optional<Response> sendAndReceive(Command command) {
         checkConnection();
         try {
-            sendCommand(command.getCommand(), parameter, socket.getOutputStream());
+            sendCommand(command.getCommand(), command.getParamter(), socket.getOutputStream());
             return receiveResponse();
         } catch (Exception e) {
             throw new ConnectionException("Communication failure.", e);

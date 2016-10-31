@@ -22,7 +22,7 @@ package de.theves.denon4j.net;
  *
  * @author Sascha Theves
  */
-public class TimeoutException extends NetException {
+public class TimeoutException extends ConnectionException {
     public TimeoutException() {
         super();
     }
@@ -33,5 +33,9 @@ public class TimeoutException extends NetException {
 
     public TimeoutException(String message) {
         super(message);
+    }
+
+    public TimeoutException(String message, Throwable cause) {
+        super(message, cause);
     }
 }
