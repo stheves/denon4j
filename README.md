@@ -58,6 +58,9 @@ Apache License Version 2.0, January 2004 (see LICENSE file)
 # Roadmap
 
 - Full implementation of Denon AVR 1912 protocol
+-- iPod Dock extended control
+-- Analog tuner control
+-- other paramers from paramter list (specification)
 - OpenHAB binding
 - User Interfaces (command line, desktop, mobile, web)
 - Async network I/O
