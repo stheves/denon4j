@@ -17,14 +17,13 @@
 
 package de.theves.denon4j;
 
-import de.theves.denon4j.model.Playback;
 import de.theves.denon4j.model.Sources;
 import de.theves.denon4j.model.Volume;
 
 public class Avr1912Demo {
 
     public void demo(String host, int port) throws Exception {
-        Avr1912 avr = new Avr1912(host, port);
+        Avr1912Controller avr = new Avr1912Controller(host, port);
         avr.connect(1000);
 
 
@@ -44,20 +43,17 @@ public class Avr1912Demo {
                     + avr.selectInputSource(Sources.SAT_CBL));
             Thread.sleep(2000);
             System.out.println("INPUT?: " + avr.inputSource());
-            System.out.println("PLAY IRADION: "
-                    + avr.play(Playback.INTERNET_RADIO));
             System.out.println("SLEEPTIMER?: " + avr.isSleepTimerSet());
             System.out.println("SLEEPTIMERSET: " + avr.sleepTimer("010"));
             System.out.println("SLEEPTIMEROFF:" + avr.sleepTimerOff());
+            System.out.println(avr.netUsbControl().getInfo());
 
-            // OSD support
-            OSD osd = avr.createOSD();
-            osd.show();
+            // MainMenu support
+            MainMenu osd = avr.mainMenu();
+            osd.showMenu();
             osd.moveCursorDown();
             osd.moveCursorUp();
-            osd.hide();
-
-            System.out.println("Now Playing: " + osd.getArtist());
+            osd.hideMenu();
         } finally {
             avr.disconnect();
         }

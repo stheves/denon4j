@@ -18,19 +18,17 @@
 package de.theves.denon4j;
 
 import de.theves.denon4j.model.Command;
-import de.theves.denon4j.model.Response;
-
-import java.util.Optional;
 
 /**
- * Represents the on screen display.
+ * Represents the on screen display. Can be used to browse the system menu and get information about what`s
+ * currently on air.
  *
  * @author Sascha Theves
  */
-public class OSD {
-    private GenericDenonReceiver receiver;
+public class MainMenu {
+    private GenericController receiver;
 
-    public OSD(GenericDenonReceiver receiver) {
+    public MainMenu(GenericController receiver) {
         this.receiver = receiver;
     }
 
@@ -54,29 +52,11 @@ public class OSD {
         this.receiver.send(new Command("MNENT"));
     }
 
-    public void show() {
+    public void showMenu() {
         this.receiver.send(new Command("MNMEN ON"));
     }
 
-    public void hide() {
+    public void hideMenu() {
         this.receiver.send(new Command("MNMEN OFF"));
-    }
-
-    public String getArtist() {
-        // TODO find out which source is currently playing and return the display info from that source
-        Optional<Response> response = receiver.send(new Command("NSA"));
-        if (response.isPresent()) {
-            return response.get().getEvents().get(3).getMessage();
-        }
-        return null;
-    }
-
-    public String getTrack() {
-        // TODO find out which source is currently playing and return the display info from that source
-        Optional<Response> response = receiver.send(new Command("NSA"));
-        if (response.isPresent()) {
-            return response.get().getEvents().get(2).getMessage();
-        }
-        return null;
     }
 }

@@ -15,35 +15,30 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.net;
-
-import de.theves.denon4j.model.Command;
-import de.theves.denon4j.model.Response;
-
-import java.nio.charset.Charset;
-import java.util.Optional;
+package de.theves.denon4j.model;
 
 /**
  * Class description.
  *
  * @author Sascha Theves
  */
-public interface NetClient {
-    /**
-     * Sends the command to the receiver (socket) and waits for a response
-     * (blocking).
-     *
-     * @param command   the command to send (not <code>null</code>).
-     * @return the response from the receiver (never <code>null</code>).
-     * @throws ConnectionException if a communication failure occurs.
-     */
-    Optional<Response> sendAndReceive(Command command);
+public class ParseException extends RuntimeException {
+    public ParseException() {
+    }
 
-    void connect(int timeout) throws ConnectionException;
+    public ParseException(String message) {
+        super(message);
+    }
 
-    void disconnect() throws ConnectionException;
+    public ParseException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-    boolean isConnected() throws ConnectionException;
+    public ParseException(Throwable cause) {
+        super(cause);
+    }
 
-    EventReceiver getEventReceiver();
+    public ParseException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
 }

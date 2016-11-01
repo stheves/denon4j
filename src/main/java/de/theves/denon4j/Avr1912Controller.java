@@ -28,12 +28,12 @@ import java.util.Optional;
  *
  * @author Sascha Theves
  */
-public class Avr1912 extends GenericDenonReceiver {
-    public Avr1912(NetClient client) {
+public class Avr1912Controller extends GenericController {
+    public Avr1912Controller(NetClient client) {
         super(client);
     }
 
-    public Avr1912(String host, int port) {
+    public Avr1912Controller(String host, int port) {
         super(host, port);
     }
 
@@ -133,10 +133,6 @@ public class Avr1912 extends GenericDenonReceiver {
         }
     }
 
-    public Optional<Response> play(Playback playback) {
-        return send(new Command("SI", Optional.of(playback.name())));
-    }
-
     public DigitalInputMode getDigitalInputMode() {
         Optional<Response> response = send(new Command(("DC?")));
         return responseParser.parseDigitalInputMode(response);
@@ -159,8 +155,12 @@ public class Avr1912 extends GenericDenonReceiver {
         return responseParser.parseSurroundMode(response);
     }
 
-    public OSD createOSD() {
-        return new OSD(this);
+    public MainMenu mainMenu() {
+        return new MainMenu(this);
+    }
+
+    public NetUsbControl netUsbControl() {
+        return new NetUsbControl(this, responseParser);
     }
 
     public Response isSleepTimerSet() {

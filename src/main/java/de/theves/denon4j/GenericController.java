@@ -31,9 +31,9 @@ import java.util.Optional;
  * This class is intended to be subclassed by clients who want to implement their own receiver model.
  *
  * @author Sascha Theves
- * @see Avr1912
+ * @see Avr1912Controller
  */
-public class GenericDenonReceiver {
+public class GenericController {
 
     protected final NetClient client;
     protected final ResponseParser responseParser;
@@ -44,7 +44,7 @@ public class GenericDenonReceiver {
      * @param hostname the hostname or ip address of the avr receiver (e.g. 192.168.1.105)
      * @param port     the port of the receiver (standard is 23).
      */
-    public GenericDenonReceiver(String hostname, Integer port) {
+    public GenericController(String hostname, Integer port) {
         this(new TcpClient(hostname, port, Optional.empty()));
     }
 
@@ -53,7 +53,7 @@ public class GenericDenonReceiver {
      *
      * @param client the client to use.
      */
-    public GenericDenonReceiver(NetClient client) {
+    public GenericController(NetClient client) {
         this.client = Objects.requireNonNull(client);
         this.responseParser = new ResponseParser();
     }

@@ -26,6 +26,7 @@ import java.util.Optional;
  */
 public class Command {
     private String command;
+    // TODO remove param and implement getPrefix, getParam, getValue
     private Optional<String> paramter;
 
     public Command(String command) {

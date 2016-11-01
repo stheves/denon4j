@@ -17,27 +17,43 @@
 
 package de.theves.denon4j.model;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
- * Class description.
+ * Represents the content of the info display.
  *
  * @author Sascha Theves
  */
-// TODO split message into command prefix and value
-public class Event {
-    private String message;
+public class DisplayInfo {
+    private List<InfoListEntry> informationList;
+    private int cursorPosition;
+    private String title;
 
-    public Event(String message) {
-        this.message = message;
+    public DisplayInfo(String title, List<InfoListEntry> infoList, int cursorPos) {
+        this.title = title;
+        this.informationList = infoList;
+        this.cursorPosition = cursorPos;
     }
 
-    public String getMessage() {
-        return message;
+    public String getTitle() {
+        return title;
+    }
+
+    public List<InfoListEntry> getInformationList() {
+        return informationList;
+    }
+
+    public int getCursorPosition() {
+        return cursorPosition;
     }
 
     @Override
     public String toString() {
-        return "Event{" +
-                "message='" + message + '\'' +
+        return "DisplayInfo{" +
+                "informationList=" + Arrays.toString(informationList.toArray()) +
+                ", cursorPosition=" + cursorPosition +
+                ", title='" + title + '\'' +
                 '}';
     }
 }

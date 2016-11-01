@@ -23,8 +23,9 @@ import de.theves.denon4j.model.Event;
 import de.theves.denon4j.model.ReceiverState;
 import de.theves.denon4j.model.Response;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
@@ -45,6 +46,7 @@ public final class TcpClient implements NetClient {
     private final String host;
     private Socket socket;
     private EventReceiver eventReceiver;
+    private BufferedWriter writer;
 
     public TcpClient(String host, Integer port, Optional<EventReceiver> receiver) {
         this.host = Optional.ofNullable(host).orElse("192.168.1.105");
@@ -55,7 +57,7 @@ public final class TcpClient implements NetClient {
     }
 
     @Override
-    public void connect(int timeout) throws ConnectException {
+    public synchronized void connect(int timeout) throws ConnectException {
         if (isConnected()) {
             throw new ConnectException("Already connected.");
         }
@@ -63,7 +65,9 @@ public final class TcpClient implements NetClient {
             socket = new Socket();
             socket.setSoTimeout(0);
             socket.connect(new InetSocketAddress(host, port), timeout);
+            writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
             eventReceiver = getEventReceiver();
+            // TODO add consumer in controller
             eventReceiver.addConsumer(new StateChangeListener(new ReceiverState()));
             eventReceiver.startListening();
         } catch (SocketTimeoutException ste) {
@@ -73,7 +77,8 @@ public final class TcpClient implements NetClient {
         }
     }
 
-    private EventReceiver getEventReceiver() {
+    @Override
+    public EventReceiver getEventReceiver() {
         if (null != eventReceiver) {
             return eventReceiver;
         } else {
@@ -98,7 +103,10 @@ public final class TcpClient implements NetClient {
     }
 
     @Override
-    public void disconnect() {
+    public synchronized void disconnect() {
+        if (!isConnected()) {
+            return;
+        }
         try {
             eventReceiver.interrupt();
             socket.close();
@@ -107,6 +115,7 @@ public final class TcpClient implements NetClient {
         } finally {
             socket = null;
             eventReceiver = null;
+            writer = null;
         }
     }
 
@@ -115,23 +124,24 @@ public final class TcpClient implements NetClient {
     public Optional<Response> sendAndReceive(Command command) {
         checkConnection();
         try {
-            sendCommand(command.getCommand(), command.getParamter(), socket.getOutputStream());
+            sendCommand(command.getCommand(), command.getParamter());
             return receiveResponse();
         } catch (Exception e) {
             throw new ConnectionException("Communication failure.", e);
         }
     }
 
-    private void sendCommand(String command, Optional<String> parameter, OutputStream out) throws IOException {
+    private void sendCommand(String command, Optional<String> parameter) throws IOException {
         String request = buildRequest(command, parameter);
-        out.write(request.getBytes(ENCODING));
-        out.flush();
+        writer.write(request);
+        writer.flush();
     }
 
     private Optional<Response> receiveResponse() {
         List<Event> events = new ArrayList<>();
         Optional<String> nextEvent;
         while ((nextEvent = eventReceiver.nextEvent(200)).isPresent()) {
+            // TODO split event into command or prefix/parameter/value
             events.add(new Event(nextEvent.get()));
         }
         if (events.isEmpty()) {
