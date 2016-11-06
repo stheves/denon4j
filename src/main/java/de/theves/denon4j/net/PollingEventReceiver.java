@@ -40,7 +40,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class PollingEventReceiver extends Thread implements EventReceiver {
 
-    private static final AtomicInteger THREAD_NUM = new AtomicInteger(1);
+    private static final AtomicInteger THREAD_NUM = new AtomicInteger(0);
 
     private final Logger logger = LoggerFactory.getLogger(PollingEventReceiver.class);
 
@@ -114,7 +114,7 @@ public class PollingEventReceiver extends Thread implements EventReceiver {
                 throw new ConnectionException("Socket error.", se);
             }
         } catch (Exception e) {
-            throw new ConnectException("Socket error.", e);
+            throw new ConnectionException("Socket error.", e);
         }
     }
 
@@ -124,8 +124,8 @@ public class PollingEventReceiver extends Thread implements EventReceiver {
                 ev.onEvent(event);
             } catch (Exception e) {
                 // catch any exception from consumers and process the next one
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Exception notifying consumer: " + ev, e);
+                if (logger.isWarnEnabled()) {
+                    logger.warn("Exception notifying consumer: " + ev, e);
                 }
             }
         }
