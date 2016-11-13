@@ -32,28 +32,28 @@ public class Avr1912Demo {
             if (!avr.isPowerOn()) {
                 System.out.println("POWERING ON: " + avr.powerOn());
             }
-            System.out.println("MUTED?: " + avr.isMuted());
-            System.out.println("VOL?: " + avr.volume());
-            System.out.println("VOLUP: " + avr.volumeUp());
-            System.out.println("VOLDOWN: " + avr.volumeDown());
-            System.out.println("VOLSET505: " + avr.changeVolume(new Volume("55")));
-            System.out.println("VOL?: " + avr.volume());
+//            System.out.println("MUTED?: " + avr.isMuted());
+//            System.out.println("VOL?: " + avr.volume());
+//            System.out.println("VOLUP: " + avr.volumeUp());
+//            System.out.println("VOLDOWN: " + avr.volumeDown());
+//            System.out.println("VOLSET505: " + avr.changeVolume(new Volume("55")));
+//            System.out.println("VOL?: " + avr.volume());
             System.out.println("INPUT: " + avr.inputSource());
-            System.out.println("INPUTSET: "
-                    + avr.selectInputSource(Sources.SAT_CBL));
-            Thread.sleep(2000);
-            System.out.println("INPUT?: " + avr.inputSource());
-            System.out.println("SLEEPTIMER?: " + avr.isSleepTimerSet());
-            System.out.println("SLEEPTIMERSET: " + avr.sleepTimer("010"));
-            System.out.println("SLEEPTIMEROFF:" + avr.sleepTimerOff());
-            System.out.println(avr.netUsbControl().getInfo());
-
-            // MainMenu support
-            MainMenu osd = avr.mainMenu();
-            osd.showMenu();
-            osd.moveCursorDown();
-            osd.moveCursorUp();
-            osd.hideMenu();
+//            System.out.println("INPUTSET: "
+//                    + avr.selectInputSource(Sources.SAT_CBL));
+//            Thread.sleep(2000);
+//            System.out.println("INPUT?: " + avr.inputSource());
+//            System.out.println("SLEEPTIMER?: " + avr.isSleepTimerSet());
+//            System.out.println("SLEEPTIMERSET: " + avr.sleepTimer("010"));
+//            System.out.println("SLEEPTIMEROFF:" + avr.sleepTimerOff());
+//            System.out.println(avr.netUsbControl().getInfo());
+//
+//            // MainMenu support
+//            MainMenu osd = avr.mainMenu();
+//            osd.showMenu();
+//            osd.moveCursorDown();
+//            osd.moveCursorUp();
+//            osd.hideMenu();
         } finally {
             avr.disconnect();
         }

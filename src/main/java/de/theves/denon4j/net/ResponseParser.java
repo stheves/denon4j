@@ -30,6 +30,11 @@ import java.util.Optional;
  * @author Sascha Theves
  */
 public class ResponseParser {
+    public Sources parseInputSource(Optional<Response>res) {
+        checkResponse(res);
+        Event volValue = findFirstMatch(res.get(), "SI");
+        return Sources.valueOf(volValue.getMessage().substring(2));
+    }
     public SurroundMode parseSurroundMode(Optional<Response> res) {
         checkResponse(res);
         Event volValue = findFirstMatch(res.get(), "MS");

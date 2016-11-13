@@ -104,8 +104,9 @@ public class Avr1912Controller extends GenericController {
         return volume();
     }
 
-    public Response inputSource() {
-        return send(new Command("SI?")).orElseThrow(() -> new TimeoutException("No response within received."));
+    public Sources inputSource() {
+        Optional<Response> response = send(new Command("SI?"));
+        return responseParser.parseInputSource(response);
     }
 
     public Optional<Response> selectInputSource(Sources source) {
