@@ -20,11 +20,10 @@ package de.theves.denon4j.net;
 import de.theves.denon4j.model.Command;
 import de.theves.denon4j.model.Response;
 
-import java.nio.charset.Charset;
 import java.util.Optional;
 
 /**
- * Class description.
+ * Low-level network client for communication with AVR.
  *
  * @author Sascha Theves
  */
@@ -33,17 +32,29 @@ public interface NetClient {
      * Sends the command to the receiver (socket) and waits for a response
      * (blocking).
      *
-     * @param command   the command to send (not <code>null</code>).
+     * @param command the command to send (not <code>null</code>).
      * @return the response from the receiver (never <code>null</code>).
      * @throws ConnectionException if a communication failure occurs.
      */
-    Optional<Response> sendAndReceive(Command command);
+    Optional<Response> send(Command command);
 
+    /**
+     * Connect to the receiver.
+     *
+     * @param timeout the timeout in seconds to wait for connection establishment.
+     * @throws ConnectionException if connection could not be established.
+     */
     void connect(int timeout) throws ConnectionException;
 
-    void disconnect() throws ConnectionException;
+    /**
+     * Disconnects this client.
+     */
+    void disconnect();
 
-    boolean isConnected() throws ConnectionException;
-
-    EventReceiver getEventReceiver();
+    /**
+     * Returns <code>true</code> if this client is connected to the receiver.
+     *
+     * @return <code>true</code> if connected.
+     */
+    boolean isConnected();
 }

@@ -22,6 +22,8 @@ import de.theves.denon4j.net.EventConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 /**
  * Class description.
  *
@@ -32,14 +34,17 @@ public class StateChangeListener implements EventConsumer {
     private final Logger logger = LoggerFactory.getLogger(StateChangeListener.class);
 
     private ReceiverState currentState;
+    private final ReentrantReadWriteLock lock;
 
     public StateChangeListener(ReceiverState currentState) {
         this.currentState = currentState;
+        this.lock = new ReentrantReadWriteLock(true);
     }
 
     @Override
     public void onEvent(String event) {
-        synchronized (currentState) {
+        lock.writeLock().lock();
+        try {
             if (event.startsWith("ZM")) {
                 String value = event.substring(2);
                 boolean oldValue = currentState.isMainZoneOn();
@@ -66,12 +71,17 @@ public class StateChangeListener implements EventConsumer {
             if (logger.isDebugEnabled()) {
                 logger.debug("Current state: " + currentState);
             }
+        } finally {
+            lock.writeLock().unlock();
         }
     }
 
     public ReceiverState getCurrentState() {
-        synchronized (currentState) {
+        lock.readLock().lock();
+        try {
             return currentState;
+        } finally {
+            lock.readLock().unlock();
         }
     }
 }

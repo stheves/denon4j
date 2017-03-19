@@ -97,7 +97,7 @@ public class GenericController {
      * @return the plain response..
      */
     public Optional<Response> send(Command command) {
-        return client.sendAndReceive(command);
+        return client.send(command);
     }
 
     @Override

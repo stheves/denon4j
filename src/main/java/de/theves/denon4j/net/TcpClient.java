@@ -66,7 +66,7 @@ public final class TcpClient implements NetClient {
             socket.setSoTimeout(0);
             socket.connect(new InetSocketAddress(host, port), timeout);
             writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-            eventReceiver = getEventReceiver();
+            eventReceiver = new PollingEventReceiver(socket);
             // TODO add consumer in controller
             eventReceiver.addConsumer(new StateChangeListener(new ReceiverState()));
             eventReceiver.startListening();
@@ -75,20 +75,6 @@ public final class TcpClient implements NetClient {
         } catch (IOException e) {
             throw new ConnectException("Cannot connect to host/ip " + host + " on port " + port, e);
         }
-    }
-
-    @Override
-    public EventReceiver getEventReceiver() {
-        if (null != eventReceiver) {
-            return eventReceiver;
-        } else {
-            return fallbackReceiver();
-        }
-
-    }
-
-    protected EventReceiver fallbackReceiver() {
-        return new PollingEventReceiver(socket);
     }
 
     private void checkConnection() {
@@ -121,7 +107,7 @@ public final class TcpClient implements NetClient {
 
 
     @Override
-    public Optional<Response> sendAndReceive(Command command) {
+    public Optional<Response> send(Command command) {
         checkConnection();
         try {
             sendCommand(command.getCommand(), command.getParamter());

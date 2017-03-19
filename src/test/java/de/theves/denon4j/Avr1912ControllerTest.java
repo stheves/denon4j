@@ -55,10 +55,10 @@ public class Avr1912ControllerTest {
         verify(netClient).isConnected();
 
         receiver.mute();
-        verify(netClient).sendAndReceive(eq(new Command("MUTEON")));
+        verify(netClient).send(eq(new Command("MUTEON")));
 
         receiver.powerOff();
-        verify(netClient).sendAndReceive(eq(new Command("PWSTANDBY")));
+        verify(netClient).send(eq(new Command("PWSTANDBY")));
 
         receiver.disconnect();
         verify(netClient).disconnect();
@@ -74,6 +74,6 @@ public class Avr1912ControllerTest {
     public void testSendGenericCommand() {
         Command command = new Command("FOO", Optional.of("BAR"));
         receiver.send(command);
-        verify(netClient).sendAndReceive(same(command));
+        verify(netClient).send(same(command));
     }
 }
