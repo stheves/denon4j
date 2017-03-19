@@ -104,16 +104,16 @@ public class Avr1912Controller extends GenericController {
         return volume();
     }
 
-    public Sources inputSource() {
+    public Sources getInputSource() {
         Optional<Response> response = send(new Command("SI?"));
         return responseParser.parseInputSource(response);
     }
 
-    public Optional<Response> selectInputSource(Sources source) {
+    public Optional<Response> setInputSource(Sources source) {
         return send(new Command("SI", Optional.of(source.name())));
     }
 
-    public Optional<Response> selectVideoSource(Sources source) {
+    public Optional<Response> setVideoSource(VideoSource source) {
         return send(new Command("SV", Optional.of(source.name())));
     }
 
@@ -139,19 +139,11 @@ public class Avr1912Controller extends GenericController {
         return responseParser.parseDigitalInputMode(response);
     }
 
-    public Optional<Response> digitalInputModeAuto() {
-        return send(new Command("DC", Optional.of("AUTO")));
+    public Optional<Response> setDigitalInputMode(DigitalInputMode mode) {
+        return send(new Command("DC", Optional.of(mode.getMode())));
     }
 
-    public Optional<Response> dolbyModePCM() {
-        return send(new Command("DC", Optional.of("PCM")));
-    }
-
-    public Optional<Response> dolbyModeDts() {
-        return send(new Command("DC", Optional.of("DTS")));
-    }
-
-    public SurroundMode surroundMode() {
+    public SurroundMode getSurroundMode() {
         Optional<Response> response = send(new Command("MS?"));
         return responseParser.parseSurroundMode(response);
     }
@@ -164,15 +156,16 @@ public class Avr1912Controller extends GenericController {
         return new NetUsbControl(this, responseParser);
     }
 
-    public Response isSleepTimerSet() {
-        return send(new Command("SLP?")).orElseThrow(() -> new TimeoutException("No response within received."));
+    public boolean isSleepTimerSet() {
+        Response response = send(new Command("SLP?")).orElseThrow(() -> new TimeoutException("No response within received."));
+        return !response.getEvents().get(0).getMessage().equals("SLPOFF");
     }
 
     public Optional<Response> sleepTimer(String value) {
         return send(new Command("SLP", Optional.of(value)));
     }
 
-    public Optional<Response> sleepTimerOff() {
+    public Optional<Response> disableSleepTimer() {
         return send(new Command("SLPOFF"));
     }
 }

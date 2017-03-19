@@ -18,7 +18,6 @@
 package de.theves.denon4j;
 
 import de.theves.denon4j.model.Sources;
-import de.theves.denon4j.model.Volume;
 
 public class Avr1912Demo {
 
@@ -38,14 +37,15 @@ public class Avr1912Demo {
 //            System.out.println("VOLDOWN: " + avr.volumeDown());
 //            System.out.println("VOLSET505: " + avr.changeVolume(new Volume("55")));
 //            System.out.println("VOL?: " + avr.volume());
-            System.out.println("INPUT: " + avr.inputSource());
+            System.out.println("INPUT: " + avr.getInputSource());
+            avr.isSleepTimerSet();
 //            System.out.println("INPUTSET: "
-//                    + avr.selectInputSource(Sources.SAT_CBL));
+//                    + avr.setInputSource(Sources.SAT_CBL));
 //            Thread.sleep(2000);
-//            System.out.println("INPUT?: " + avr.inputSource());
+//            System.out.println("INPUT?: " + avr.getInputSource());
 //            System.out.println("SLEEPTIMER?: " + avr.isSleepTimerSet());
 //            System.out.println("SLEEPTIMERSET: " + avr.sleepTimer("010"));
-//            System.out.println("SLEEPTIMEROFF:" + avr.sleepTimerOff());
+//            System.out.println("SLEEPTIMEROFF:" + avr.disableSleepTimer());
 //            System.out.println(avr.netUsbControl().getInfo());
 //
 //            // MainMenu support
