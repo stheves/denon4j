@@ -54,14 +54,3 @@ Apache License Version 2.0, January 2004 (see LICENSE file)
 # Denon AVR Control Protocol Specs
 
 - [AVR-2112CI/AVR-1912](denon-avr-1912-protokoll.pdf)
-
-# Roadmap
-
-- Full implementation of Denon AVR 1912 protocol
--- iPod Dock extended control
--- Analog tuner control
--- other paramers from paramter list (specification)
-- OpenHAB binding
-- User Interfaces (command line, desktop, mobile, web)
-- Async network I/O
-- More supported receivers
