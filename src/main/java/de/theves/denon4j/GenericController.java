@@ -17,12 +17,15 @@
 
 package de.theves.denon4j;
 
-import de.theves.denon4j.model.Command;
-import de.theves.denon4j.model.Response;
-import de.theves.denon4j.net.*;
+import de.theves.denon4j.model.Control;
+import de.theves.denon4j.model.Event;
+import de.theves.denon4j.net.EventConsumer;
+import de.theves.denon4j.net.Protocol;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * Immutable generic receiver class that acts as the base class for all receiver implementations.
@@ -31,84 +34,55 @@ import java.util.Optional;
  * This class is intended to be subclassed by clients who want to implement their own receiver model.
  *
  * @author Sascha Theves
- * @see Avr1912Controller
  */
-public class GenericController {
+public class GenericController implements EventConsumer {
 
-    protected final NetClient client;
-    protected final ResponseParser responseParser;
-
-    /**
-     * Creates a receiver for the given host and port.
-     *
-     * @param hostname the hostname or ip address of the avr receiver (e.g. 192.168.1.105)
-     * @param port     the port of the receiver (standard is 23).
-     */
-    public GenericController(String hostname, Integer port) {
-        this(new TcpClient(hostname, port, Optional.empty()));
-    }
+    protected final Protocol client;
+    protected final CommandRegistry registry;
+    private final Map<Class, Control> controls;
 
     /**
      * Creates a receiver with the given net client. The client is used for the communication with the receiver.
      *
      * @param client the client to use.
      */
-    public GenericController(NetClient client) {
+    public GenericController(Protocol client, CommandRegistry registry) {
         this.client = Objects.requireNonNull(client);
-        this.responseParser = new ResponseParser();
+        this.registry = Objects.requireNonNull(registry);
+        this.controls = Collections.synchronizedMap(new HashMap<>(10));
+        this.client.addEventConsumer(this);
     }
 
-    /**
-     * Connects the client to the receiver. Call this method first before executing any commands.
-     *
-     * @param timeout the time to wait for connection establishment.
-     * @throws TimeoutException                       if the connection timeout is reached.
-     * @throws de.theves.denon4j.net.ConnectException if the client is already connected.
-     * @throws ConnectionException                    if an error occurs connecting to the receiver.
-     */
-    public void connect(int timeout) throws ConnectionException {
-        client.connect(timeout);
+    public void addControl(Control ctrl) {
+        if (null != ctrl) {
+            controls.put(ctrl.getClass(), ctrl);
+        }
     }
 
-    /**
-     * Disconnect from receiver. Make sure to call this method when finished otherwise the connection relies open.
-     *
-     * @throws ConnectionException if an error occurs when disconnecting.
-     */
-    public void disconnect() throws ConnectionException {
-        client.disconnect();
+    public void removeControl(Control ctrl) {
+        if (null != ctrl) {
+            controls.remove(ctrl.getClass());
+        }
     }
 
-    /**
-     * Returns <code>true</code> if the client is connected to the receiver.
-     *
-     * @return <code>true</code> if connected.
-     * @throws ConnectionException if the connection state cannot be determined.
-     */
-    public boolean isConnected() throws ConnectionException {
-        return client.isConnected();
-    }
-
-    /**
-     * Sends the <code>command</code> with <code>parameter</code> and <code>paramter</code> to the receiver.
-     * Waits <code>readTimeout</code> ms for receiving the response.
-     *
-     * @param command the command (not <code>null</code>).
-     * @return the plain response..
-     */
-    public Optional<Response> send(Command command) {
-        return client.send(command);
+    public <T> T adapt(Class<T> cls) {
+        return (T) controls.get(cls);
     }
 
     @Override
     protected void finalize() throws Throwable {
         super.finalize();
-        // seems that somebody has forgotton to his/her housekeeping.
-        // try to clean up now.
         if (client.isConnected()) {
-            // try to clean up if not already done
+            // seems that somebody has forgotten to do his housekeeping.
+            // try to clean up now.
             client.disconnect();
         }
 
+    }
+
+    @Override
+    public void onEvent(Event event) {
+        controls.values().stream().filter(control1 -> control1.getCommandPrefix().equals(event.getPrefix())).
+                forEach(control -> control.handle(event));
     }
 }

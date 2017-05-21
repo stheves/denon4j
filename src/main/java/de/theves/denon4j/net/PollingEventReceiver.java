@@ -26,9 +26,6 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.net.SocketException;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -38,7 +35,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * @author Sascha Theves
  */
-public class PollingEventReceiver extends Thread implements EventReceiver {
+public class PollingEventReceiver extends Thread implements Runnable {
 
     private static final AtomicInteger THREAD_NUM = new AtomicInteger(0);
 
@@ -47,42 +44,22 @@ public class PollingEventReceiver extends Thread implements EventReceiver {
     private final BlockingQueue<String> eventQueue;
 
     private final Socket socket;
+    private final TcpClient client;
 
     private BufferedReader reader;
 
-    private final List<EventConsumer> eventConsumers;
-
-    public PollingEventReceiver(Socket socket) {
+    public PollingEventReceiver(TcpClient client, Socket socket) {
         super("PollingEventReceiver-" + THREAD_NUM.getAndAdd(1));
+        this.client = client;
         this.socket = socket;
         this.eventQueue = new ArrayBlockingQueue<>(256);
-        this.eventConsumers = Collections.synchronizedList(new ArrayList<>(16));
         openStream();
     }
 
-    @Override
     public void startListening() {
         start();
     }
 
-    @Override
-    public void addConsumer(EventConsumer consumer) {
-        if (null != consumer) {
-            eventConsumers.add(consumer);
-        }
-    }
-
-    @Override
-    public void removeConsumer(EventConsumer consumer) {
-        eventConsumers.remove(consumer);
-    }
-
-    @Override
-    public List<EventConsumer> getEventConsumers() {
-        return Collections.unmodifiableList(eventConsumers);
-    }
-
-    @Override
     public void run() {
         logger.debug("PollingEventReceiver started. Listening for events...");
         while (!isInterrupted()) {
@@ -106,37 +83,13 @@ public class PollingEventReceiver extends Thread implements EventReceiver {
                 logger.debug("Event received: " + lastEvent);
             }
             eventQueue.put(lastEvent);
-            notifyConsumers(lastEvent);
+            client.received(lastEvent);
         } catch (SocketException se) {
-            if (socket.isClosed() || socket.isInputShutdown()) {
-                // silently ignore
-            } else {
+            if (!socket.isClosed() && !socket.isInputShutdown()) {
                 throw new ConnectionException("Socket error.", se);
             }
         } catch (Exception e) {
             throw new ConnectionException("Socket error.", e);
-        }
-    }
-
-    private void notifyConsumers(String event) {
-        for (EventConsumer ev : eventConsumers) {
-            try {
-                ev.onEvent(event);
-            } catch (Exception e) {
-                // catch any exception from consumers and process the next one
-                if (logger.isWarnEnabled()) {
-                    logger.warn("Exception notifying consumer: " + ev, e);
-                }
-            }
-        }
-    }
-
-    @Override
-    public Optional<String> nextEvent(int timeout) {
-        try {
-            return Optional.ofNullable(eventQueue.poll(timeout, TimeUnit.MILLISECONDS));
-        } catch (InterruptedException e) {
-            return Optional.empty();
         }
     }
 }

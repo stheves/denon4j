@@ -18,45 +18,28 @@
 package de.theves.denon4j;
 
 import de.theves.denon4j.model.Command;
+import de.theves.denon4j.model.CommandId;
+import de.theves.denon4j.model.ValueCommand;
 
 /**
- * Represents the on screen display. Can be used to browse the system menu and get information about what`s
- * currently on air.
+ * Class description.
  *
  * @author Sascha Theves
  */
-public class MainMenu {
-    private GenericController receiver;
+public class CommandFactory {
 
-    public MainMenu(GenericController receiver) {
-        this.receiver = receiver;
+    private CommandFactory() {
     }
 
-    public void moveCursorDown() {
-        this.receiver.send(new Command("MNCDN"));
-    }
-
-    public void moveCursorUp() {
-        this.receiver.send(new Command("MNCUP"));
-    }
-
-    public void moveCursorLeft() {
-        this.receiver.send(new Command("MNCLT"));
-    }
-
-    public void moveCursorRight() {
-        this.receiver.send(new Command("MNCRT"));
-    }
-
-    public void enter() {
-        this.receiver.send(new Command("MNENT"));
-    }
-
-    public void showMenu() {
-        this.receiver.send(new Command("MNMEN ON"));
-    }
-
-    public void hideMenu() {
-        this.receiver.send(new Command("MNMEN OFF"));
+    public static Command create(String prefix, String param) {
+        if (null != prefix) {
+            String command = prefix + param;
+            CommandId commandId = CommandId.from(command);
+            if (command.contains("[")) {
+                return new ValueCommand(commandId, command);
+            }
+            return new Command(commandId, command);
+        }
+        throw new IllegalArgumentException("Command may not be null");
     }
 }

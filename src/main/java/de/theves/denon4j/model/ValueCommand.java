@@ -17,44 +17,23 @@
 
 package de.theves.denon4j.model;
 
-import de.theves.denon4j.net.Protocol;
-
-import java.util.Objects;
-
 /**
  * Class description.
  *
  * @author Sascha Theves
  */
-public class Command extends Event {
-    private final CommandId id;
+public class ValueCommand extends Command {
+    private ParameterValue value;
 
-    public Command(CommandId id, String raw) {
-        super(raw);
-        this.id = Objects.requireNonNull(id);
+    public ValueCommand(CommandId id, String raw) {
+        super(id, raw);
     }
 
-    public CommandId getId() {
-        return id;
+    public void setValue(ParameterValue value) {
+        this.value = value;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Command command = (Command) o;
-        return Objects.equals(id, command.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
-
-    @Override
-    public String toString() {
-        return "Command{" +
-                "id=" + id +
-                "} " + super.toString();
+    public ParameterValue getValue() {
+        return value;
     }
 }

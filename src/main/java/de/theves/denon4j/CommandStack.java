@@ -17,28 +17,28 @@
 
 package de.theves.denon4j;
 
+import de.theves.denon4j.model.Command;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Class description.
  *
  * @author Sascha Theves
  */
-public class EmptyResponseException extends RuntimeException {
-    public EmptyResponseException() {
+public class CommandStack {
+    private final Receiver receiver;
+    private List<Command> commandList = new ArrayList<>();
+    private Command mostRecentCommand;
+
+    public CommandStack(Receiver receiver) {
+        this.receiver = receiver;
     }
 
-    public EmptyResponseException(String message) {
-        super(message);
-    }
-
-    public EmptyResponseException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public EmptyResponseException(Throwable cause) {
-        super(cause);
-    }
-
-    public EmptyResponseException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
+    public void execute(Command command) {
+        receiver.getProtocol().send(command);
+        commandList.add(command);
+        mostRecentCommand = command;
     }
 }

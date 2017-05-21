@@ -17,11 +17,13 @@
 
 package de.theves.denon4j.net;
 
+import de.theves.denon4j.model.Event;
+
 /**
  * Class description.
  *
  * @author Sascha Theves
  */
 public interface EventConsumer {
-    void onEvent(String event);
+    void onEvent(Event event);
 }

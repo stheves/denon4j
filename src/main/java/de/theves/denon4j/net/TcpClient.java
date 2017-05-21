@@ -17,21 +17,21 @@
 
 package de.theves.denon4j.net;
 
-import de.theves.denon4j.StateChangeListener;
 import de.theves.denon4j.model.Command;
 import de.theves.denon4j.model.Event;
-import de.theves.denon4j.model.ReceiverState;
-import de.theves.denon4j.model.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
 
 /**
@@ -39,21 +39,22 @@ import java.util.Optional;
  *
  * @author Sascha Theves
  */
-public final class TcpClient implements NetClient {
-    char END = 0x0d; // \r character
-    Charset ENCODING = Charset.forName("US-ASCII");
+public final class TcpClient implements Protocol {
+    private final static char CR = 0x0d; // \r character
+
+    private final Logger logger = LoggerFactory.getLogger(TcpClient.class);
     private final Integer port;
     private final String host;
-    private Socket socket;
-    private EventReceiver eventReceiver;
-    private BufferedWriter writer;
+    private final Collection<EventConsumer> eventConsumers;
 
-    public TcpClient(String host, Integer port, Optional<EventReceiver> receiver) {
-        this.host = Optional.ofNullable(host).orElse("192.168.1.105");
+    private Socket socket;
+    private PollingEventReceiver eventReceiver;
+    private Writer writer;
+
+    public TcpClient(String host, Integer port) {
+        this.host = Optional.ofNullable(host).orElse("127.0.0.1");
         this.port = Optional.ofNullable(port).orElse(23);
-        if (receiver.isPresent()) {
-            this.eventReceiver = receiver.get();
-        }
+        this.eventConsumers = Collections.synchronizedList(new ArrayList<>(10));
     }
 
     @Override
@@ -66,9 +67,7 @@ public final class TcpClient implements NetClient {
             socket.setSoTimeout(0);
             socket.connect(new InetSocketAddress(host, port), timeout);
             writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-            eventReceiver = new PollingEventReceiver(socket);
-            // TODO add consumer in controller
-            eventReceiver.addConsumer(new StateChangeListener(new ReceiverState()));
+            eventReceiver = new PollingEventReceiver(this, socket);
             eventReceiver.startListening();
         } catch (SocketTimeoutException ste) {
             throw new TimeoutException("Could not establish connection within timeout of " + timeout + " ms.", ste);
@@ -107,41 +106,48 @@ public final class TcpClient implements NetClient {
 
 
     @Override
-    public Optional<Response> send(Command command) {
+    public void send(Command command) {
         checkConnection();
+        doSend(command);
+    }
+
+    private void doSend(Command command) {
         try {
-            sendCommand(command.getCommand(), command.getParamter());
-            return receiveResponse();
+            writer.write(command.build() + CR);
+            writer.flush();
         } catch (Exception e) {
             throw new ConnectionException("Communication failure.", e);
         }
     }
 
-    private void sendCommand(String command, Optional<String> parameter) throws IOException {
-        String request = buildRequest(command, parameter);
-        writer.write(request);
-        writer.flush();
+    @Override
+    public void addEventConsumer(EventConsumer participant) {
+        eventConsumers.add(participant);
     }
 
-    private Optional<Response> receiveResponse() {
-        List<Event> events = new ArrayList<>();
-        Optional<String> nextEvent;
-        while ((nextEvent = eventReceiver.nextEvent(200)).isPresent()) {
-            // TODO split event into command or prefix/parameter/value
-            events.add(new Event(nextEvent.get()));
-        }
-        if (events.isEmpty()) {
-            return Optional.empty();
-        } else {
-            return Optional.of(new Response(events));
+    @Override
+    public void removeEventConsumer(EventConsumer participant) {
+        eventConsumers.remove(participant);
+    }
+
+    @Override
+    public Collection<EventConsumer> getEventConsumers() {
+        return Collections.unmodifiableCollection(eventConsumers);
+    }
+
+    private void notify(Event event) {
+        synchronized (eventConsumers) {
+            for (EventConsumer eventConsumer : eventConsumers) {
+                try {
+                    eventConsumer.onEvent(event);
+                } catch (Exception e) {
+                    logger.warn("Error invoking consumer", e);
+                }
+            }
         }
     }
 
-    private String buildRequest(String command, Optional<String> value) {
-        String request = command;
-        if (value.isPresent()) {
-            request += value.get();
-        }
-        return request + END;
+    public void received(String event) {
+        notify(new Event(event));
     }
 }

@@ -18,16 +18,17 @@
 package de.theves.denon4j.net;
 
 import de.theves.denon4j.model.Command;
+import de.theves.denon4j.model.RequestCommand;
 import de.theves.denon4j.model.Response;
 
-import java.util.Optional;
+import java.util.Collection;
 
 /**
  * Low-level network client for communication with AVR.
  *
  * @author Sascha Theves
  */
-public interface NetClient {
+public interface Protocol {
     /**
      * Sends the command to the receiver (socket) and waits for a response
      * (blocking).
@@ -36,7 +37,13 @@ public interface NetClient {
      * @return the response from the receiver (never <code>null</code>).
      * @throws ConnectionException if a communication failure occurs.
      */
-    Optional<Response> send(Command command);
+    void send(Command command);
+
+    void addEventConsumer(EventConsumer eventConsumer);
+
+    void removeEventConsumer(EventConsumer eventConsumer);
+
+    Collection<EventConsumer> getEventConsumers();
 
     /**
      * Connect to the receiver.

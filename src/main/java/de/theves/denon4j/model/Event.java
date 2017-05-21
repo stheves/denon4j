@@ -17,27 +17,52 @@
 
 package de.theves.denon4j.model;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Objects;
+
 /**
  * Class description.
  *
  * @author Sascha Theves
  */
-// TODO split message into command prefix and value
 public class Event {
-    private String message;
+    private final String prefix;
+    private final Parameter parameter;
+    private final byte[] raw;
 
-    public Event(String message) {
-        this.message = message;
+    private Event(byte[] raw) {
+        this.raw = Objects.requireNonNull(raw);
+        String rawStr = new String(raw, StandardCharsets.US_ASCII);
+        this.prefix = rawStr.substring(0, 2);
+        this.parameter = new Parameter(rawStr.substring(2));
     }
 
-    public String getMessage() {
-        return message;
+    public Event(String raw) {
+        this(raw.getBytes(StandardCharsets.US_ASCII));
+    }
+
+    public String getPrefix() {
+        return prefix;
+    }
+
+    public Parameter getParameter() {
+        return parameter;
+    }
+
+    public byte[] getRaw() {
+        return raw;
+    }
+
+    public String build() {
+        return getPrefix() + getParameter().build();
     }
 
     @Override
     public String toString() {
         return "Event{" +
-                "message='" + message + '\'' +
+                "prefix='" + prefix + '\'' +
+                ", parameter=" + parameter +
                 '}';
     }
 }

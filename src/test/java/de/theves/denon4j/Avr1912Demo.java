@@ -17,16 +17,17 @@
 
 package de.theves.denon4j;
 
-import de.theves.denon4j.model.Sources;
-import de.theves.denon4j.model.Volume;
-
 public class Avr1912Demo {
 
     public void demo(String host, int port) throws Exception {
-        Avr1912Controller avr = new Avr1912Controller(host, port);
+        Avr1912 avr = new Avr1912(host, port);
+
+        // show all available commands
+        avr.printCommands();
+
         avr.connect(1000);
         try {
-//            System.out.println("PWON: " + avr.isPowerOn());
+            System.out.println("PWON: " + avr.isOn());
 //            if (!avr.isPowerOn()) {
 //                System.out.println("POWERING ON: " + avr.powerOn());
 //            }
@@ -45,7 +46,7 @@ public class Avr1912Demo {
 //            System.out.println("SLEEPTIMER?: " + avr.isSleepTimerSet());
 //            System.out.println("SLEEPTIMERSET: " + avr.sleepTimer("010"));
 //            System.out.println("SLEEPTIMEROFF:" + avr.disableSleepTimer());
-            System.out.println(avr.netUsbControl().getInfo());
+//            System.out.println(avr.netUsbControl().getInfo());
 //
 //            // MainMenu support
 //            MainMenu osd = avr.mainMenu();
@@ -63,7 +64,7 @@ public class Avr1912Demo {
             System.err.println("Try java -jar $/path/to/jar $host $port");
             System.exit(1);
         }
-        System.out.println(String.format("Starting demo... Receiver: %s:%s",
+        System.out.println(String.format("Starting demo... Avr1912: %s:%s",
                 args[0], args[1]));
         Avr1912Demo test = new Avr1912Demo();
         test.demo(args[0], Integer.parseInt(args[1]));

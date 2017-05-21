@@ -15,46 +15,15 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.model;
+package de.theves.denon4j.net;
 
-import de.theves.denon4j.net.Protocol;
-
-import java.util.Objects;
+import de.theves.denon4j.model.Event;
 
 /**
  * Class description.
  *
  * @author Sascha Theves
  */
-public class Command extends Event {
-    private final CommandId id;
-
-    public Command(CommandId id, String raw) {
-        super(raw);
-        this.id = Objects.requireNonNull(id);
-    }
-
-    public CommandId getId() {
-        return id;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Command command = (Command) o;
-        return Objects.equals(id, command.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
-
-    @Override
-    public String toString() {
-        return "Command{" +
-                "id=" + id +
-                "} " + super.toString();
-    }
+public interface Participant {
+    void onEvent(Event event);
 }

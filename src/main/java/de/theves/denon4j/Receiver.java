@@ -15,34 +15,18 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.model;
+package de.theves.denon4j;
+
+import de.theves.denon4j.net.Protocol;
 
 /**
- * Volume parameter represents the receivers volume.
+ * Class description.
  *
  * @author Sascha Theves
  */
-public class Volume extends Parameter {
-    private Float floatValue;
-
-    public Volume(String vol) {
-        super(vol);
-        if (!vol.matches("\\d\\d\\d?")) {
-            throw new IllegalArgumentException("Volume value must be in the form 'ddd' e.g. '565'.");
-        }
-        String floatValueAsStr = vol.substring(0, 2);
-        if (vol.length() == 3) {
-            floatValueAsStr += "." + vol.charAt(vol.length() - 1);
-        }
-
-        floatValue = new Float(floatValueAsStr);
-
-        if (floatValue > 99) {
-            throw new IllegalArgumentException("Volume cannot be higher than 99.");
-        }
-    }
-
-    public Float getFloatValue() {
-        return floatValue;
-    }
+public interface Receiver {
+    Protocol getProtocol();
+    CommandRegistry getCommandRegistry();
+    CommandStack getCommandStack();
+    void printCommands();
 }

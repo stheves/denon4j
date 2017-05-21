@@ -17,26 +17,45 @@
 
 package de.theves.denon4j.model;
 
+import java.util.Objects;
+
 /**
- * Class description.
+ * Command identifier.
  *
  * @author Sascha Theves
  */
-public class InfoListEntry {
-    private String info;
+public class CommandId {
+    private String identifier;
 
-    public InfoListEntry(String info) {
-        this.info = info;
+    private CommandId(String identifier) {
+        this.identifier = Objects.requireNonNull(identifier);
     }
 
-    public String getInfo() {
-        return info;
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    public static CommandId from(String command) {
+        return new CommandId(command);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CommandId commandId = (CommandId) o;
+        return Objects.equals(identifier, commandId.identifier);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(identifier);
     }
 
     @Override
     public String toString() {
-        return "InfoListEntry{" +
-                "info='" + info + '\'' +
+        return "CommandId{" +
+                "identifier='" + identifier + '\'' +
                 '}';
     }
 }

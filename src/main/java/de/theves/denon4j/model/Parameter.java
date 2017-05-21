@@ -17,28 +17,33 @@
 
 package de.theves.denon4j.model;
 
-import java.util.Objects;
-
 /**
  * Class description.
  *
  * @author Sascha Theves
  */
 public class Parameter {
-    private String value;
+    public static final Parameter EMPTY = new Parameter("");
+    public static final Parameter REQUEST = new Parameter("?");
 
-    public Parameter(String value) {
-        this.value = Objects.requireNonNull(value);
+    private String name;
+
+
+    public Parameter(String name) {
+        if (null == name || name.trim().length() > 25) {
+            throw new IllegalArgumentException("Name cannot be null or greater than 25 chars");
+        }
+        this.name = name;
     }
 
-    public String getValue() {
-        return value;
+    public String getName() {
+        return name;
     }
 
     @Override
     public String toString() {
         return "Parameter{" +
-                "value='" + value + '\'' +
+                "name='" + name + '\'' +
                 '}';
     }
 
@@ -49,12 +54,16 @@ public class Parameter {
 
         Parameter parameter = (Parameter) o;
 
-        return value != null ? value.equals(parameter.value) : parameter.value == null;
+        return name != null ? name.equals(parameter.name) : parameter.name == null;
 
     }
 
     @Override
     public int hashCode() {
-        return value != null ? value.hashCode() : 0;
+        return name != null ? name.hashCode() : 0;
+    }
+
+    public String build() {
+        return getName();
     }
 }
