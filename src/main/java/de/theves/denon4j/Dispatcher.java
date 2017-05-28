@@ -17,27 +17,46 @@
 
 package de.theves.denon4j;
 
+import de.theves.denon4j.net.EventListener;
 import de.theves.denon4j.net.Protocol;
 
+import java.util.Collection;
+import java.util.HashSet;
+
 /**
- * Class description.
- *
  * @author Sascha Theves
  */
-public class CommandFactory {
+public class Dispatcher implements EventListener {
 
-    private CommandFactory() {
+    private final Collection<Control> controls;
+
+    /**
+     */
+    public Dispatcher(Protocol protocol) {
+        this.controls = new HashSet<>();
+        protocol.addListener(this);
     }
 
-    public static Command create(Protocol protocol, String prefix, String param) {
-        if (null != prefix) {
-            String command = prefix + param;
-            CommandId commandId = CommandId.random();
-            if (command.contains("[")) {
-                return new SetCommand(protocol, commandId, prefix);
-            }
-            return new Command(protocol, commandId, prefix, Parameter.create(param));
+    public void addControl(Control ctrl) {
+        if (null != ctrl) {
+            ctrl.init();
+            controls.add(ctrl);
         }
-        throw new IllegalArgumentException("Command may not be null");
+    }
+
+    public void removeControl(Control ctrl) {
+        if (null != ctrl) {
+            controls.remove(ctrl);
+        }
+    }
+
+    public Collection<Control> getControls() {
+        return controls;
+    }
+
+    @Override
+    public void onEvent(Event event) {
+        controls.stream().filter(ctrl -> ctrl.getCommandPrefix().equals(event.getPrefix())).
+                forEach(control -> control.handle(event));
     }
 }

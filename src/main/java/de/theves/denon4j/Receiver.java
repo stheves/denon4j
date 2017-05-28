@@ -17,16 +17,11 @@
 
 package de.theves.denon4j;
 
-import de.theves.denon4j.net.Protocol;
-
 /**
  * Class description.
  *
  * @author Sascha Theves
  */
-public interface Receiver {
-    Protocol getProtocol();
-    CommandRegistry getCommandRegistry();
-    CommandStack getCommandStack();
-    void printCommands();
+public interface Receiver extends AutoCloseable {
+    void printHelp();
 }

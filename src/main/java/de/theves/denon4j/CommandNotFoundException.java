@@ -15,12 +15,23 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.model;
+package de.theves.denon4j;
 
 /**
  * Class description.
  *
  * @author Sascha Theves
  */
-public class Value {
+public class CommandNotFoundException extends RuntimeException {
+    public CommandNotFoundException(String message) {
+        super(message);
+    }
+
+    public CommandNotFoundException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public CommandNotFoundException(Throwable cause) {
+        super(cause);
+    }
 }

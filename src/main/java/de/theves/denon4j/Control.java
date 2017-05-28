@@ -15,21 +15,16 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.model;
+package de.theves.denon4j;
 
 /**
  * Class description.
  *
  * @author Sascha Theves
  */
-public enum  DigitalInputMode {
-    AUTO("AUTO"), DTS("DTS"), PCM("PCM");
-    private final String mode;
-    DigitalInputMode(String mode) {
-        this.mode = mode;
-    }
-
-    public String getMode() {
-        return mode;
-    }
+public interface Control {
+    void handle(Event event);
+    String getCommandPrefix();
+    void init();
+    void dispose();
 }

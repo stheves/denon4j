@@ -15,38 +15,17 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.model;
+package de.theves.denon4j;
 
 /**
  * Class description.
  *
  * @author Sascha Theves
  */
-public enum SurroundMode {
-    MOVIE("MOVIE"),
-    MUSIC("MUSIC"),
-    GAME("GAME"),
-    DIRECT("DIRECT"),
-    PURE_DIRECT("PURE DIRECT"),
-    STEREO("STEREO"),
-    STANDARD("STANDARD"),
-    DOLBY_DIGITAL("DOLBY DIGITAL"),
-    DTS("DTS SURROUND"),
-    MULTI_CHANNEL_STEREO("MCH STEREO"),
-    ROCK_ARENA("ROCK ARENA"),
-    JAZZ_CLUB("JAZZ CLUB"),
-    MONO_MOVIE("MONO MOVIE"),
-    MATRIX("MATRIX"),
-    VIDEO_GAME("VIDEO GAME"),
-    VIRTUAL("VIRTUAL");
-
-    private String mode;
-
-    SurroundMode(String mode) {
-        this.mode = mode;
+public class AsciiValue extends Value {
+    private final String ascii;
+    public AsciiValue(String ascii) {
+        this.ascii = ascii;
     }
 
-    public String getMode() {
-        return mode;
-    }
 }

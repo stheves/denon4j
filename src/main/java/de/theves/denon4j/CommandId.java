@@ -15,9 +15,10 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.model;
+package de.theves.denon4j;
 
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Command identifier.
@@ -35,8 +36,8 @@ public class CommandId {
         return identifier;
     }
 
-    public static CommandId from(String command) {
-        return new CommandId(command);
+    public static CommandId random() {
+        return new CommandId(UUID.randomUUID().toString());
     }
 
     @Override

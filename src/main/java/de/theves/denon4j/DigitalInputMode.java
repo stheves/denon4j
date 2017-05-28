@@ -15,17 +15,21 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.model;
+package de.theves.denon4j;
 
 /**
  * Class description.
  *
  * @author Sascha Theves
  */
-public class AsciiValue extends Value {
-    private final String ascii;
-    public AsciiValue(String ascii) {
-        this.ascii = ascii;
+public enum  DigitalInputMode {
+    AUTO("AUTO"), DTS("DTS"), PCM("PCM");
+    private final String mode;
+    DigitalInputMode(String mode) {
+        this.mode = mode;
     }
 
+    public String getMode() {
+        return mode;
+    }
 }

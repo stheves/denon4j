@@ -15,28 +15,19 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.model;
+package de.theves.denon4j;
 
-public enum Sources {
-    CD("CD"), TUNER("TUNER"), DVD("DVD"), BD("BD"), TV("TV"), SAT_CBL("SAT/CBL"), GAME(
-            "GAME"), GAME2("GAME2"), AUX("V.AUX"), DOCK("DOCK"), SOURCE(
-            "SOURCE"), IPOD("IPOD"), NET_UBS("NET/USB"), RHAPSODY("RHAPSODY"), NAPSTER(
-            "NAPSTER"), PANDORA("PANDORA"), LASTFM("LASTFM"), FLICKR("FLICKR"), FAVORITES(
-            "FAVORITES"), IRADIO("IRADIO"), UPNP_SERVER("SERVER"), USB_IPOD(
-            "USB/IPOD");
+public enum Playback {
+    USB("USB"), IPOD("IPD"), INTERNET_RADIO("IRP"), FAVORITES(
+            "FVP");
+    private String playback;
 
-    private String inputSource;
-
-    Sources(String source) {
-        this.inputSource = source;
-    }
-
-    public String getInputSource() {
-        return inputSource;
+    Playback(String playback) {
+        this.playback = playback;
     }
 
     @Override
     public String toString() {
-        return inputSource;
+        return playback;
     }
 }

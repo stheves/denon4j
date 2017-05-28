@@ -15,25 +15,30 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.model;
+package de.theves.denon4j;
 
 /**
  * Class description.
  *
  * @author Sascha Theves
  */
-public class ValueCommand extends Command {
-    private ParameterValue value;
+public enum VideoSource {
+    DVD("DVD"), BD("BD"), TV("TV"), SAT_CBL("SAT/CBL"), GAME(
+            "GAME"), GAME2("GAME2"), AUX("V.AUX"), DOCK("DOCK"), SOURCE(
+            "SOURCE");
 
-    public ValueCommand(CommandId id, String raw) {
-        super(id, raw);
+    private String source;
+
+    VideoSource(String source) {
+        this.source = source;
     }
 
-    public void setValue(ParameterValue value) {
-        this.value = value;
+    public String getSource() {
+        return source;
     }
 
-    public ParameterValue getValue() {
-        return value;
+    @Override
+    public String toString() {
+        return source;
     }
 }

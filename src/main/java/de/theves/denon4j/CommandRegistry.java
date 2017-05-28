@@ -17,9 +17,7 @@
 
 package de.theves.denon4j;
 
-import de.theves.denon4j.model.Command;
-import de.theves.denon4j.model.CommandId;
-import de.theves.denon4j.model.Parameter;
+import de.theves.denon4j.net.Protocol;
 
 import java.io.PrintStream;
 import java.util.*;
@@ -31,9 +29,13 @@ import java.util.*;
  */
 public class CommandRegistry {
     private final Map<CommandId, Command> commands;
+    private final CommandStack commandStack;
+    private final Protocol protocol;
 
-    public CommandRegistry() {
-        this.commands = new HashMap<>();
+    public CommandRegistry(Protocol protocol) {
+        this.commands = new LinkedHashMap<>();
+        this.commandStack = new CommandStack(this);
+        this.protocol = protocol;
     }
 
     public void deregisterCommand(CommandId id) {
@@ -50,25 +52,29 @@ public class CommandRegistry {
         }
     }
 
-    public Command getCommand(CommandId id) {
-        return commands.get(id);
+    public Optional<Command> getCommand(CommandId id) {
+        return Optional.ofNullable(commands.get(id));
     }
 
-    private Command registerCommand(String prefix, String param) {
-        Command cmd = CommandFactory.create(prefix, param);
+    public Command register(String prefix, String param) {
+        Command cmd = CommandFactory.create(protocol, prefix, param);
         this.commands.put(cmd.getId(), cmd);
         return cmd;
     }
 
-    public Collection<Command> registerCommands(String prefix, String... parameters) {
-        Collection<Command> result = new ArrayList<>(parameters.length + 1);
+    public List<Command> teach(String prefix, String... parameters) {
+        List<Command> result = new ArrayList<>(parameters.length + 1);
         if (parameters.length == 0) {
-            result.add(registerCommand(prefix, Parameter.EMPTY.getName()));
+            result.add(register(prefix, Parameter.EMPTY.getName()));
         } else {
             for (String param : parameters) {
-                result.add(registerCommand(prefix, param));
+                result.add(register(prefix, param));
             }
         }
         return result;
+    }
+
+    public CommandStack getCommandStack() {
+        return commandStack;
     }
 }

@@ -15,7 +15,7 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.model;
+package de.theves.denon4j;
 
 import java.util.Objects;
 
@@ -24,20 +24,36 @@ import java.util.Objects;
  *
  * @author Sascha Theves
  */
-public class ParameterValue {
-    private Parameter parameter;
-    private Value value;
+public class Event {
+    private final String prefix;
+    private final Parameter parameter;
 
-    public ParameterValue(Parameter parameter, Value value) {
+    protected Event(String prefix, Parameter parameter) {
+        this.prefix = Objects.requireNonNull(prefix);
         this.parameter = Objects.requireNonNull(parameter);
-        this.value = Objects.requireNonNull(value);
+    }
+
+    public String getPrefix() {
+        return prefix;
     }
 
     public Parameter getParameter() {
         return parameter;
     }
 
-    public Value getValue() {
-        return value;
+    public String build() {
+        return getPrefix() + getParameter().build();
+    }
+
+    @Override
+    public String toString() {
+        return "Event{" +
+                "prefix='" + prefix + '\'' +
+                ", parameter=" + parameter +
+                '}';
+    }
+
+    public static Event create(String event) {
+        return new Event(event.substring(0, 2), Parameter.create(event.substring(2)));
     }
 }

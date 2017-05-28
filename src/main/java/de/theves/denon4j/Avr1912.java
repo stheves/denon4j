@@ -17,9 +17,8 @@
 
 package de.theves.denon4j;
 
-import de.theves.denon4j.model.Power;
 import de.theves.denon4j.net.Protocol;
-import de.theves.denon4j.net.TcpClient;
+import de.theves.denon4j.net.Tcp;
 
 /**
  * Class description.
@@ -27,52 +26,74 @@ import de.theves.denon4j.net.TcpClient;
  * @author Sascha Theves
  */
 public class Avr1912 implements Receiver {
-    private final GenericController controller;
+    private final Dispatcher dispatcher;
     private final Protocol protocol;
-    private final CommandRegistry registry = new CommandRegistry();
-    private final CommandStack commandStack;
+    private final CommandRegistry registry;
+    private Toggle powerToggle;
+    private Fader masterFader;
 
     public Avr1912(String host, int port) {
-        protocol = new TcpClient(host, port);
-        controller = new GenericController(protocol, registry);
-        commandStack = new CommandStack(this);
+        protocol = new Tcp(host, port);
+        registry = new CommandRegistry(protocol);
+        dispatcher = new Dispatcher(protocol);
         addControls();
     }
 
-    private void addControls() {
-        controller.addControl(new PowerControl(this));
+    // Begin Controls
+    public boolean isPowerOn() {
+        return powerToggle.isOn();
     }
 
-    public boolean isOn() {
-        Power power = controller.adapt(PowerControl.class).getState();
-        return power == Power.ON;
+    public void togglePower() {
+        powerToggle.toggle();
     }
+
+    public void masterVolUp() {
+        masterFader.fadeUp();
+    }
+
+    public void masterVolDown() {
+        masterFader.fadeDown();
+    }
+
+    public Value getMasterVol() {
+        return masterFader.fader();
+    }
+
+    public void setMasterVol(Value vol) {
+        masterFader.set(vol);
+    }
+    // End Controls
 
     @Override
-    public void printCommands() {
+    public void printHelp() {
         registry.printCommands(System.out);
     }
 
-    @Override
-    public CommandStack getCommandStack() {
-        return commandStack;
-    }
-
     public void connect(int timeout) {
-        protocol.connect(timeout);
+        protocol.establishConnection(timeout);
     }
 
     public void disconnect() {
+        dispatcher.getControls().stream().forEach(Control::dispose);
         protocol.disconnect();
     }
 
-    @Override
-    public CommandRegistry getCommandRegistry() {
-        return registry;
+    private void addControls() {
+        // power control
+        powerToggle = new Toggle(registry, "PW", "ON", "STANDBY");
+        dispatcher.addControl(powerToggle);
+
+        // master vol. control
+        masterFader = new Fader(registry, "MV", "UP", "DOWN", "[000-999]");
+        dispatcher.addControl(masterFader);
+
+        // center vol. control
+
     }
 
     @Override
-    public Protocol getProtocol() {
-        return protocol;
+    public void close() throws Exception {
+        disconnect();
     }
 }

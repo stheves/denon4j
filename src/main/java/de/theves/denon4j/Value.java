@@ -15,54 +15,41 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.model;
-
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Objects;
+package de.theves.denon4j;
 
 /**
  * Class description.
  *
  * @author Sascha Theves
  */
-public class Event {
-    private final String prefix;
-    private final Parameter parameter;
-    private final byte[] raw;
+public class Value {
+    public static final Value NULL = new Value();
 
-    private Event(byte[] raw) {
-        this.raw = Objects.requireNonNull(raw);
-        String rawStr = new String(raw, StandardCharsets.US_ASCII);
-        this.prefix = rawStr.substring(0, 2);
-        this.parameter = new Parameter(rawStr.substring(2));
+    private String value;
+
+    public Value() {
     }
 
-    public Event(String raw) {
-        this(raw.getBytes(StandardCharsets.US_ASCII));
+    public Value(String value) {
+        this.value = value;
     }
 
-    public String getPrefix() {
-        return prefix;
+    public String getValue() {
+        return value;
     }
 
-    public Parameter getParameter() {
-        return parameter;
-    }
-
-    public byte[] getRaw() {
-        return raw;
+    public void setValue(String value) {
+        this.value = value;
     }
 
     public String build() {
-        return getPrefix() + getParameter().build();
+        return value;
     }
 
     @Override
     public String toString() {
-        return "Event{" +
-                "prefix='" + prefix + '\'' +
-                ", parameter=" + parameter +
+        return "Value{" +
+                "value='" + value + '\'' +
                 '}';
     }
 }

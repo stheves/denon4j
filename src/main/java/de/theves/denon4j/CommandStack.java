@@ -17,10 +17,10 @@
 
 package de.theves.denon4j;
 
-import de.theves.denon4j.model.Command;
-
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Class description.
@@ -28,17 +28,49 @@ import java.util.List;
  * @author Sascha Theves
  */
 public class CommandStack {
-    private final Receiver receiver;
-    private List<Command> commandList = new ArrayList<>();
-    private Command mostRecentCommand;
+    private final LinkedList<Command> commandList;
+    private final CommandRegistry commandRegistry;
 
-    public CommandStack(Receiver receiver) {
-        this.receiver = receiver;
+    public CommandStack(CommandRegistry commandRegistry) {
+        this.commandRegistry = commandRegistry;
+        commandList = new LinkedList<>();
     }
 
-    public void execute(Command command) {
-        receiver.getProtocol().send(command);
-        commandList.add(command);
-        mostRecentCommand = command;
+    public Optional<Event> execute(CommandId commandId, Value value) {
+        synchronized (commandList) {
+            Command cmd = safeGetCommand(commandId);
+            if (cmd instanceof SetCommand) {
+                ((SetCommand) cmd).set(value);
+            }
+            Optional<Event> result = cmd.execute();
+            commandList.add(cmd);
+            return result;
+        }
+    }
+
+    public List<Command> history() {
+        synchronized (commandList) {
+            return Collections.unmodifiableList(commandList);
+        }
+    }
+
+    public void redo() {
+        synchronized (commandList) {
+            commandList.getLast().execute();
+        }
+    }
+
+    public boolean canRedo() {
+        synchronized (commandList) {
+            return commandList.getLast() != null;
+        }
+    }
+
+    private Command safeGetCommand(CommandId commandId) {
+        Optional<Command> command = commandRegistry.getCommand(commandId);
+        if (!command.isPresent()) {
+            throw new CommandNotFoundException("Command not found: " + commandId);
+        }
+        return command.get();
     }
 }

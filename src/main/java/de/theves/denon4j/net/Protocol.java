@@ -17,11 +17,11 @@
 
 package de.theves.denon4j.net;
 
-import de.theves.denon4j.model.Command;
-import de.theves.denon4j.model.RequestCommand;
-import de.theves.denon4j.model.Response;
+import de.theves.denon4j.Command;
+import de.theves.denon4j.Event;
 
 import java.util.Collection;
+import java.util.Optional;
 
 /**
  * Low-level network client for communication with AVR.
@@ -39,11 +39,11 @@ public interface Protocol {
      */
     void send(Command command);
 
-    void addEventConsumer(EventConsumer eventConsumer);
+    Optional<Event> recv(long timeout);
 
-    void removeEventConsumer(EventConsumer eventConsumer);
+    void addListener(EventListener eventListener);
 
-    Collection<EventConsumer> getEventConsumers();
+    void removeListener(EventListener eventListener);
 
     /**
      * Connect to the receiver.
@@ -51,7 +51,7 @@ public interface Protocol {
      * @param timeout the timeout in seconds to wait for connection establishment.
      * @throws ConnectionException if connection could not be established.
      */
-    void connect(int timeout) throws ConnectionException;
+    void establishConnection(int timeout) throws ConnectionException;
 
     /**
      * Disconnects this client.

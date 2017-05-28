@@ -15,25 +15,33 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.model;
+package de.theves.denon4j;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import de.theves.denon4j.net.Protocol;
 
-public class Response {
-    private List<Event> events;
+/**
+ * Class description.
+ *
+ * @author Sascha Theves
+ */
+public class SetCommand extends Command {
+    private Value value;
 
-    public Response(List<Event> events) {
-        this.events = Objects.requireNonNull(events);
+    public SetCommand(Protocol protocol, CommandId id, String prefix) {
+        super(protocol, id, prefix, Parameter.EMPTY);
     }
 
-    public List<Event> getEvents() {
-        return Collections.unmodifiableList(events);
+    public void set(Value value) {
+        this.value = value;
+    }
+
+    public Value getValue() {
+        return value;
     }
 
     @Override
-    public String toString() {
-        return events.toString();
+    public String build() {
+        String preBuild = super.build();
+        return preBuild + value.build();
     }
 }

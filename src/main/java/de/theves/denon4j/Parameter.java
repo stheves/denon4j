@@ -15,46 +15,62 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.model;
-
-import de.theves.denon4j.net.Protocol;
-
-import java.util.Objects;
+package de.theves.denon4j;
 
 /**
  * Class description.
  *
  * @author Sascha Theves
  */
-public class Command extends Event {
-    private final CommandId id;
+public class Parameter {
+    public static final Parameter EMPTY = new Parameter("");
+    public static final Parameter REQUEST = new Parameter("?");
 
-    public Command(CommandId id, String raw) {
-        super(raw);
-        this.id = Objects.requireNonNull(id);
+    private String name;
+
+
+    private Parameter(String name) {
+        if (null == name || name.trim().length() > 25) {
+            throw new IllegalArgumentException("Name cannot be null or greater than 25 chars");
+        }
+        this.name = name;
     }
 
-    public CommandId getId() {
-        return id;
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String toString() {
+        return "Parameter{" +
+                "name='" + name + '\'' +
+                '}';
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Command command = (Command) o;
-        return Objects.equals(id, command.id);
+
+        Parameter parameter = (Parameter) o;
+
+        return name != null ? name.equals(parameter.name) : parameter.name == null;
+
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return name != null ? name.hashCode() : 0;
     }
 
-    @Override
-    public String toString() {
-        return "Command{" +
-                "id=" + id +
-                "} " + super.toString();
+    public String build() {
+        return getName();
+    }
+
+    public static Parameter create(String name) {
+        if (REQUEST.getName().equals(name)) {
+            return REQUEST;
+        }
+        return new Parameter(name);
     }
 }

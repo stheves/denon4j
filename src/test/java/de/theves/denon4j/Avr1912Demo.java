@@ -20,42 +20,22 @@ package de.theves.denon4j;
 public class Avr1912Demo {
 
     public void demo(String host, int port) throws Exception {
-        Avr1912 avr = new Avr1912(host, port);
+        try (Avr1912 avr = new Avr1912(host, port)) {
+            // show all available commands
+            avr.printHelp();
+            avr.connect(1000);
+            System.out.println("PWON: " + avr.isPowerOn());
+            if (!avr.isPowerOn()) {
+                // powering on
+                avr.togglePower();
+            }
 
-        // show all available commands
-        avr.printCommands();
-
-        avr.connect(1000);
-        try {
-            System.out.println("PWON: " + avr.isOn());
-//            if (!avr.isPowerOn()) {
-//                System.out.println("POWERING ON: " + avr.powerOn());
-//            }
-//            System.out.println("MUTED?: " + avr.isMuted());
-//            System.out.println("VOL?: " + avr.volume());
-//            System.out.println("VOLUP: " + avr.volumeUp());
-//            System.out.println("VOLDOWN: " + avr.volumeDown());
-//            System.out.println("VOLSET505: " + avr.changeVolume(new Volume("55")));
-//            System.out.println("VOL?: " + avr.volume());
-//            System.out.println("INPUT: " + avr.getInputSource());
-//            avr.isSleepTimerSet();
-//            System.out.println("INPUTSET: "
-//                    + avr.setInputSource(Sources.SAT_CBL));
-//            Thread.sleep(2000);
-//            System.out.println("INPUT?: " + avr.getInputSource());
-//            System.out.println("SLEEPTIMER?: " + avr.isSleepTimerSet());
-//            System.out.println("SLEEPTIMERSET: " + avr.sleepTimer("010"));
-//            System.out.println("SLEEPTIMEROFF:" + avr.disableSleepTimer());
-//            System.out.println(avr.netUsbControl().getInfo());
-//
-//            // MainMenu support
-//            MainMenu osd = avr.mainMenu();
-//            osd.showMenu();
-//            osd.moveCursorDown();
-//            osd.moveCursorUp();
-//            osd.hideMenu();
-        } finally {
-            avr.disconnect();
+            System.out.println("MASTER VOL: " + avr.getMasterVol());
+            avr.masterVolDown();
+            System.out.println("MASTER VOL: " + avr.getMasterVol());
+            avr.setMasterVol(new Value("50"));
+            System.out.println("MASTER VOL: " + avr.getMasterVol());
+            avr.masterVolUp();
         }
     }
 

@@ -25,58 +25,51 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.net.SocketException;
-import java.nio.charset.Charset;
-import java.util.Optional;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Sascha Theves
  */
-public class PollingEventReceiver extends Thread implements Runnable {
+public class EventReader extends Thread implements Runnable {
 
-    private static final AtomicInteger THREAD_NUM = new AtomicInteger(0);
-
-    private final Logger logger = LoggerFactory.getLogger(PollingEventReceiver.class);
+    private final Logger logger = LoggerFactory.getLogger(EventReader.class);
 
     private final BlockingQueue<String> eventQueue;
 
     private final Socket socket;
-    private final TcpClient client;
+    private final Tcp client;
 
     private BufferedReader reader;
 
-    public PollingEventReceiver(TcpClient client, Socket socket) {
-        super("PollingEventReceiver-" + THREAD_NUM.getAndAdd(1));
+    public EventReader(Tcp client, Socket socket) {
+        super("EventReader");
         this.client = client;
         this.socket = socket;
         this.eventQueue = new ArrayBlockingQueue<>(256);
         openStream();
     }
 
-    public void startListening() {
-        start();
-    }
-
+    @Override
     public void run() {
-        logger.debug("PollingEventReceiver started. Listening for events...");
+        logger.debug("Listening for events...");
         while (!isInterrupted()) {
-            poll();
+            read();
         }
-        logger.debug("PollingEventReceiver stopped.");
+        logger.debug("Stopped.");
     }
 
     private void openStream() {
         try {
-            this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), Charset.forName("UTF-8")));
+            this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.US_ASCII));
         } catch (IOException e) {
             throw new ConnectionException(e);
         }
     }
 
-    private void poll() {
+    private void read() {
         try {
             String lastEvent = reader.readLine();
             if (logger.isDebugEnabled()) {
@@ -91,5 +84,15 @@ public class PollingEventReceiver extends Thread implements Runnable {
         } catch (Exception e) {
             throw new ConnectionException("Socket error.", e);
         }
+    }
+
+    public String poll(long timeout) {
+        String event = null;
+        try {
+            event = eventQueue.poll(timeout, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            logger.warn("Unexpected interrupt", e);
+        }
+        return event;
     }
 }

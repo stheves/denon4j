@@ -17,8 +17,8 @@
 
 package de.theves.denon4j.net;
 
-import de.theves.denon4j.model.Command;
-import de.theves.denon4j.model.Event;
+import de.theves.denon4j.Command;
+import de.theves.denon4j.Event;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +29,7 @@ import java.io.Writer;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -39,46 +40,47 @@ import java.util.Optional;
  *
  * @author Sascha Theves
  */
-public final class TcpClient implements Protocol {
+public final class Tcp implements Protocol {
+    private final Logger logger = LoggerFactory.getLogger(Tcp.class);
+
     private final static char CR = 0x0d; // \r character
 
-    private final Logger logger = LoggerFactory.getLogger(TcpClient.class);
     private final Integer port;
+
     private final String host;
-    private final Collection<EventConsumer> eventConsumers;
+
+    private final Collection<EventListener> eventListeners;
 
     private Socket socket;
-    private PollingEventReceiver eventReceiver;
+
+    private EventReader eventReader;
+
     private Writer writer;
 
-    public TcpClient(String host, Integer port) {
+    public Tcp(String host, Integer port) {
         this.host = Optional.ofNullable(host).orElse("127.0.0.1");
         this.port = Optional.ofNullable(port).orElse(23);
-        this.eventConsumers = Collections.synchronizedList(new ArrayList<>(10));
+        this.eventListeners = Collections.synchronizedList(new ArrayList<>(10));
     }
 
     @Override
-    public synchronized void connect(int timeout) throws ConnectException {
+    public synchronized void establishConnection(int timeout) throws ConnectException {
         if (isConnected()) {
             throw new ConnectException("Already connected.");
         }
         try {
             socket = new Socket();
-            socket.setSoTimeout(0);
+            socket.setSoTimeout(0); // set infinite poll timeout
             socket.connect(new InetSocketAddress(host, port), timeout);
-            writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-            eventReceiver = new PollingEventReceiver(this, socket);
-            eventReceiver.startListening();
+
+            writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.US_ASCII));
+
+            eventReader = new EventReader(this, socket);
+            eventReader.start();
         } catch (SocketTimeoutException ste) {
             throw new TimeoutException("Could not establish connection within timeout of " + timeout + " ms.", ste);
         } catch (IOException e) {
-            throw new ConnectException("Cannot connect to host/ip " + host + " on port " + port, e);
-        }
-    }
-
-    private void checkConnection() {
-        if (!isConnected()) {
-            throw new ConnectionException("Not connected.");
+            throw new ConnectException("Cannot establishConnection to host/ip " + host + " on port " + port, e);
         }
     }
 
@@ -93,22 +95,64 @@ public final class TcpClient implements Protocol {
             return;
         }
         try {
-            eventReceiver.interrupt();
+            eventReader.interrupt();
             socket.close();
         } catch (IOException e) {
             // ignore
-        } finally {
-            socket = null;
-            eventReceiver = null;
-            writer = null;
+            logger.debug("Disconnect failure", e);
         }
     }
-
 
     @Override
     public void send(Command command) {
         checkConnection();
         doSend(command);
+    }
+
+    @Override
+    public Optional<Event> recv(long timeout) {
+        checkConnection();
+        Optional<Event> resp;
+        String event = eventReader.poll(timeout);
+        if (null == event) {
+            resp = Optional.empty();
+        } else {
+            resp = Optional.of(Event.create(event));
+        }
+        return resp;
+    }
+
+
+    @Override
+    public void addListener(EventListener participant) {
+        eventListeners.add(participant);
+    }
+
+    @Override
+    public void removeListener(EventListener participant) {
+        eventListeners.remove(participant);
+    }
+
+    void received(String event) {
+        notify(Event.create(event));
+    }
+
+    private void notify(Event event) {
+        synchronized (eventListeners) {
+            for (EventListener eventListener : eventListeners) {
+                try {
+                    eventListener.onEvent(event);
+                } catch (Exception e) {
+                    logger.warn("Error invoking consumer", e);
+                }
+            }
+        }
+    }
+
+    private void checkConnection() {
+        if (!isConnected()) {
+            throw new ConnectionException("Not connected.");
+        }
     }
 
     private void doSend(Command command) {
@@ -118,36 +162,5 @@ public final class TcpClient implements Protocol {
         } catch (Exception e) {
             throw new ConnectionException("Communication failure.", e);
         }
-    }
-
-    @Override
-    public void addEventConsumer(EventConsumer participant) {
-        eventConsumers.add(participant);
-    }
-
-    @Override
-    public void removeEventConsumer(EventConsumer participant) {
-        eventConsumers.remove(participant);
-    }
-
-    @Override
-    public Collection<EventConsumer> getEventConsumers() {
-        return Collections.unmodifiableCollection(eventConsumers);
-    }
-
-    private void notify(Event event) {
-        synchronized (eventConsumers) {
-            for (EventConsumer eventConsumer : eventConsumers) {
-                try {
-                    eventConsumer.onEvent(event);
-                } catch (Exception e) {
-                    logger.warn("Error invoking consumer", e);
-                }
-            }
-        }
-    }
-
-    public void received(String event) {
-        notify(new Event(event));
     }
 }
