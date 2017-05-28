@@ -26,5 +26,6 @@ public interface Control {
     void handle(Event event);
     String getCommandPrefix();
     void init();
+    boolean isInitialized();
     void dispose();
 }

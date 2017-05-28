@@ -19,23 +19,23 @@ package de.theves.denon4j;
 
 import java.util.List;
 
-import static de.theves.denon4j.Value.NULL;
 
 /**
  * Class description.
  *
  * @author Sascha Theves
  */
-public class Fader extends ControlAdapter {
+public class Slider extends AbstractControl {
     private final String up;
     private final String down;
     private final String set;
+
     private CommandId upId;
     private CommandId downId;
     private CommandId setId;
     private CommandId requestId;
 
-    public Fader(CommandRegistry registry, String prefix, String up, String down, String set) {
+    public Slider(CommandRegistry registry, String prefix, String up, String down, String set) {
         super(registry, prefix);
         this.up = up;
         this.down = down;
@@ -43,32 +43,32 @@ public class Fader extends ControlAdapter {
     }
 
     @Override
-    public void init() {
-        List<Command> commands = register(up, down, set, Parameter.REQUEST.getName());
+    protected void doInit() {
+        List<Command> commands = register(up, down, set, ParameterImpl.REQUEST.getValue());
         upId = commands.get(0).getId();
         downId = commands.get(1).getId();
         setId = commands.get(2).getId();
         requestId = commands.get(3).getId();
     }
 
-    public void fadeUp() {
-        executeCommand(upId, NULL);
+    public void slideUp() {
+        executeCommand(upId);
     }
 
-    public void fadeDown() {
-        executeCommand(downId, NULL);
+    public void slideDown() {
+        executeCommand(downId);
     }
 
-    public Value fader() {
-        return getState();
+    public String getValue() {
+        return getState().getValue();
     }
 
-    public void set(Value value) {
+    public void set(String value) {
         executeCommand(setId, value);
     }
 
     @Override
-    public CommandId getRequestId() {
-        return requestId;
+    protected RequestCommand getRequestCommand() {
+        return (RequestCommand) getRegistry().getCommand(requestId);
     }
 }

@@ -20,76 +20,71 @@ package de.theves.denon4j;
 import de.theves.denon4j.net.Protocol;
 import de.theves.denon4j.net.Tcp;
 
+import java.io.PrintStream;
+
 /**
  * Class description.
  *
  * @author Sascha Theves
  */
 public class Avr1912 implements Receiver {
-    private final Dispatcher dispatcher;
+    private final EventDispatcher eventDispatcher;
     private final Protocol protocol;
     private final CommandRegistry registry;
     private Toggle powerToggle;
-    private Fader masterFader;
+    private Slider masterSlider;
+    private Toggle muteToggle;
 
     public Avr1912(String host, int port) {
         protocol = new Tcp(host, port);
         registry = new CommandRegistry(protocol);
-        dispatcher = new Dispatcher(protocol);
+        eventDispatcher = new EventDispatcher(protocol);
         addControls();
     }
 
-    // Begin Controls
-    public boolean isPowerOn() {
-        return powerToggle.isOn();
+    public Toggle power() {
+        return powerToggle;
     }
 
-    public void togglePower() {
-        powerToggle.toggle();
+    public Slider masterVolume() {
+        return masterSlider;
     }
 
-    public void masterVolUp() {
-        masterFader.fadeUp();
+    public Toggle mute() {
+        return muteToggle;
     }
-
-    public void masterVolDown() {
-        masterFader.fadeDown();
-    }
-
-    public Value getMasterVol() {
-        return masterFader.fader();
-    }
-
-    public void setMasterVol(Value vol) {
-        masterFader.set(vol);
-    }
-    // End Controls
 
     @Override
-    public void printHelp() {
-        registry.printCommands(System.out);
+    public void printHelp(PrintStream writer) {
+        registry.printCommands(writer);
     }
 
     public void connect(int timeout) {
         protocol.establishConnection(timeout);
+        eventDispatcher.startDispatching();
     }
 
     public void disconnect() {
-        dispatcher.getControls().stream().forEach(Control::dispose);
+        eventDispatcher.getControls().stream().forEach(Control::dispose);
+        eventDispatcher.getControls().clear();
         protocol.disconnect();
     }
 
     private void addControls() {
         // power control
         powerToggle = new Toggle(registry, "PW", "ON", "STANDBY");
-        dispatcher.addControl(powerToggle);
+        powerToggle.init();
+        eventDispatcher.addControl(powerToggle);
 
         // master vol. control
-        masterFader = new Fader(registry, "MV", "UP", "DOWN", "[000-999]");
-        dispatcher.addControl(masterFader);
+        masterSlider = new Slider(registry, "MV", "UP", "DOWN", "[000-999]");
+        masterSlider.init();
+        eventDispatcher.addControl(masterSlider);
 
-        // center vol. control
-
+        // mute control
+        muteToggle = new Toggle(registry, "MU", "ON", "OFF");
+        muteToggle.init();
+        eventDispatcher.addControl(muteToggle);
     }
 
     @Override

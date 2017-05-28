@@ -22,24 +22,25 @@ import de.theves.denon4j.net.Protocol;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Objects;
 
 /**
  * @author Sascha Theves
  */
-public class Dispatcher implements EventListener {
+public class EventDispatcher implements EventListener {
 
     private final Collection<Control> controls;
+    private final Protocol protocol;
 
     /**
      */
-    public Dispatcher(Protocol protocol) {
+    public EventDispatcher(Protocol protocol) {
+        this.protocol = Objects.requireNonNull(protocol);
         this.controls = new HashSet<>();
-        protocol.addListener(this);
     }
 
     public void addControl(Control ctrl) {
         if (null != ctrl) {
-            ctrl.init();
             controls.add(ctrl);
         }
     }
@@ -56,7 +57,12 @@ public class Dispatcher implements EventListener {
 
     @Override
     public void onEvent(Event event) {
-        controls.stream().filter(ctrl -> ctrl.getCommandPrefix().equals(event.getPrefix())).
+        controls.stream().filter(ctrl ->
+                ctrl.isInitialized() && ctrl.getCommandPrefix().equals(event.getPrefix())).
                 forEach(control -> control.handle(event));
+    }
+
+    public void startDispatching() {
+        this.protocol.setListener(this);
     }
 }

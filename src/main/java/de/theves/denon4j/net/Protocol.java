@@ -19,8 +19,8 @@ package de.theves.denon4j.net;
 
 import de.theves.denon4j.Command;
 import de.theves.denon4j.Event;
+import de.theves.denon4j.RequestCommand;
 
-import java.util.Collection;
 import java.util.Optional;
 
 /**
@@ -39,11 +39,9 @@ public interface Protocol {
      */
     void send(Command command);
 
-    Optional<Event> recv(long timeout);
+    void setListener(EventListener eventListener);
 
-    void addListener(EventListener eventListener);
-
-    void removeListener(EventListener eventListener);
+    Event receive(RequestCommand requestCommand);
 
     /**
      * Connect to the receiver.

@@ -22,10 +22,12 @@ package de.theves.denon4j;
  *
  * @author Sascha Theves
  */
-public class AsciiValue extends Value {
-    private final String ascii;
-    public AsciiValue(String ascii) {
-        this.ascii = ascii;
+public class AlreadyInitException extends RuntimeException {
+    public AlreadyInitException(String message) {
+        super(message);
     }
 
+    public AlreadyInitException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

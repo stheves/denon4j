@@ -19,6 +19,8 @@ package de.theves.denon4j.net;
 
 import de.theves.denon4j.Command;
 import de.theves.denon4j.Event;
+import de.theves.denon4j.EventImpl;
+import de.theves.denon4j.RequestCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,9 +32,6 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Optional;
 
 /**
@@ -41,26 +40,23 @@ import java.util.Optional;
  * @author Sascha Theves
  */
 public final class Tcp implements Protocol {
-    private final Logger logger = LoggerFactory.getLogger(Tcp.class);
-
     private final static char CR = 0x0d; // \r character
 
+    private final Logger logger = LoggerFactory.getLogger(Tcp.class);
     private final Integer port;
-
     private final String host;
+    private final EventReader eventReader;
 
-    private final Collection<EventListener> eventListeners;
-
+    private EventListener eventListener;
     private Socket socket;
-
-    private EventReader eventReader;
-
     private Writer writer;
+    private Event mostRecent;
 
     public Tcp(String host, Integer port) {
         this.host = Optional.ofNullable(host).orElse("127.0.0.1");
         this.port = Optional.ofNullable(port).orElse(23);
-        this.eventListeners = Collections.synchronizedList(new ArrayList<>(10));
+        socket = new Socket();
+        eventReader = new EventReader(this, socket);
     }
 
     @Override
@@ -69,13 +65,11 @@ public final class Tcp implements Protocol {
             throw new ConnectException("Already connected.");
         }
         try {
-            socket = new Socket();
             socket.setSoTimeout(0); // set infinite poll timeout
             socket.connect(new InetSocketAddress(host, port), timeout);
 
             writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.US_ASCII));
 
-            eventReader = new EventReader(this, socket);
             eventReader.start();
         } catch (SocketTimeoutException ste) {
             throw new TimeoutException("Could not establish connection within timeout of " + timeout + " ms.", ste);
@@ -110,41 +104,37 @@ public final class Tcp implements Protocol {
     }
 
     @Override
-    public Optional<Event> recv(long timeout) {
-        checkConnection();
-        Optional<Event> resp;
-        String event = eventReader.poll(timeout);
-        if (null == event) {
-            resp = Optional.empty();
-        } else {
-            resp = Optional.of(Event.create(event));
+    public void setListener(EventListener participant) {
+        this.eventListener = participant;
+    }
+
+    @Override
+    public Event receive(RequestCommand requestCommand) {
+        synchronized (eventReader) {
+            send(requestCommand);
+            try {
+                eventReader.wait(20000);
+            } catch (InterruptedException e) {
+                logger.warn("Receive interrupted", e);
+            }
         }
-        return resp;
-    }
-
-
-    @Override
-    public void addListener(EventListener participant) {
-        eventListeners.add(participant);
-    }
-
-    @Override
-    public void removeListener(EventListener participant) {
-        eventListeners.remove(participant);
+        return mostRecent;
     }
 
     void received(String event) {
-        notify(Event.create(event));
+        if (logger.isDebugEnabled()) {
+            logger.debug("Event received: {}", event);
+        }
+        mostRecent = EventImpl.create(event);
+        notify(mostRecent);
     }
 
     private void notify(Event event) {
-        synchronized (eventListeners) {
-            for (EventListener eventListener : eventListeners) {
-                try {
-                    eventListener.onEvent(event);
-                } catch (Exception e) {
-                    logger.warn("Error invoking consumer", e);
-                }
+        if (null != eventListener) {
+            try {
+                eventListener.onEvent(event);
+            } catch (Exception e) {
+                logger.warn("Error invoking event listener", e);
             }
         }
     }

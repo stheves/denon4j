@@ -22,55 +22,6 @@ package de.theves.denon4j;
  *
  * @author Sascha Theves
  */
-public class Parameter {
-    public static final Parameter EMPTY = new Parameter("");
-    public static final Parameter REQUEST = new Parameter("?");
-
-    private String name;
-
-
-    private Parameter(String name) {
-        if (null == name || name.trim().length() > 25) {
-            throw new IllegalArgumentException("Name cannot be null or greater than 25 chars");
-        }
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public String toString() {
-        return "Parameter{" +
-                "name='" + name + '\'' +
-                '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Parameter parameter = (Parameter) o;
-
-        return name != null ? name.equals(parameter.name) : parameter.name == null;
-
-    }
-
-    @Override
-    public int hashCode() {
-        return name != null ? name.hashCode() : 0;
-    }
-
-    public String build() {
-        return getName();
-    }
-
-    public static Parameter create(String name) {
-        if (REQUEST.getName().equals(name)) {
-            return REQUEST;
-        }
-        return new Parameter(name);
-    }
+public interface Parameter extends Buildable {
+    String getValue();
 }

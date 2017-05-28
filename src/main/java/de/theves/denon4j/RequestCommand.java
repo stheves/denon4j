@@ -24,21 +24,19 @@ import de.theves.denon4j.net.Protocol;
  *
  * @author Sascha Theves
  */
-public class CommandFactory {
+public class RequestCommand extends Command {
+    private Event received;
 
-    private CommandFactory() {
+    public RequestCommand(Protocol protocol, CommandId id, String prefix) {
+        super(protocol, id, prefix, ParameterImpl.REQUEST);
     }
 
-    public static Command create(Protocol protocol, String prefix, String param) {
-        if (null != prefix) {
-            CommandId commandId = CommandId.random();
-            if (param.contains("[")) {
-                return new SetCommand(protocol, commandId, prefix);
-            } else if (param.equals(ParameterImpl.REQUEST.getValue())) {
-                return new RequestCommand(protocol, commandId, prefix);
-            }
-            return new Command(protocol, commandId, prefix, ParameterImpl.create(param));
-        }
-        throw new IllegalArgumentException("Command may not be null");
+    @Override
+    protected void doSend() {
+        received = protocol.receive(this);
+    }
+
+    public Event getReceived() {
+        return received;
     }
 }

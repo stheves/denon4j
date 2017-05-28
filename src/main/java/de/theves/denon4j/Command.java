@@ -21,19 +21,20 @@ import de.theves.denon4j.net.Protocol;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * Class description.
  *
  * @author Sascha Theves
  */
-public class Command extends Event {
-    private final Object monitor = new Object();
-    private final CommandId id;
-    private final Protocol protocol;
+public class Command extends EventImpl {
+    private final LocalDateTime NEVER = LocalDateTime.MIN;
 
-    private LocalDateTime lastExecutionTime;
+    private final CommandId id;
+
+    protected final Protocol protocol;
+
+    private LocalDateTime executedAt = NEVER;
 
     public Command(Protocol protocol, CommandId id, String prefix, Parameter parameter) {
         super(prefix, parameter);
@@ -45,22 +46,17 @@ public class Command extends Event {
         return id;
     }
 
-    public LocalDateTime getLastExecutionTime() {
-        return lastExecutionTime;
+    public LocalDateTime getExecutedAt() {
+        return executedAt;
     }
 
-    public Optional<Event> execute() {
-        synchronized (monitor) {
-            Optional<Event> result;
-            protocol.send(this);
-            if (Parameter.REQUEST == getParameter()) {
-                result = protocol.recv(200);
-            } else {
-                result = Optional.empty();
-            }
-            lastExecutionTime = LocalDateTime.now();
-            return result;
-        }
+    public void execute() {
+        doSend();
+        executedAt = LocalDateTime.now();
+    }
+
+    protected void doSend() {
+        protocol.send(this);
     }
 
     @Override
@@ -76,10 +72,13 @@ public class Command extends Event {
         return Objects.hash(id);
     }
 
+
     @Override
     public String toString() {
         return "Command{" +
                 "id=" + id +
-                "} " + super.toString();
+                ", cmd=" + build() +
+                ", executedAt=" + executedAt +
+                '}';
     }
 }

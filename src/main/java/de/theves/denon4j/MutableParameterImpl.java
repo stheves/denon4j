@@ -17,28 +17,27 @@
 
 package de.theves.denon4j;
 
-import de.theves.denon4j.net.Protocol;
-
 /**
  * Class description.
  *
  * @author Sascha Theves
  */
-public class CommandFactory {
+public class MutableParameterImpl implements Parameter {
+    private String value;
 
-    private CommandFactory() {
+    public void setValue(String val) {
+        if (val != null) {
+            this.value = val;
+        }
     }
 
-    public static Command create(Protocol protocol, String prefix, String param) {
-        if (null != prefix) {
-            CommandId commandId = CommandId.random();
-            if (param.contains("[")) {
-                return new SetCommand(protocol, commandId, prefix);
-            } else if (param.equals(ParameterImpl.REQUEST.getValue())) {
-                return new RequestCommand(protocol, commandId, prefix);
-            }
-            return new Command(protocol, commandId, prefix, ParameterImpl.create(param));
-        }
-        throw new IllegalArgumentException("Command may not be null");
+    @Override
+    public String getValue() {
+        return value;
+    }
+
+    @Override
+    public String build() {
+        return getValue() != null ? getValue() : "";
     }
 }

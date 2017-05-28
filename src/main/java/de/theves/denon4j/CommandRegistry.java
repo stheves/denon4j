@@ -52,8 +52,12 @@ public class CommandRegistry {
         }
     }
 
-    public Optional<Command> getCommand(CommandId id) {
-        return Optional.ofNullable(commands.get(id));
+    public Command getCommand(CommandId id) {
+        return commands.get(id);
+    }
+
+    public boolean isRegistered(CommandId id) {
+        return commands.containsKey(id);
     }
 
     public Command register(String prefix, String param) {
@@ -65,7 +69,7 @@ public class CommandRegistry {
     public List<Command> teach(String prefix, String... parameters) {
         List<Command> result = new ArrayList<>(parameters.length + 1);
         if (parameters.length == 0) {
-            result.add(register(prefix, Parameter.EMPTY.getName()));
+            result.add(register(prefix, ParameterImpl.EMPTY.getValue()));
         } else {
             for (String param : parameters) {
                 result.add(register(prefix, param));

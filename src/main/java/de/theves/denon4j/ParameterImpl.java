@@ -17,28 +17,45 @@
 
 package de.theves.denon4j;
 
-import de.theves.denon4j.net.Protocol;
-
 /**
  * Class description.
  *
  * @author Sascha Theves
  */
-public class CommandFactory {
+class ParameterImpl implements Parameter {
+    public static final ParameterImpl EMPTY = new ParameterImpl("");
+    public static final Parameter REQUEST = new ParameterImpl("?");
 
-    private CommandFactory() {
+    private String value;
+
+
+    ParameterImpl(String value) {
+        if (null == value || value.trim().length() > 25) {
+            throw new IllegalArgumentException("Name cannot be null or greater than 25 chars");
+        }
+        this.value = value;
     }
 
-    public static Command create(Protocol protocol, String prefix, String param) {
-        if (null != prefix) {
-            CommandId commandId = CommandId.random();
-            if (param.contains("[")) {
-                return new SetCommand(protocol, commandId, prefix);
-            } else if (param.equals(ParameterImpl.REQUEST.getValue())) {
-                return new RequestCommand(protocol, commandId, prefix);
-            }
-            return new Command(protocol, commandId, prefix, ParameterImpl.create(param));
+    public String getValue() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return "ParameterImpl{" +
+                "value='" + value + '\'' +
+                '}';
+    }
+
+    @Override
+    public String build() {
+        return getValue();
+    }
+
+    public static Parameter create(String name) {
+        if (REQUEST.getValue().equals(name)) {
+            return REQUEST;
         }
-        throw new IllegalArgumentException("Command may not be null");
+        return new ParameterImpl(name);
     }
 }

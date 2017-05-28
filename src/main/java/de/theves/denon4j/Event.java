@@ -17,43 +17,12 @@
 
 package de.theves.denon4j;
 
-import java.util.Objects;
-
 /**
  * Class description.
  *
  * @author Sascha Theves
  */
-public class Event {
-    private final String prefix;
-    private final Parameter parameter;
-
-    protected Event(String prefix, Parameter parameter) {
-        this.prefix = Objects.requireNonNull(prefix);
-        this.parameter = Objects.requireNonNull(parameter);
-    }
-
-    public String getPrefix() {
-        return prefix;
-    }
-
-    public Parameter getParameter() {
-        return parameter;
-    }
-
-    public String build() {
-        return getPrefix() + getParameter().build();
-    }
-
-    @Override
-    public String toString() {
-        return "Event{" +
-                "prefix='" + prefix + '\'' +
-                ", parameter=" + parameter +
-                '}';
-    }
-
-    public static Event create(String event) {
-        return new Event(event.substring(0, 2), Parameter.create(event.substring(2)));
-    }
+public interface Event extends Buildable{
+    String getPrefix();
+    Parameter getParameter();
 }

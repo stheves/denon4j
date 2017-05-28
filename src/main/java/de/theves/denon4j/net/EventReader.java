@@ -26,9 +26,6 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author Sascha Theves
@@ -36,8 +33,6 @@ import java.util.concurrent.TimeUnit;
 public class EventReader extends Thread implements Runnable {
 
     private final Logger logger = LoggerFactory.getLogger(EventReader.class);
-
-    private final BlockingQueue<String> eventQueue;
 
     private final Socket socket;
     private final Tcp client;
@@ -48,15 +43,14 @@ public class EventReader extends Thread implements Runnable {
         super("EventReader");
         this.client = client;
         this.socket = socket;
-        this.eventQueue = new ArrayBlockingQueue<>(256);
-        openStream();
     }
 
     @Override
     public void run() {
+        openStream();
         logger.debug("Listening for events...");
         while (!isInterrupted()) {
-            read();
+            next();
         }
         logger.debug("Stopped.");
     }
@@ -69,14 +63,15 @@ public class EventReader extends Thread implements Runnable {
         }
     }
 
-    private void read() {
+    private void next() {
         try {
             String lastEvent = reader.readLine();
-            if (logger.isDebugEnabled()) {
-                logger.debug("Event received: " + lastEvent);
+            if (null != lastEvent) {
+                synchronized (this) {
+                    client.received(lastEvent);
+                    notify();
+                }
             }
-            eventQueue.put(lastEvent);
-            client.received(lastEvent);
         } catch (SocketException se) {
             if (!socket.isClosed() && !socket.isInputShutdown()) {
                 throw new ConnectionException("Socket error.", se);
@@ -84,15 +79,5 @@ public class EventReader extends Thread implements Runnable {
         } catch (Exception e) {
             throw new ConnectionException("Socket error.", e);
         }
-    }
-
-    public String poll(long timeout) {
-        String event = null;
-        try {
-            event = eventQueue.poll(timeout, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
-            logger.warn("Unexpected interrupt", e);
-        }
-        return event;
     }
 }

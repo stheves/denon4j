@@ -17,10 +17,12 @@
 
 package de.theves.denon4j;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Class description.
@@ -28,7 +30,10 @@ import java.util.Optional;
  * @author Sascha Theves
  */
 public class CommandStack {
+    private final Logger logger = LoggerFactory.getLogger(CommandStack.class);
+
     private final LinkedList<Command> commandList;
+
     private final CommandRegistry commandRegistry;
 
     public CommandStack(CommandRegistry commandRegistry) {
@@ -36,15 +41,16 @@ public class CommandStack {
         commandList = new LinkedList<>();
     }
 
-    public Optional<Event> execute(CommandId commandId, Value value) {
+    public Command execute(CommandId commandId, String value) {
         synchronized (commandList) {
-            Command cmd = safeGetCommand(commandId);
+            Command cmd = assertGetCommand(commandId);
             if (cmd instanceof SetCommand) {
                 ((SetCommand) cmd).set(value);
             }
-            Optional<Event> result = cmd.execute();
+            cmd.execute();
             commandList.add(cmd);
-            return result;
+            logger.debug("Command executed: " + cmd);
+            return cmd;
         }
     }
 
@@ -66,11 +72,10 @@ public class CommandStack {
         }
     }
 
-    private Command safeGetCommand(CommandId commandId) {
-        Optional<Command> command = commandRegistry.getCommand(commandId);
-        if (!command.isPresent()) {
+    private Command assertGetCommand(CommandId commandId) {
+        if (!commandRegistry.isRegistered(commandId)) {
             throw new CommandNotFoundException("Command not found: " + commandId);
         }
-        return command.get();
+        return commandRegistry.getCommand(commandId);
     }
 }

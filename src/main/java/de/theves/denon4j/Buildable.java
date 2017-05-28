@@ -22,34 +22,6 @@ package de.theves.denon4j;
  *
  * @author Sascha Theves
  */
-public class Value {
-    public static final Value NULL = new Value();
-
-    private String value;
-
-    public Value() {
-    }
-
-    public Value(String value) {
-        this.value = value;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
-    }
-
-    public String build() {
-        return value;
-    }
-
-    @Override
-    public String toString() {
-        return "Value{" +
-                "value='" + value + '\'' +
-                '}';
-    }
+public interface Buildable {
+    String build();
 }

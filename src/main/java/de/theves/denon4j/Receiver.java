@@ -17,11 +17,13 @@
 
 package de.theves.denon4j;
 
+import java.io.PrintStream;
+
 /**
  * Class description.
  *
  * @author Sascha Theves
  */
 public interface Receiver extends AutoCloseable {
-    void printHelp();
+    void printHelp(PrintStream writer);
 }

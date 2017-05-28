@@ -22,20 +22,32 @@ public class Avr1912Demo {
     public void demo(String host, int port) throws Exception {
         try (Avr1912 avr = new Avr1912(host, port)) {
             // show all available commands
-            avr.printHelp();
+            avr.printHelp(System.out);
+
+            // establish connection
             avr.connect(1000);
-            System.out.println("PWON: " + avr.isPowerOn());
-            if (!avr.isPowerOn()) {
+
+            // power control
+            Toggle power = avr.power();
+            System.out.println("PWON: " + power.switchedOn());
+            if (!power.switchedOn()) {
                 // powering on
-                avr.togglePower();
+                power.toggle();
             }
 
-            System.out.println("MASTER VOL: " + avr.getMasterVol());
-            avr.masterVolDown();
-            System.out.println("MASTER VOL: " + avr.getMasterVol());
-            avr.setMasterVol(new Value("50"));
-            System.out.println("MASTER VOL: " + avr.getMasterVol());
-            avr.masterVolUp();
+//            Slider master = avr.masterVolume();
+//            System.out.println("MASTER VOL: " + master.getValue());
+//            master.slideDown();
+//            System.out.println("MASTER VOL: " + master.getValue());
+//            master.set("50");
+//            System.out.println("MASTER VOL: " + master.getValue());
+//            master.slideUp();
+
+            Toggle mute = avr.mute();
+            mute.toggle();
+            System.out.println("MUTE ON: " + mute.switchedOn());
+            mute.switchOff();
+            System.out.println("MUTE OFF: " + mute.switchedOff());
         }
     }
 
