@@ -19,16 +19,14 @@ package de.theves.denon4j.internal;
 
 import de.theves.denon4j.CommandNotFoundException;
 import de.theves.denon4j.CommandRegistry;
+import de.theves.denon4j.Signature;
 import de.theves.denon4j.net.Command;
 import de.theves.denon4j.net.CommandId;
 import de.theves.denon4j.net.Parameter;
 import de.theves.denon4j.net.Protocol;
 
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * Class description.
@@ -84,7 +82,7 @@ public class CommandRegistryImpl implements CommandRegistry {
     }
 
     @Override
-    public List<Command> teach(String prefix, String... parameters) {
+    public List<Command> registerAll(String prefix, String... parameters) {
         List<Command> result = new ArrayList<>(parameters.length + 1);
         if (parameters.length == 0) {
             result.add(register(prefix, Parameter.EMPTY.getValue()));
@@ -99,5 +97,26 @@ public class CommandRegistryImpl implements CommandRegistry {
     @Override
     public CommandStackImpl getCommandStack() {
         return commandStackImpl;
+    }
+
+    @Override
+    public Optional<Command> findBySignature(Signature signature) {
+        for (Command cmd : commands.values()) {
+            if (cmd.build().equals(signature.signature())) {
+                return Optional.of(cmd);
+            }
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public List<Command> findByPrefix(String prefix) {
+        List<Command> result = new ArrayList<>();
+        for (Command cmd : commands.values()) {
+            if (cmd.getPrefix().equals(prefix)) {
+                result.add(cmd);
+            }
+        }
+        return result;
     }
 }

@@ -25,7 +25,7 @@ import de.theves.denon4j.net.Protocol;
 import java.io.PrintStream;
 
 /**
- * Class description.
+ * Implementation of the Denon AVR 1912 protocol spec.
  *
  * @author Sascha Theves
  */
@@ -33,16 +33,21 @@ public class Avr1912 implements AVR {
     private final EventDispatcher eventDispatcher;
     private final Protocol protocol;
     private final CommandRegistry registry;
+
     private Toggle powerToggle;
     private Slider masterSlider;
     private Toggle muteToggle;
-    private SelectInput selectInput;
-    private SelectVideo selectVideo;
+    private Select<InputSource> selectInput;
+    private Select<VideoSource> selectVideo;
 
     public Avr1912(String host, int port) {
-        protocol = new Tcp(host, port);
-        registry = new CommandRegistryImpl(protocol);
-        eventDispatcher = new EventDispatcher(protocol);
+        this(new Tcp(host, port));
+    }
+
+    public Avr1912(Protocol protocol) {
+        this.protocol = protocol;
+        this.registry = new CommandRegistryImpl(protocol);
+        this.eventDispatcher = new EventDispatcher(protocol);
         addControls();
     }
 
@@ -58,12 +63,12 @@ public class Avr1912 implements AVR {
         return muteToggle;
     }
 
-    public void selectInput(InputSource source) {
-        selectInput.select(source);
+    public Select<InputSource> selectInput() {
+        return selectInput;
     }
 
-    public void selectVideo(VideoSource source) {
-        selectVideo.select(source);
+    public Select<VideoSource> selectVideo() {
+        return selectVideo;
     }
 
     @Override
@@ -99,14 +104,24 @@ public class Avr1912 implements AVR {
         eventDispatcher.addControl(muteToggle);
 
         // select input
-        selectInput = new SelectInput(registry);
+        selectInput = new Select<>(registry, "SI", InputSource.class);
+        selectInput.init();
 
         // select video
-        selectVideo = new SelectVideo(registry);
+        selectVideo = new Select<>(registry, "SV", VideoSource.class);
+        selectVideo.init();
+    }
+
+    CommandRegistry getRegistry() {
+        return registry;
     }
 
     @Override
     public void close() throws Exception {
         disconnect();
+    }
+
+    public boolean isConnected() {
+        return protocol.isConnected();
     }
 }

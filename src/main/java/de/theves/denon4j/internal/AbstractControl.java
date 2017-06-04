@@ -124,7 +124,7 @@ public abstract class AbstractControl implements Control {
     }
 
     protected List<Command> register(String... parameters) {
-        commands.addAll(getRegistry().teach(getCommandPrefix(), parameters));
+        commands.addAll(getRegistry().registerAll(getCommandPrefix(), parameters));
         return commands;
     }
 

@@ -6,6 +6,7 @@ import de.theves.denon4j.net.CommandId;
 
 import java.io.PrintStream;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Registry for all known commands. Commands can be registered/deregisted and executed via the {@link CommandStack}.
@@ -65,7 +66,7 @@ public interface CommandRegistry {
      * @param parameters the command`s parameters.
      * @return a list containing the registered commands in the order of the parameters.
      */
-    List<Command> teach(String prefix, String... parameters);
+    List<Command> registerAll(String prefix, String... parameters);
 
     /**
      * Returns the command stack for this registry.
@@ -73,4 +74,20 @@ public interface CommandRegistry {
      * @return the command stack.
      */
     CommandStackImpl getCommandStack();
+
+    /**
+     * Find a command by it`s signature.
+     *
+     * @param signature the signature of the command.
+     * @return the command found by the signature or an empty optional.
+     */
+    Optional<Command> findBySignature(Signature signature);
+
+    /**
+     * Finds all commands with the given <code>prefix</code>.
+     *
+     * @param prefix the command`s prefix.
+     * @return all commands with <code>prefix</code>.
+     */
+    List<Command> findByPrefix(String prefix);
 }

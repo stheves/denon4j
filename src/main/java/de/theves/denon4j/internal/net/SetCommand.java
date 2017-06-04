@@ -38,9 +38,4 @@ public class SetCommand extends Command {
             mutableParameter.setValue(value);
         }
     }
-
-    @Override
-    public String build() {
-        return super.build() + mutableParameter.build();
-    }
 }
