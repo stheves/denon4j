@@ -21,22 +21,17 @@ import de.theves.denon4j.controls.Signature;
 import de.theves.denon4j.net.Parameter;
 
 /**
- * Class description.
+ * Mutable implementation of an {@link Parameter}.
  *
  * @author stheves
  */
-public class ParameterImpl implements Parameter {
-    public static final Parameter EMPTY = new ParameterImpl("");
-    public static final Parameter REQUEST = new ParameterImpl("?");
-
+public class MutableParameter implements Parameter {
     private String value;
 
-
-    public ParameterImpl(String value) {
-        if (null == value || value.trim().length() > 25) {
-            throw new IllegalArgumentException("Name cannot be null or greater than 25 chars");
+    public void setValue(String val) {
+        if (val != null) {
+            this.value = val;
         }
-        this.value = value;
     }
 
     @Override
@@ -45,21 +40,7 @@ public class ParameterImpl implements Parameter {
     }
 
     @Override
-    public String toString() {
-        return "Parameter{" +
-                "value='" + value + '\'' +
-                '}';
-    }
-
-    @Override
     public Signature build() {
-        return this::getValue;
-    }
-
-    public static Parameter createParameter(String name) {
-        if (REQUEST.getValue().equals(name)) {
-            return REQUEST;
-        }
-        return new ParameterImpl(name);
+        return getValue() != null ? this::getValue : () -> "";
     }
 }

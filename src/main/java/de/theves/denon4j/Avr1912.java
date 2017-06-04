@@ -25,6 +25,7 @@ import de.theves.denon4j.net.Protocol;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.regex.Pattern;
 
 import static de.theves.denon4j.controls.SwitchState.*;
 
@@ -34,6 +35,8 @@ import static de.theves.denon4j.controls.SwitchState.*;
  * @author stheves
  */
 public class Avr1912 implements AVR {
+    private static final Pattern PATTERN_MASTER_VOL = Pattern.compile("[0-9][0-9][5]?");
+
     private final EventDispatcher eventDispatcher;
     private final Protocol protocol;
     private final Collection<Control> controls;
@@ -45,7 +48,7 @@ public class Avr1912 implements AVR {
     private Select<InputSource> selectInput;
     private Select<VideoSource> selectVideo;
     private Toggle mainZoneToggle;
-    private Select<NetControl> selectNet;
+    private Select<ExtendedControls> selectNet;
 
     public Avr1912(String host, int port) {
         this(new Tcp(host, port));
@@ -89,7 +92,7 @@ public class Avr1912 implements AVR {
         return selectInput;
     }
 
-    public Select<NetControl> selectNetworkControl() {
+    public Select<ExtendedControls> selectNetworkControl() {
         return selectNet;
     }
 
@@ -121,36 +124,43 @@ public class Avr1912 implements AVR {
     private void addControls(Collection<Control> controls) {
         // power control
         powerToggle = new ToggleImpl(registry, "PW", ON, STANDBY);
+        powerToggle.setName("Power switch");
         powerToggle.init();
         controls.add(powerToggle);
 
         // master vol. control
-        masterSlider = new SliderImpl(registry, "MV", "UP", "DOWN", "[000-999]");
+        masterSlider = new SliderImpl(registry, "MV", "UP", "DOWN", PATTERN_MASTER_VOL);
+        masterSlider.setName("Master Volume");
         masterSlider.init();
         controls.add(masterSlider);
 
         // mute control
         muteToggle = new ToggleImpl(registry, "MU", ON, OFF);
+        muteToggle.setName("Mute Toggle");
         muteToggle.init();
         controls.add(muteToggle);
 
         // select input
-        selectInput = new SelectImpl<>(registry, "SI", InputSource.class);
+        selectInput = new SelectImpl<>(registry, "SI", InputSource.values());
+        selectInput.setName("Select INPUT Source");
         selectInput.init();
         controls.add(selectInput);
 
         // select video
-        selectVideo = new SelectImpl<>(registry, "SV", VideoSource.class);
+        selectVideo = new SelectImpl<>(registry, "SV", VideoSource.values());
+        selectVideo.setName("Select VIDEO source");
         selectVideo.init();
         controls.add(selectVideo);
 
         // main zone toggle
         mainZoneToggle = new ToggleImpl(registry, "ZM", ON, OFF);
+        mainZoneToggle.setName("Main Zone Toggle");
         mainZoneToggle.init();
         controls.add(mainZoneToggle);
 
         // network audio/usb/ipod DIRECT extended control
-        selectNet = new SelectImpl<>(registry, "NS", NetControl.class);
+        selectNet = new SelectImpl<>(registry, "NS", ExtendedControls.values());
+        selectNet.setName("Network USB/AUDIO/IPOD Extended Control");
         selectNet.init();
         controls.add(selectNet);
     }

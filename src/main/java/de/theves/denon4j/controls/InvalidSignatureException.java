@@ -15,27 +15,17 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.internal.net;
+package de.theves.denon4j.controls;
 
-import de.theves.denon4j.net.CommandId;
-import de.theves.denon4j.net.Protocol;
+import java.util.regex.Pattern;
 
 /**
- * Command that sends a mutable value to the AVR.
+ * Class description.
  *
  * @author stheves
  */
-public class SetCommandImpl extends CommandImpl {
-    private final MutableParameter mutableParameter;
-
-    public SetCommandImpl(Protocol protocol, CommandId id, String prefix) {
-        super(protocol, id, prefix, new MutableParameter());
-        this.mutableParameter = (MutableParameter) getParameter();
-    }
-
-    public void set(String value) {
-        if (value != null) {
-            mutableParameter.setValue(value);
-        }
+public class InvalidSignatureException extends RuntimeException {
+    public InvalidSignatureException(String value, Pattern pattern) {
+        super(String.format("Value %s must match pattern %s", value, pattern.pattern()));
     }
 }

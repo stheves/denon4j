@@ -19,6 +19,7 @@ package de.theves.denon4j.internal;
 
 import de.theves.denon4j.controls.CommandRegistry;
 import de.theves.denon4j.controls.Control;
+import de.theves.denon4j.controls.NotYetInitializedException;
 import de.theves.denon4j.internal.net.AlreadyInitException;
 import de.theves.denon4j.internal.net.ParameterImpl;
 import de.theves.denon4j.internal.net.RequestCommandImpl;
@@ -37,19 +38,29 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author stheves
  */
 public abstract class AbstractControl implements Control {
-    private static final Parameter DIRTY = ParameterImpl.create("");
+    private static final Parameter DIRTY = ParameterImpl.createParameter("");
 
     private final String prefix;
     private final CommandRegistry registry;
     private final AtomicBoolean initialized = new AtomicBoolean(false);
+    private final List<Command> commands = new ArrayList<>(10);
     private final Object stateMonitor = new Object();
 
     private Parameter state = DIRTY;
-    private final List<Command> commands = new ArrayList<>(10);
+    private String name;
 
     AbstractControl(CommandRegistry registry, String prefix) {
         this.prefix = Objects.requireNonNull(prefix);
         this.registry = Objects.requireNonNull(registry);
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 
     @Override
@@ -86,7 +97,7 @@ public abstract class AbstractControl implements Control {
 
     private void checkInitialized() {
         if (!initialized.get()) {
-            throw new IllegalStateException("Not initialized");
+            throw new NotYetInitializedException(this);
         }
     }
 

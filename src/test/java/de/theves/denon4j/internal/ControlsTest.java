@@ -4,12 +4,12 @@ import de.theves.denon4j.Avr1912;
 import de.theves.denon4j.controls.*;
 import de.theves.denon4j.internal.net.EventImpl;
 import de.theves.denon4j.net.*;
+import org.assertj.core.api.AbstractLongAssert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -60,13 +60,12 @@ public class ControlsTest {
         si.select(InputSource.SAT_CBL);
 
         when(protocol.receive((RequestCommand) cmd("SI?"))).thenReturn(event("SISAT/CBL"));
-        Optional<InputSource> source = si.getSource();
-        assertThat(source).hasValue(InputSource.SAT_CBL);
+        InputSource source = si.getSource();
+        assertThat(source).isEqualTo(InputSource.SAT_CBL);
 
         Command cmd = cmd("SISAT/CBL");
         verify(protocol).send(cmd);
         assertThat(cmd.getExecutedAt()).isAfter(LocalDateTime.MIN);
-
     }
 
     @Test
@@ -123,23 +122,31 @@ public class ControlsTest {
 
     @Test
     public void testNetworkControl() {
-        Select<NetControl> selectNetworkControl = avr1912.selectNetworkControl();
+        Select<ExtendedControls> selectNetworkControl = avr1912.selectNetworkControl();
         assertThat(selectNetworkControl.getCommands()).hasSize(20);
         assertThat(selectNetworkControl.getCommandPrefix()).isEqualTo("NS");
 
-        selectNetworkControl.select(NetControl.CURSOR_DOWN);
+        selectNetworkControl.select(ExtendedControls.CURSOR_DOWN);
         verify(protocol).send(cmd("NS91"));
     }
 
     @Test
-    public void testHealth() {
+    public void testCorrectInit() {
         // check all controls initialized
-        assertThat(avr1912.getControls()
+        assertControlsInitialized();
+
+        // and added to dispatcher
+        assertAddedToDispatcher();
+    }
+
+    private AbstractLongAssert<?> assertControlsInitialized() {
+        return assertThat(avr1912.getControls()
                 .stream()
                 .filter(c -> !c.isInitialized())
                 .count()).isEqualTo(0);
+    }
 
-        // and added to dispatcher
+    private void assertAddedToDispatcher() {
         assertThat(avr1912.getEventDispatcher().getControls())
                 .containsExactlyInAnyOrder(
                         avr1912.getControls()

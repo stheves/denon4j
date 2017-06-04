@@ -15,32 +15,30 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.internal.net;
-
-import de.theves.denon4j.controls.Signature;
-import de.theves.denon4j.net.Parameter;
+package de.theves.denon4j.controls;
 
 /**
  * Class description.
  *
  * @author stheves
  */
-public class MutableParameterImpl implements Parameter {
-    private String value;
+public enum ExtendedControls {
+    CURSOR_UP("90"),CURSOR_DOWN("91"),CURSOR_LEFT("92"),CURSOR_RIGHT("93"),ENTER("94"),PLAY("9A"),PAUSE("9B"),STOP("9C"),
+    SKIP_PLUS("9D"),SKIP_MINUS("9E"),REPEAT_ONE("9H"),REPEAT_ALL("9I"),REPEAT_OFF("9J"),SHUFFLE_ON("9K"),SHUFFLE_OFF("9M"),
+    MODE("9W"),PAGE_NEXT("9X"),PAGE_PREV("9Y"),PARTY_MODE("PT");
 
-    public void setValue(String val) {
-        if (val != null) {
-            this.value = val;
-        }
+    private final String control;
+
+    ExtendedControls(String control) {
+        this.control = control;
+    }
+
+    public String getControl() {
+        return control;
     }
 
     @Override
-    public String getValue() {
-        return value;
-    }
-
-    @Override
-    public Signature build() {
-        return getValue() != null ? this::getValue : () -> "";
+    public String toString() {
+        return getControl();
     }
 }

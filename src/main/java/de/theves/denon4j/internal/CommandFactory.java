@@ -23,7 +23,10 @@ import de.theves.denon4j.internal.net.RequestCommandImpl;
 import de.theves.denon4j.internal.net.SetCommandImpl;
 import de.theves.denon4j.net.Command;
 import de.theves.denon4j.net.CommandId;
+import de.theves.denon4j.net.Parameter;
 import de.theves.denon4j.net.Protocol;
+
+import static de.theves.denon4j.internal.net.ParameterImpl.createParameter;
 
 /**
  * Factory for commands.
@@ -35,16 +38,17 @@ class CommandFactory {
     private CommandFactory() {
     }
 
-    static Command create(Protocol protocol, String prefix, String param) {
+    static Command createCommand(Protocol protocol, String prefix, String param) {
         if (null != prefix) {
             CommandId commandId = CommandId.random();
+            Parameter parameter = createParameter(param);
             if (param.contains("[")) {
                 return new SetCommandImpl(protocol, commandId, prefix);
             } else if (param.equals(ParameterImpl.REQUEST.getValue())) {
                 return new RequestCommandImpl(protocol, commandId, prefix);
             }
-            return new CommandImpl(protocol, commandId, prefix, ParameterImpl.create(param));
+            return new CommandImpl(protocol, commandId, prefix, parameter);
         }
-        throw new IllegalArgumentException("CommandImpl may not be null");
+        throw new IllegalArgumentException("Command may not be null");
     }
 }

@@ -8,7 +8,6 @@ import de.theves.denon4j.net.RequestCommand;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -17,21 +16,21 @@ import java.util.stream.Stream;
  *
  * @author stheves
  */
-public class SelectImpl<S extends Enum<S>> extends AbstractControl implements Select<S> {
-    private final Class<S> enumCls;
+public class SelectImpl<S extends Enum> extends AbstractControl implements Select<S> {
+    private final S[] values;
 
     private List<String> paramList;
 
-    public SelectImpl(CommandRegistry registry, String prefix, Class<S> source) {
+    public SelectImpl(CommandRegistry registry, String prefix, S... values) {
         super(registry, prefix);
-        this.enumCls = source;
+        this.values = values;
     }
 
     @Override
     protected void doInit() {
-        paramList = new ArrayList<>(enumCls.getEnumConstants().length + 1); // +1 for request parameter
+        paramList = new ArrayList<>(values.length + 1); // +1 for request parameter
 
-        paramList.addAll(Stream.of(enumCls.getEnumConstants()).map(S::toString).collect(Collectors.toList()));
+        paramList.addAll(Stream.of(values).map(Enum::toString).collect(Collectors.toList()));
 
         paramList.add(ParameterImpl.REQUEST.getValue());
         register(paramList.toArray(new String[paramList.size()]));
@@ -43,15 +42,16 @@ public class SelectImpl<S extends Enum<S>> extends AbstractControl implements Se
     }
 
     @Override
-    public Optional<S> getSource() {
+    public S getSource() {
         Parameter state = getState();
         return findSource(state);
     }
 
-    private Optional<S> findSource(Parameter state) {
-        return Stream.of(enumCls.getEnumConstants()).filter(
-                ec -> Enum.valueOf(enumCls, ec.name()).toString().equals(state.getValue())
-        ).findFirst();
+    private S findSource(Parameter state) {
+        return Stream.of(values)
+                .filter(e -> state.getValue().equals(e.toString()))
+                .findFirst()
+                .orElseThrow(IllegalStateException::new);
     }
 
     @Override

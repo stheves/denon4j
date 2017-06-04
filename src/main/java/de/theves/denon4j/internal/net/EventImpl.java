@@ -70,6 +70,6 @@ public class EventImpl implements Event {
     }
 
     public static Event create(String event) {
-        return new EventImpl(event.substring(0, 2), ParameterImpl.create(event.substring(2)));
+        return new EventImpl(event.substring(0, 2), ParameterImpl.createParameter(event.substring(2)));
     }
 }

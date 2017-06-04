@@ -66,4 +66,18 @@ public interface Control {
      * Disposes this control and frees resources.
      */
     void dispose();
+
+    /**
+     * Returns the name of the control.
+     *
+     * @return the name.
+     */
+    String getName();
+
+    /**
+     * Sets the name of this control.
+     *
+     * @param name the name.
+     */
+    void setName(String name);
 }

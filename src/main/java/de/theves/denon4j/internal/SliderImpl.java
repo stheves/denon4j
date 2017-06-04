@@ -18,13 +18,16 @@
 package de.theves.denon4j.internal;
 
 import de.theves.denon4j.controls.CommandRegistry;
+import de.theves.denon4j.controls.InvalidSignatureException;
 import de.theves.denon4j.controls.Slider;
 import de.theves.denon4j.internal.net.ParameterImpl;
 import de.theves.denon4j.net.Command;
 import de.theves.denon4j.net.CommandId;
+import de.theves.denon4j.net.Event;
 import de.theves.denon4j.net.RequestCommand;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 
 /**
@@ -35,23 +38,23 @@ import java.util.List;
 public class SliderImpl extends AbstractControl implements Slider {
     private final String up;
     private final String down;
-    private final String set;
+    private final Pattern pattern;
 
     private CommandId upId;
     private CommandId downId;
     private CommandId setId;
     private CommandId requestId;
 
-    public SliderImpl(CommandRegistry registry, String prefix, String up, String down, String set) {
+    public SliderImpl(CommandRegistry registry, String prefix, String up, String down, Pattern pattern) {
         super(registry, prefix);
         this.up = up;
         this.down = down;
-        this.set = set;
+        this.pattern = pattern;
     }
 
     @Override
     protected void doInit() {
-        List<Command> commands = register(up, down, set, ParameterImpl.REQUEST.getValue());
+        List<Command> commands = register(up, down, pattern.pattern(), ParameterImpl.REQUEST.getValue());
         upId = commands.get(0).getId();
         downId = commands.get(1).getId();
         setId = commands.get(2).getId();
@@ -75,11 +78,31 @@ public class SliderImpl extends AbstractControl implements Slider {
 
     @Override
     public void set(String value) {
+        validate(value);
         executeCommand(setId, value);
+    }
+
+    public void validate(String value) throws InvalidSignatureException {
+        if (!isValid(value)) {
+            throw new InvalidSignatureException(value, pattern);
+        }
+    }
+
+    public boolean isValid(String value) {
+        return pattern.matcher(value).matches();
     }
 
     @Override
     protected RequestCommand getRequestCommand() {
         return (RequestCommand) getRegistry().getCommand(requestId);
+    }
+
+    @Override
+    public void handle(Event event) {
+        // check for pattern
+        validate(event.getParameter().getValue());
+
+        // handle only valid ones
+        super.handle(event);
     }
 }

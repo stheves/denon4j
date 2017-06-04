@@ -29,6 +29,8 @@ import java.io.PrintStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static de.theves.denon4j.internal.CommandFactory.createCommand;
+
 /**
  * Class description.
  *
@@ -77,7 +79,7 @@ public class CommandRegistryImpl implements CommandRegistry {
 
     @Override
     public Command register(String prefix, String param) {
-        Command cmd = CommandFactory.create(protocol, prefix, param);
+        Command cmd = createCommand(protocol, prefix, param);
         this.commands.put(cmd.getId(), cmd);
         return cmd;
     }
