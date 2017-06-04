@@ -26,12 +26,12 @@ public class SelectInputTest {
 
         List<Command> commands = si.getCommands();
         assertThat(commands.size()).isEqualTo(23);
-        si.select(InputSource.CD);
+        si.select(InputSource.SAT_CBL);
 
-        when(protocol.receive(si.getRequestCommand())).thenReturn(EventImpl.create("SICD"));
+        when(protocol.receive(si.getRequestCommand())).thenReturn(EventImpl.create("SISAT/CBL"));
         Optional<InputSource> source = si.getSource();
-        assertThat(source).hasValue(InputSource.CD);
+        assertThat(source).hasValue(InputSource.SAT_CBL);
 
-        verify(protocol).send(registry.getCommands().get(0));
+        verify(protocol).send(registry.getCommands().get(5));
     }
 }
