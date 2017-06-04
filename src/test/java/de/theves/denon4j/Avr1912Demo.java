@@ -17,6 +17,7 @@
 
 package de.theves.denon4j;
 
+import de.theves.denon4j.controls.InputSource;
 import de.theves.denon4j.controls.SwitchState;
 import de.theves.denon4j.controls.Toggle;
 import de.theves.denon4j.controls.VideoSource;
@@ -49,6 +50,9 @@ public class Avr1912Demo {
 
             Thread.sleep(200);
             avr.selectVideo().select(VideoSource.SAT_CBL);
+
+            Thread.sleep(200);
+            avr.selectInput().select(InputSource.IRADIO);
         }
         System.out.println("------------DEMO END------------");
     }

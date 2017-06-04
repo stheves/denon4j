@@ -18,6 +18,7 @@
 package de.theves.denon4j.internal;
 
 import de.theves.denon4j.controls.CommandRegistry;
+import de.theves.denon4j.controls.SwitchState;
 import de.theves.denon4j.controls.Toggle;
 
 /**
@@ -27,15 +28,15 @@ import de.theves.denon4j.controls.Toggle;
  */
 public class ToggleImpl extends SwitchImpl implements Toggle {
 
-    public ToggleImpl(CommandRegistry registry, String prefix, String on, String off) {
+    public ToggleImpl(CommandRegistry registry, String prefix, SwitchState on, SwitchState off) {
         super(registry, prefix, on, off);
     }
 
     public void toggle() {
-        if (onValue.equals(getState().getValue())) {
+        if (onValue.getState().equals(getState().getValue())) {
             switchOff();
         }
-        if (offValue.equals(getState().getValue())) {
+        if (offValue.getState().equals(getState().getValue())) {
             switchOn();
         }
     }

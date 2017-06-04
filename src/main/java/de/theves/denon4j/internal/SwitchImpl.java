@@ -34,14 +34,14 @@ import java.util.List;
  * @author stheves
  */
 public abstract class SwitchImpl extends AbstractControl implements Switch {
-    protected final String onValue;
-    protected final String offValue;
+    protected final SwitchState onValue;
+    protected final SwitchState offValue;
 
     private CommandId onId;
     private CommandId offId;
     private CommandId requestId;
 
-    SwitchImpl(CommandRegistry registry, String prefix, String onValue, String offValue) {
+    SwitchImpl(CommandRegistry registry, String prefix, SwitchState onValue, SwitchState offValue) {
         super(registry, prefix);
         this.onValue = onValue;
         this.offValue = offValue;
@@ -63,7 +63,7 @@ public abstract class SwitchImpl extends AbstractControl implements Switch {
     }
 
     private void registerCommands() {
-        List<Command> commands = register(onValue, offValue, ParameterImpl.REQUEST.getValue());
+        List<Command> commands = register(onValue.getState(), offValue.getState(), ParameterImpl.REQUEST.getValue());
         onId = commands.get(0).getId();
         offId = commands.get(1).getId();
         requestId = commands.get(2).getId();

@@ -24,6 +24,8 @@ import de.theves.denon4j.net.Protocol;
 
 import java.io.PrintStream;
 
+import static de.theves.denon4j.controls.SwitchState.*;
+
 /**
  * Implementation of the Denon AVR 1912 protocol spec.
  *
@@ -39,6 +41,7 @@ public class Avr1912 implements AVR {
     private Toggle muteToggle;
     private Select<InputSource> selectInput;
     private Select<VideoSource> selectVideo;
+    private Toggle mainZoneToggle;
 
     public Avr1912(String host, int port) {
         this(new Tcp(host, port));
@@ -53,6 +56,10 @@ public class Avr1912 implements AVR {
 
     public Toggle power() {
         return powerToggle;
+    }
+
+    public Toggle mainZone() {
+        return mainZoneToggle;
     }
 
     public Slider masterVolume() {
@@ -89,7 +96,7 @@ public class Avr1912 implements AVR {
 
     private void addControls() {
         // power control
-        powerToggle = new ToggleImpl(registry, "PW", "ON", "STANDBY");
+        powerToggle = new ToggleImpl(registry, "PW", ON, STANDBY);
         powerToggle.init();
         eventDispatcher.addControl(powerToggle);
 
@@ -99,7 +106,7 @@ public class Avr1912 implements AVR {
         eventDispatcher.addControl(masterSlider);
 
         // mute control
-        muteToggle = new ToggleImpl(registry, "MU", "ON", "OFF");
+        muteToggle = new ToggleImpl(registry, "MU", ON, OFF);
         muteToggle.init();
         eventDispatcher.addControl(muteToggle);
 
@@ -110,6 +117,10 @@ public class Avr1912 implements AVR {
         // select video
         selectVideo = new SelectImpl<>(registry, "SV", VideoSource.class);
         selectVideo.init();
+
+        // main zone toggle
+        mainZoneToggle = new ToggleImpl(registry, "ZM", ON, OFF);
+        mainZoneToggle.init();
     }
 
     public CommandRegistry getRegistry() {

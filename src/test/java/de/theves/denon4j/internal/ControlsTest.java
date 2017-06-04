@@ -74,7 +74,7 @@ public class ControlsTest {
         Toggle power = avr1912.power();
         assertThat(power.getCommands())
                 .hasSize(3)
-                .containsAll(cmds("PWON", "PWSTANDBY", "PW?"));
+                .containsExactlyInAnyOrder(cmds("PWON", "PWSTANDBY", "PW?"));
 
         when(protocol.receive((RequestCommand) cmd("PW?")))
                 .thenReturn(event("PWSTANDBY"), event("PWON"));
@@ -90,7 +90,7 @@ public class ControlsTest {
     @Test
     public void testMuteControl() {
         Toggle mute = avr1912.mute();
-        assertThat(mute.getCommands()).hasSize(3).containsAll(cmds("MUON", "MUOFF", "MU?"));
+        assertThat(mute.getCommands()).hasSize(3).containsExactlyInAnyOrder(cmds("MUON", "MUOFF", "MU?"));
     }
 
     @Test(expected = CommandNotFoundException.class)
@@ -101,7 +101,7 @@ public class ControlsTest {
     @Test
     public void testMasterSlider() {
         Slider slider = avr1912.masterVolume();
-        assertThat(slider.getCommands()).hasSize(4).containsAll(cmds("MVUP", "MVDOWN", "MV", "MV?"));
+        assertThat(slider.getCommands()).hasSize(4).containsExactlyInAnyOrder(cmds("MVUP", "MVDOWN", "MV", "MV?"));
         when(protocol.receive((RequestCommand) cmd("MV?"))).thenReturn(event("MV45"));
         assertThat(slider.getValue()).isEqualTo("45");
 
@@ -115,12 +115,19 @@ public class ControlsTest {
         verify(protocol).send(cmd("MV55"));
     }
 
+    @Test
+    public void testMainZoneToggle() {
+        Toggle toggle = avr1912.mainZone();
+        assertThat(toggle.getCommands()).hasSize(3).containsExactlyInAnyOrder(cmds("ZMON", "ZMOFF", "ZM?"));
+    }
+
     private Event event(String e) {
         return EventImpl.create(e);
     }
 
-    private List<Command> cmds(String... sig) {
-        return Stream.of(sig).map(this::cmd).collect(Collectors.toList());
+    private Command[] cmds(String... sig) {
+        List<Command> commandList = Stream.of(sig).map(this::cmd).collect(Collectors.toList());
+        return commandList.toArray(new Command[commandList.size()]);
     }
 
     private Command cmd(String s) {
