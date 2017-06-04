@@ -34,6 +34,8 @@ public class Avr1912 implements Receiver {
     private Toggle powerToggle;
     private Slider masterSlider;
     private Toggle muteToggle;
+    private SelectInput selectInput;
+    private SelectVideo selectVideo;
 
     public Avr1912(String host, int port) {
         protocol = new Tcp(host, port);
@@ -52,6 +54,14 @@ public class Avr1912 implements Receiver {
 
     public Toggle mute() {
         return muteToggle;
+    }
+
+    public void selectInput(InputSource source) {
+        selectInput.select(source);
+    }
+
+    public void selectVideo(VideoSource source) {
+        selectVideo.select(source);
     }
 
     @Override
@@ -85,6 +95,12 @@ public class Avr1912 implements Receiver {
         muteToggle = new Toggle(registry, "MU", "ON", "OFF");
         muteToggle.init();
         eventDispatcher.addControl(muteToggle);
+
+        // select input
+        selectInput = new SelectInput(registry);
+
+        // select video
+        selectVideo = new SelectVideo(registry);
     }
 
     @Override

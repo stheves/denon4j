@@ -110,8 +110,8 @@ public abstract class AbstractControl implements Control {
         }
     }
 
-    protected void executeCommand(CommandId requestId) {
-        executeCommand(requestId, null);
+    protected void executeCommand(CommandId commandId) {
+        executeCommand(commandId, null);
     }
 
     protected List<Command> register(String... parameters) {
