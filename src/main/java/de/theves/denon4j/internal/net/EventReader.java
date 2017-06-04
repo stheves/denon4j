@@ -15,8 +15,9 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.net;
+package de.theves.denon4j.internal.net;
 
+import de.theves.denon4j.net.ConnectionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +40,7 @@ public class EventReader extends Thread implements Runnable {
 
     private BufferedReader reader;
 
-    public EventReader(Tcp client, Socket socket) {
+    EventReader(Tcp client, Socket socket) {
         super("EventReader");
         this.client = client;
         this.socket = socket;
@@ -73,7 +74,7 @@ public class EventReader extends Thread implements Runnable {
                 }
             }
         } catch (SocketException se) {
-            if (!socket.isClosed() && !socket.isInputShutdown()) {
+            if (!socket.isClosed() || !socket.isInputShutdown()) {
                 throw new ConnectionException("Socket error.", se);
             }
         } catch (Exception e) {

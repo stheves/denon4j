@@ -17,6 +17,10 @@
 
 package de.theves.denon4j;
 
+import de.theves.denon4j.internal.net.RequestCommand;
+import de.theves.denon4j.net.Command;
+import de.theves.denon4j.net.Parameter;
+
 import java.util.List;
 
 
@@ -44,7 +48,7 @@ public class Slider extends AbstractControl {
 
     @Override
     protected void doInit() {
-        List<Command> commands = register(up, down, set, ParameterImpl.REQUEST.getValue());
+        List<Command> commands = register(up, down, set, Parameter.REQUEST.getValue());
         upId = commands.get(0).getId();
         downId = commands.get(1).getId();
         setId = commands.get(2).getId();

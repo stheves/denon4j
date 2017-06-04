@@ -15,47 +15,51 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j;
+package de.theves.denon4j.internal.net;
+
+import de.theves.denon4j.net.Event;
+import de.theves.denon4j.net.Parameter;
+
+import java.util.Objects;
 
 /**
  * Class description.
  *
  * @author Sascha Theves
  */
-class ParameterImpl implements Parameter {
-    public static final ParameterImpl EMPTY = new ParameterImpl("");
-    public static final Parameter REQUEST = new ParameterImpl("?");
+public class EventImpl implements Event {
+    private final String prefix;
+    private final Parameter parameter;
 
-    private String value;
-
-
-    ParameterImpl(String value) {
-        if (null == value || value.trim().length() > 25) {
-            throw new IllegalArgumentException("Name cannot be null or greater than 25 chars");
-        }
-        this.value = value;
-    }
-
-    public String getValue() {
-        return value;
+    protected EventImpl(String prefix, Parameter parameter) {
+        this.prefix = Objects.requireNonNull(prefix);
+        this.parameter = Objects.requireNonNull(parameter);
     }
 
     @Override
-    public String toString() {
-        return "ParameterImpl{" +
-                "value='" + value + '\'' +
-                '}';
+    public String getPrefix() {
+        return prefix;
+    }
+
+    @Override
+    public Parameter getParameter() {
+        return parameter;
     }
 
     @Override
     public String build() {
-        return getValue();
+        return getPrefix() + getParameter().build();
     }
 
-    public static Parameter create(String name) {
-        if (REQUEST.getValue().equals(name)) {
-            return REQUEST;
-        }
-        return new ParameterImpl(name);
+    @Override
+    public String toString() {
+        return "EventImpl{" +
+                "prefix='" + prefix + '\'' +
+                ", parameter=" + parameter +
+                '}';
+    }
+
+    public static Event create(String event) {
+        return new EventImpl(event.substring(0, 2), ParameterImpl.create(event.substring(2)));
     }
 }

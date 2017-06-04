@@ -15,30 +15,13 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j;
-
-import de.theves.denon4j.net.Protocol;
+package de.theves.denon4j.net;
 
 /**
  * Class description.
  *
  * @author Sascha Theves
  */
-public class SetCommand extends Command {
-    private final MutableParameterImpl mutableParameter;
-    public SetCommand(Protocol protocol, CommandId id, String prefix) {
-        super(protocol, id, prefix, new MutableParameterImpl());
-        this.mutableParameter = (MutableParameterImpl) getParameter();
-    }
-
-    public void set(String value) {
-        if (value != null) {
-            mutableParameter.setValue(value);
-        }
-    }
-
-    @Override
-    public String build() {
-        return super.build() + mutableParameter.build();
-    }
+public interface Buildable {
+    String build();
 }

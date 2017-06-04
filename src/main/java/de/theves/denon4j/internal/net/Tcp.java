@@ -15,12 +15,9 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.net;
+package de.theves.denon4j.internal.net;
 
-import de.theves.denon4j.Command;
-import de.theves.denon4j.Event;
-import de.theves.denon4j.EventImpl;
-import de.theves.denon4j.RequestCommand;
+import de.theves.denon4j.net.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -112,12 +109,14 @@ public final class Tcp implements Protocol {
     public Event receive(RequestCommand requestCommand) {
         synchronized (eventReader) {
             send(requestCommand);
+            // wait until response is received
             try {
-                eventReader.wait(20000);
+                eventReader.wait(200);
             } catch (InterruptedException e) {
                 logger.warn("Receive interrupted", e);
             }
         }
+        // we expecting the last event as result of the request command
         return mostRecent;
     }
 

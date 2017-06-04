@@ -15,48 +15,32 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j;
+package de.theves.denon4j.internal.net;
 
-import java.util.Objects;
+import de.theves.denon4j.CommandId;
+import de.theves.denon4j.net.Command;
+import de.theves.denon4j.net.Protocol;
 
 /**
  * Class description.
  *
  * @author Sascha Theves
  */
-public class EventImpl implements Event {
-    private final String prefix;
-    private final Parameter parameter;
-
-    protected EventImpl(String prefix, Parameter parameter) {
-        this.prefix = Objects.requireNonNull(prefix);
-        this.parameter = Objects.requireNonNull(parameter);
+public class SetCommand extends Command {
+    private final MutableParameterImpl mutableParameter;
+    public SetCommand(Protocol protocol, CommandId id, String prefix) {
+        super(protocol, id, prefix, new MutableParameterImpl());
+        this.mutableParameter = (MutableParameterImpl) getParameter();
     }
 
-    @Override
-    public String getPrefix() {
-        return prefix;
-    }
-
-    @Override
-    public Parameter getParameter() {
-        return parameter;
+    public void set(String value) {
+        if (value != null) {
+            mutableParameter.setValue(value);
+        }
     }
 
     @Override
     public String build() {
-        return getPrefix() + getParameter().build();
-    }
-
-    @Override
-    public String toString() {
-        return "EventImpl{" +
-                "prefix='" + prefix + '\'' +
-                ", parameter=" + parameter +
-                '}';
-    }
-
-    public static Event create(String event) {
-        return new EventImpl(event.substring(0, 2), ParameterImpl.create(event.substring(2)));
+        return super.build() + mutableParameter.build();
     }
 }

@@ -15,9 +15,10 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j;
+package de.theves.denon4j.net;
 
-import de.theves.denon4j.net.Protocol;
+import de.theves.denon4j.CommandId;
+import de.theves.denon4j.internal.net.EventImpl;
 
 import java.time.LocalDateTime;
 import java.util.Objects;

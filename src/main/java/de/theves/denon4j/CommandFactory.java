@@ -17,6 +17,10 @@
 
 package de.theves.denon4j;
 
+import de.theves.denon4j.internal.net.RequestCommand;
+import de.theves.denon4j.internal.net.SetCommand;
+import de.theves.denon4j.net.Command;
+import de.theves.denon4j.net.Parameter;
 import de.theves.denon4j.net.Protocol;
 
 /**
@@ -24,20 +28,20 @@ import de.theves.denon4j.net.Protocol;
  *
  * @author Sascha Theves
  */
-public class CommandFactory {
+class CommandFactory {
 
     private CommandFactory() {
     }
 
-    public static Command create(Protocol protocol, String prefix, String param) {
+    static Command create(Protocol protocol, String prefix, String param) {
         if (null != prefix) {
             CommandId commandId = CommandId.random();
             if (param.contains("[")) {
                 return new SetCommand(protocol, commandId, prefix);
-            } else if (param.equals(ParameterImpl.REQUEST.getValue())) {
+            } else if (param.equals(Parameter.REQUEST.getValue())) {
                 return new RequestCommand(protocol, commandId, prefix);
             }
-            return new Command(protocol, commandId, prefix, ParameterImpl.create(param));
+            return new Command(protocol, commandId, prefix, Parameter.create(param));
         }
         throw new IllegalArgumentException("Command may not be null");
     }

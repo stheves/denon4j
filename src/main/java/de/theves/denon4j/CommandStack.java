@@ -17,6 +17,8 @@
 
 package de.theves.denon4j;
 
+import de.theves.denon4j.internal.net.SetCommand;
+import de.theves.denon4j.net.Command;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

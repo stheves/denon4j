@@ -17,6 +17,8 @@
 
 package de.theves.denon4j;
 
+import de.theves.denon4j.net.Command;
+import de.theves.denon4j.net.Parameter;
 import de.theves.denon4j.net.Protocol;
 
 import java.io.PrintStream;
@@ -69,7 +71,7 @@ public class CommandRegistry {
     public List<Command> teach(String prefix, String... parameters) {
         List<Command> result = new ArrayList<>(parameters.length + 1);
         if (parameters.length == 0) {
-            result.add(register(prefix, ParameterImpl.EMPTY.getValue()));
+            result.add(register(prefix, Parameter.EMPTY.getValue()));
         } else {
             for (String param : parameters) {
                 result.add(register(prefix, param));

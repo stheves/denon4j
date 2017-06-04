@@ -17,6 +17,11 @@
 
 package de.theves.denon4j;
 
+import de.theves.denon4j.internal.net.RequestCommand;
+import de.theves.denon4j.net.Command;
+import de.theves.denon4j.net.Event;
+import de.theves.denon4j.net.Parameter;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -29,7 +34,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author Sascha Theves
  */
 public abstract class AbstractControl implements Control {
-    private static final Parameter DIRTY = ParameterImpl.create("");
+    private static final Parameter DIRTY = Parameter.create("");
 
     private final String prefix;
     private final CommandRegistry registry;

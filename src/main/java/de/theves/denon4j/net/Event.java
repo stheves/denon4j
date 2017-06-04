@@ -15,29 +15,14 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j;
+package de.theves.denon4j.net;
 
 /**
  * Class description.
  *
  * @author Sascha Theves
  */
-public class MutableParameterImpl implements Parameter {
-    private String value;
-
-    public void setValue(String val) {
-        if (val != null) {
-            this.value = val;
-        }
-    }
-
-    @Override
-    public String getValue() {
-        return value;
-    }
-
-    @Override
-    public String build() {
-        return getValue() != null ? getValue() : "";
-    }
+public interface Event extends Buildable {
+    String getPrefix();
+    Parameter getParameter();
 }

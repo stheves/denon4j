@@ -15,13 +15,31 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j;
+package de.theves.denon4j.internal.net;
+
+import de.theves.denon4j.CommandId;
+import de.theves.denon4j.net.Command;
+import de.theves.denon4j.net.Event;
+import de.theves.denon4j.net.Protocol;
 
 /**
  * Class description.
  *
  * @author Sascha Theves
  */
-public interface Buildable {
-    String build();
+public class RequestCommand extends Command {
+    private Event received;
+
+    public RequestCommand(Protocol protocol, CommandId id, String prefix) {
+        super(protocol, id, prefix, ParameterImpl.REQUEST);
+    }
+
+    @Override
+    protected void doSend() {
+        received = protocol.receive(this);
+    }
+
+    public Event getReceived() {
+        return received;
+    }
 }

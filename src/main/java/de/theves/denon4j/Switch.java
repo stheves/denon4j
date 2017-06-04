@@ -17,6 +17,10 @@
 
 package de.theves.denon4j;
 
+import de.theves.denon4j.internal.net.RequestCommand;
+import de.theves.denon4j.net.Command;
+import de.theves.denon4j.net.Parameter;
+
 import java.util.List;
 
 /**
@@ -28,21 +32,21 @@ public abstract class Switch extends AbstractControl {
     private final String onValue;
     private final String offValue;
 
-    protected CommandId onId;
-    protected CommandId offId;
-    protected CommandId requestId;
+    private CommandId onId;
+    private CommandId offId;
+    private CommandId requestId;
 
-    public Switch(CommandRegistry registry, String prefix, String onValue, String offValue) {
+    Switch(CommandRegistry registry, String prefix, String onValue, String offValue) {
         super(registry, prefix);
         this.onValue = onValue;
         this.offValue = offValue;
     }
 
-    protected void switchOff() {
+    public void switchOff() {
         executeCommand(offId);
     }
 
-    protected void switchOn() {
+    public void switchOn() {
         executeCommand(onId);
     }
 
@@ -68,7 +72,7 @@ public abstract class Switch extends AbstractControl {
     }
 
     private void registerCommands() {
-        List<Command> commands = register(onValue, offValue, ParameterImpl.REQUEST.getValue());
+        List<Command> commands = register(onValue, offValue, Parameter.REQUEST.getValue());
         onId = commands.get(0).getId();
         offId = commands.get(1).getId();
         requestId = commands.get(2).getId();

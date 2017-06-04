@@ -15,7 +15,9 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j;
+package de.theves.denon4j.net;
+
+import de.theves.denon4j.internal.net.ParameterImpl;
 
 /**
  * Class description.
@@ -23,5 +25,15 @@ package de.theves.denon4j;
  * @author Sascha Theves
  */
 public interface Parameter extends Buildable {
+    Parameter EMPTY = create("");
+    Parameter REQUEST = create("?");
+
     String getValue();
+
+    static Parameter create(String name) {
+        if (REQUEST.getValue().equals(name)) {
+            return REQUEST;
+        }
+        return new ParameterImpl(name);
+    }
 }

@@ -15,28 +15,47 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j;
+package de.theves.denon4j.internal.net;
 
-import de.theves.denon4j.net.Protocol;
+import de.theves.denon4j.net.Parameter;
 
 /**
  * Class description.
  *
  * @author Sascha Theves
  */
-public class RequestCommand extends Command {
-    private Event received;
+public class ParameterImpl implements Parameter {
+    private String value;
 
-    public RequestCommand(Protocol protocol, CommandId id, String prefix) {
-        super(protocol, id, prefix, ParameterImpl.REQUEST);
+
+    public ParameterImpl(String value) {
+        if (null == value || value.trim().length() > 25) {
+            throw new IllegalArgumentException("Name cannot be null or greater than 25 chars");
+        }
+        this.value = value;
     }
 
     @Override
-    protected void doSend() {
-        received = protocol.receive(this);
+    public String getValue() {
+        return value;
     }
 
-    public Event getReceived() {
-        return received;
+    @Override
+    public String toString() {
+        return "ParameterImpl{" +
+                "value='" + value + '\'' +
+                '}';
+    }
+
+    @Override
+    public String build() {
+        return getValue();
+    }
+
+    public static Parameter create(String name) {
+        if (REQUEST.getValue().equals(name)) {
+            return REQUEST;
+        }
+        return new ParameterImpl(name);
     }
 }

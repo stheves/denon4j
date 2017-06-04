@@ -17,6 +17,7 @@
 
 package de.theves.denon4j;
 
+import de.theves.denon4j.net.Event;
 import de.theves.denon4j.net.EventListener;
 import de.theves.denon4j.net.Protocol;
 

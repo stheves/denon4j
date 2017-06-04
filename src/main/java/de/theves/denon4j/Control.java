@@ -17,6 +17,8 @@
 
 package de.theves.denon4j;
 
+import de.theves.denon4j.net.Event;
+
 /**
  * Class description.
  *
