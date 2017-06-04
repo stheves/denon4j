@@ -18,23 +18,11 @@
 package de.theves.denon4j.net;
 
 /**
- * Class description.
+ * Thrown when connection timeout occurs.
  *
  * @author Sascha Theves
  */
 public class TimeoutException extends ConnectionException {
-    public TimeoutException() {
-        super();
-    }
-
-    public TimeoutException(Throwable cause) {
-        super(cause);
-    }
-
-    public TimeoutException(String message) {
-        super(message);
-    }
-
     public TimeoutException(String message, Throwable cause) {
         super(message, cause);
     }

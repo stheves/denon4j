@@ -15,30 +15,28 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j;
+package de.theves.denon4j.controls;
 
-/**
- * Class description.
- *
- * @author Sascha Theves
- */
-public enum VideoSource {
-    DVD("DVD"), BD("BD"), TV("TV"), SAT_CBL("SAT/CBL"), GAME(
+public enum InputSource {
+    CD("CD"), TUNER("TUNER"), DVD("DVD"), BD("BD"), TV("TV"), SAT_CBL("SAT/CBL"), GAME(
             "GAME"), GAME2("GAME2"), AUX("V.AUX"), DOCK("DOCK"), SOURCE(
-            "SOURCE");
+            "SOURCE"), IPOD("IPOD"), NET_UBS("NET/USB"), RHAPSODY("RHAPSODY"), NAPSTER(
+            "NAPSTER"), PANDORA("PANDORA"), LASTFM("LASTFM"), FLICKR("FLICKR"), FAVORITES(
+            "FAVORITES"), IRADIO("IRADIO"), UPNP_SERVER("SERVER"), USB_IPOD(
+            "USB/IPOD");
 
-    private String source;
+    private String inputSource;
 
-    VideoSource(String source) {
-        this.source = source;
+    InputSource(String source) {
+        this.inputSource = source;
     }
 
-    public String getSource() {
-        return source;
+    public String getInputSource() {
+        return inputSource;
     }
 
     @Override
     public String toString() {
-        return source;
+        return inputSource;
     }
 }

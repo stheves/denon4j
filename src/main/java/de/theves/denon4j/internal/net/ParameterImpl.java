@@ -25,6 +25,9 @@ import de.theves.denon4j.net.Parameter;
  * @author Sascha Theves
  */
 public class ParameterImpl implements Parameter {
+    public static final Parameter EMPTY = new ParameterImpl("");
+    public static final Parameter REQUEST = new ParameterImpl("?");
+
     private String value;
 
 

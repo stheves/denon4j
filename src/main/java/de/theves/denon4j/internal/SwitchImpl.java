@@ -15,13 +15,14 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j;
+package de.theves.denon4j.internal;
 
-import de.theves.denon4j.internal.AbstractControl;
-import de.theves.denon4j.internal.net.RequestCommand;
+import de.theves.denon4j.controls.CommandRegistry;
+import de.theves.denon4j.controls.Switch;
+import de.theves.denon4j.internal.net.ParameterImpl;
 import de.theves.denon4j.net.Command;
 import de.theves.denon4j.net.CommandId;
-import de.theves.denon4j.net.Parameter;
+import de.theves.denon4j.net.RequestCommand;
 
 import java.util.List;
 
@@ -30,7 +31,7 @@ import java.util.List;
  *
  * @author Sascha Theves
  */
-public abstract class Switch extends AbstractControl {
+public abstract class SwitchImpl extends AbstractControl implements Switch {
     private final String onValue;
     private final String offValue;
 
@@ -38,32 +39,38 @@ public abstract class Switch extends AbstractControl {
     private CommandId offId;
     private CommandId requestId;
 
-    Switch(CommandRegistry registry, String prefix, String onValue, String offValue) {
+    SwitchImpl(CommandRegistry registry, String prefix, String onValue, String offValue) {
         super(registry, prefix);
         this.onValue = onValue;
         this.offValue = offValue;
     }
 
+    @Override
     public void switchOff() {
         executeCommand(offId);
     }
 
+    @Override
     public void switchOn() {
         executeCommand(onId);
     }
 
+    @Override
     public boolean switchedOn() {
         return onValue.equals(getState().getValue());
     }
 
+    @Override
     public boolean switchedOff() {
         return offValue.equals(getState().getValue());
     }
 
+    @Override
     public String getOnValue() {
         return onValue;
     }
 
+    @Override
     public String getOffValue() {
         return offValue;
     }
@@ -74,7 +81,7 @@ public abstract class Switch extends AbstractControl {
     }
 
     private void registerCommands() {
-        List<Command> commands = register(onValue, offValue, Parameter.REQUEST.getValue());
+        List<Command> commands = register(onValue, offValue, ParameterImpl.REQUEST.getValue());
         onId = commands.get(0).getId();
         offId = commands.get(1).getId();
         requestId = commands.get(2).getId();

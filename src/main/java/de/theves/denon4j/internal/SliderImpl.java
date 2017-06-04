@@ -15,23 +15,24 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j;
+package de.theves.denon4j.internal;
 
-import de.theves.denon4j.internal.AbstractControl;
-import de.theves.denon4j.internal.net.RequestCommand;
+import de.theves.denon4j.controls.CommandRegistry;
+import de.theves.denon4j.controls.Slider;
+import de.theves.denon4j.internal.net.ParameterImpl;
 import de.theves.denon4j.net.Command;
 import de.theves.denon4j.net.CommandId;
-import de.theves.denon4j.net.Parameter;
+import de.theves.denon4j.net.RequestCommand;
 
 import java.util.List;
 
 
 /**
- * Class description.
+ * SliderImpl control for volumes.
  *
  * @author Sascha Theves
  */
-public class Slider extends AbstractControl {
+public class SliderImpl extends AbstractControl implements Slider {
     private final String up;
     private final String down;
     private final String set;
@@ -41,7 +42,7 @@ public class Slider extends AbstractControl {
     private CommandId setId;
     private CommandId requestId;
 
-    public Slider(CommandRegistry registry, String prefix, String up, String down, String set) {
+    public SliderImpl(CommandRegistry registry, String prefix, String up, String down, String set) {
         super(registry, prefix);
         this.up = up;
         this.down = down;
@@ -50,25 +51,29 @@ public class Slider extends AbstractControl {
 
     @Override
     protected void doInit() {
-        List<Command> commands = register(up, down, set, Parameter.REQUEST.getValue());
+        List<Command> commands = register(up, down, set, ParameterImpl.REQUEST.getValue());
         upId = commands.get(0).getId();
         downId = commands.get(1).getId();
         setId = commands.get(2).getId();
         requestId = commands.get(3).getId();
     }
 
+    @Override
     public void slideUp() {
         executeCommand(upId);
     }
 
+    @Override
     public void slideDown() {
         executeCommand(downId);
     }
 
+    @Override
     public String getValue() {
         return getState().getValue();
     }
 
+    @Override
     public void set(String value) {
         executeCommand(setId, value);
     }

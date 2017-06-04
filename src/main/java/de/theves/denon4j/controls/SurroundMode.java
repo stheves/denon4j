@@ -15,27 +15,38 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.internal.net;
-
-import de.theves.denon4j.net.Command;
-import de.theves.denon4j.net.CommandId;
-import de.theves.denon4j.net.Protocol;
+package de.theves.denon4j.controls;
 
 /**
  * Class description.
  *
  * @author Sascha Theves
  */
-public class SetCommand extends Command {
-    private final MutableParameterImpl mutableParameter;
-    public SetCommand(Protocol protocol, CommandId id, String prefix) {
-        super(protocol, id, prefix, new MutableParameterImpl());
-        this.mutableParameter = (MutableParameterImpl) getParameter();
+public enum SurroundMode {
+    MOVIE("MOVIE"),
+    MUSIC("MUSIC"),
+    GAME("GAME"),
+    DIRECT("DIRECT"),
+    PURE_DIRECT("PURE DIRECT"),
+    STEREO("STEREO"),
+    STANDARD("STANDARD"),
+    DOLBY_DIGITAL("DOLBY DIGITAL"),
+    DTS("DTS SURROUND"),
+    MULTI_CHANNEL_STEREO("MCH STEREO"),
+    ROCK_ARENA("ROCK ARENA"),
+    JAZZ_CLUB("JAZZ CLUB"),
+    MONO_MOVIE("MONO MOVIE"),
+    MATRIX("MATRIX"),
+    VIDEO_GAME("VIDEO GAME"),
+    VIRTUAL("VIRTUAL");
+
+    private String mode;
+
+    SurroundMode(String mode) {
+        this.mode = mode;
     }
 
-    public void set(String value) {
-        if (value != null) {
-            mutableParameter.setValue(value);
-        }
+    public String getMode() {
+        return mode;
     }
 }

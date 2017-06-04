@@ -17,13 +17,12 @@
 
 package de.theves.denon4j.internal;
 
-import de.theves.denon4j.CommandRegistry;
-import de.theves.denon4j.Control;
-import de.theves.denon4j.internal.net.RequestCommand;
-import de.theves.denon4j.net.Command;
-import de.theves.denon4j.net.CommandId;
-import de.theves.denon4j.net.Event;
-import de.theves.denon4j.net.Parameter;
+import de.theves.denon4j.controls.CommandRegistry;
+import de.theves.denon4j.controls.Control;
+import de.theves.denon4j.internal.net.AlreadyInitException;
+import de.theves.denon4j.internal.net.ParameterImpl;
+import de.theves.denon4j.internal.net.RequestCommandImpl;
+import de.theves.denon4j.net.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,7 +37,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author Sascha Theves
  */
 public abstract class AbstractControl implements Control {
-    private static final Parameter DIRTY = Parameter.create("");
+    private static final Parameter DIRTY = ParameterImpl.create("");
 
     private final String prefix;
     private final CommandRegistry registry;
@@ -48,7 +47,7 @@ public abstract class AbstractControl implements Control {
     private Parameter state = DIRTY;
     private final List<Command> commands = new ArrayList<>(10);
 
-    public AbstractControl(CommandRegistry registry, String prefix) {
+    AbstractControl(CommandRegistry registry, String prefix) {
         this.prefix = Objects.requireNonNull(prefix);
         this.registry = Objects.requireNonNull(registry);
     }
@@ -100,11 +99,11 @@ public abstract class AbstractControl implements Control {
 
     protected abstract RequestCommand getRequestCommand();
 
-    protected CommandRegistry getRegistry() {
+    CommandRegistry getRegistry() {
         return registry;
     }
 
-    protected Parameter getState() {
+    Parameter getState() {
         checkInitialized();
         synchronized (stateMonitor) {
             initState();
@@ -119,19 +118,19 @@ public abstract class AbstractControl implements Control {
         }
     }
 
-    protected void executeCommand(CommandId commandId) {
+    void executeCommand(CommandId commandId) {
         executeCommand(commandId, null);
     }
 
-    protected List<Command> register(String... parameters) {
+    List<Command> register(String... parameters) {
         commands.addAll(getRegistry().registerAll(getCommandPrefix(), parameters));
         return commands;
     }
 
-    protected void executeCommand(CommandId downId, String value) {
+    void executeCommand(CommandId downId, String value) {
         Command execute = getRegistry().getCommandStack().execute(downId, value);
-        if(execute instanceof RequestCommand) {
-           return;
+        if (execute instanceof RequestCommandImpl) {
+            return;
         }
         state = DIRTY;
     }

@@ -15,19 +15,32 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.internal;
+package de.theves.denon4j.internal.net;
+
+import de.theves.denon4j.net.CommandId;
+import de.theves.denon4j.net.Event;
+import de.theves.denon4j.net.Protocol;
+import de.theves.denon4j.net.RequestCommand;
 
 /**
- * Class description.
+ * Request command implementation.
  *
  * @author Sascha Theves
  */
-public class AlreadyInitException extends RuntimeException {
-    public AlreadyInitException(String message) {
-        super(message);
+public class RequestCommandImpl extends CommandImpl implements RequestCommand {
+    private Event received;
+
+    public RequestCommandImpl(Protocol protocol, CommandId id, String prefix) {
+        super(protocol, id, prefix, ParameterImpl.REQUEST);
     }
 
-    public AlreadyInitException(String message, Throwable cause) {
-        super(message, cause);
+    @Override
+    protected void doSend() {
+        received = protocol.receive(this);
+    }
+
+    @Override
+    public Event getReceived() {
+        return received;
     }
 }

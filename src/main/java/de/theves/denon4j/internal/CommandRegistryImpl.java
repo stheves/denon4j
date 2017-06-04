@@ -17,12 +17,12 @@
 
 package de.theves.denon4j.internal;
 
-import de.theves.denon4j.CommandNotFoundException;
-import de.theves.denon4j.CommandRegistry;
-import de.theves.denon4j.Signature;
+import de.theves.denon4j.controls.CommandNotFoundException;
+import de.theves.denon4j.controls.CommandRegistry;
+import de.theves.denon4j.controls.Signature;
+import de.theves.denon4j.internal.net.ParameterImpl;
 import de.theves.denon4j.net.Command;
 import de.theves.denon4j.net.CommandId;
-import de.theves.denon4j.net.Parameter;
 import de.theves.denon4j.net.Protocol;
 
 import java.io.PrintStream;
@@ -85,7 +85,7 @@ public class CommandRegistryImpl implements CommandRegistry {
     public List<Command> registerAll(String prefix, String... parameters) {
         List<Command> result = new ArrayList<>(parameters.length + 1);
         if (parameters.length == 0) {
-            result.add(register(prefix, Parameter.EMPTY.getValue()));
+            result.add(register(prefix, ParameterImpl.EMPTY.getValue()));
         } else {
             for (String param : parameters) {
                 result.add(register(prefix, param));

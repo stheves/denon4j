@@ -1,6 +1,5 @@
-package de.theves.denon4j;
+package de.theves.denon4j.controls;
 
-import de.theves.denon4j.internal.CommandStackImpl;
 import de.theves.denon4j.net.Command;
 import de.theves.denon4j.net.CommandId;
 
@@ -73,7 +72,7 @@ public interface CommandRegistry {
      *
      * @return the command stack.
      */
-    CommandStackImpl getCommandStack();
+    CommandStack getCommandStack();
 
     /**
      * Find a command by it`s signature.

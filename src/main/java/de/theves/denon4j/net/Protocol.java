@@ -17,8 +17,6 @@
 
 package de.theves.denon4j.net;
 
-import de.theves.denon4j.internal.net.RequestCommand;
-
 /**
  * Low-level network client for communication with AVR.
  *
@@ -30,13 +28,25 @@ public interface Protocol {
      * (blocking).
      *
      * @param command the command to send (not <code>null</code>).
-     * @return the response from the receiver (never <code>null</code>).
      * @throws ConnectionException if a communication failure occurs.
      */
     void send(Command command);
 
+    /**
+     * Sets the event listener for this protocol.
+     * The event listener is registered to the event bus for receiving all events of the AVR.
+     *
+     * @param eventListener the event listener to use.
+     */
     void setListener(EventListener eventListener);
 
+    /**
+     * Sends a request command.
+     * A request command is a special command that has a immediate response in form of an {@link Event}.
+     *
+     * @param requestCommand the command to send.
+     * @return the response of the command.
+     */
     Event receive(RequestCommand requestCommand);
 
     /**

@@ -17,15 +17,16 @@
 
 package de.theves.denon4j.internal;
 
-import de.theves.denon4j.internal.net.RequestCommand;
-import de.theves.denon4j.internal.net.SetCommand;
+import de.theves.denon4j.internal.net.CommandImpl;
+import de.theves.denon4j.internal.net.ParameterImpl;
+import de.theves.denon4j.internal.net.RequestCommandImpl;
+import de.theves.denon4j.internal.net.SetCommandImpl;
 import de.theves.denon4j.net.Command;
 import de.theves.denon4j.net.CommandId;
-import de.theves.denon4j.net.Parameter;
 import de.theves.denon4j.net.Protocol;
 
 /**
- * Class description.
+ * Factory for commands.
  *
  * @author Sascha Theves
  */
@@ -38,12 +39,12 @@ class CommandFactory {
         if (null != prefix) {
             CommandId commandId = CommandId.random();
             if (param.contains("[")) {
-                return new SetCommand(protocol, commandId, prefix);
-            } else if (param.equals(Parameter.REQUEST.getValue())) {
-                return new RequestCommand(protocol, commandId, prefix);
+                return new SetCommandImpl(protocol, commandId, prefix);
+            } else if (param.equals(ParameterImpl.REQUEST.getValue())) {
+                return new RequestCommandImpl(protocol, commandId, prefix);
             }
-            return new Command(protocol, commandId, prefix, Parameter.create(param));
+            return new CommandImpl(protocol, commandId, prefix, ParameterImpl.create(param));
         }
-        throw new IllegalArgumentException("Command may not be null");
+        throw new IllegalArgumentException("CommandImpl may not be null");
     }
 }

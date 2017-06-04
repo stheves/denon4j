@@ -15,21 +15,15 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j;
+package de.theves.denon4j.internal.net;
 
 /**
- * Class description.
+ * Thrown if control`s init-method was called multiple times.
  *
  * @author Sascha Theves
  */
-public enum  DigitalInputMode {
-    AUTO("AUTO"), DTS("DTS"), PCM("PCM");
-    private final String mode;
-    DigitalInputMode(String mode) {
-        this.mode = mode;
-    }
-
-    public String getMode() {
-        return mode;
+public class AlreadyInitException extends RuntimeException {
+    public AlreadyInitException(String message) {
+        super(message);
     }
 }

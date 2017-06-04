@@ -1,4 +1,4 @@
-package de.theves.denon4j;
+package de.theves.denon4j.controls;
 
 import de.theves.denon4j.net.Command;
 import de.theves.denon4j.net.CommandId;

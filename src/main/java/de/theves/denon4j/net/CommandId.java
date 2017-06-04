@@ -21,7 +21,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 /**
- * Command identifier.
+ * {@link Command} identifier.
  *
  * @author Sascha Theves
  */
@@ -32,7 +32,7 @@ public class CommandId {
         this.identifier = Objects.requireNonNull(identifier);
     }
 
-    public String getIdentifier() {
+    public String getId() {
         return identifier;
     }
 

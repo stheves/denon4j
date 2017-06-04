@@ -18,7 +18,7 @@
 package de.theves.denon4j.net;
 
 /**
- * Class description.
+ * Main event bus listener.
  *
  * @author Sascha Theves
  */

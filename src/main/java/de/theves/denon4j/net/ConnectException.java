@@ -1,5 +1,10 @@
 package de.theves.denon4j.net;
 
+/**
+ * Thrown if connection establishment/disconnect fails.
+ *
+ * @author Sascha Theves
+ */
 public class ConnectException extends ConnectionException {
     private static final long serialVersionUID = 1L;
 

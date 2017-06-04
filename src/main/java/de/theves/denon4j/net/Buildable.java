@@ -18,7 +18,7 @@
 package de.theves.denon4j.net;
 
 /**
- * Class description.
+ * An object that can be built.
  *
  * @author Sascha Theves
  */

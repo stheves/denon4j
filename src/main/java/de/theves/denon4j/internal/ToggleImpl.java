@@ -15,16 +15,19 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j;
+package de.theves.denon4j.internal;
+
+import de.theves.denon4j.controls.CommandRegistry;
+import de.theves.denon4j.controls.Toggle;
 
 /**
- * Class description.
+ * Toggle control implementation.
  *
  * @author Sascha Theves
  */
-public class Toggle extends Switch {
+public class ToggleImpl extends SwitchImpl implements Toggle {
 
-    public Toggle(CommandRegistry registry, String prefix, String on, String off) {
+    public ToggleImpl(CommandRegistry registry, String prefix, String on, String off) {
         super(registry, prefix, on, off);
     }
 

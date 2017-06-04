@@ -17,9 +17,9 @@
 
 package de.theves.denon4j.internal;
 
-import de.theves.denon4j.CommandRegistry;
-import de.theves.denon4j.CommandStack;
-import de.theves.denon4j.internal.net.SetCommand;
+import de.theves.denon4j.controls.CommandRegistry;
+import de.theves.denon4j.controls.CommandStack;
+import de.theves.denon4j.internal.net.SetCommandImpl;
 import de.theves.denon4j.net.Command;
 import de.theves.denon4j.net.CommandId;
 import org.slf4j.Logger;
@@ -58,14 +58,14 @@ public class CommandStackImpl implements CommandStack {
 
             // save command
             commandList.add(cmd);
-            logger.debug("Command executed: " + cmd);
+            logger.debug("CommandImpl executed: " + cmd);
             return cmd;
         }
     }
 
     private void prepareSetCommand(String value, Command cmd) {
-        if (cmd instanceof SetCommand) {
-            ((SetCommand) cmd).set(value);
+        if (cmd instanceof SetCommandImpl) {
+            ((SetCommandImpl) cmd).set(value);
         }
     }
 

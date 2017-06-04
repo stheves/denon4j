@@ -17,9 +17,12 @@
 
 package de.theves.denon4j;
 
+import de.theves.denon4j.controls.VideoSource;
+import de.theves.denon4j.internal.ToggleImpl;
+
 public class Avr1912Demo {
 
-    public void demo(String host, int port) throws Exception {
+    private void demo(String host, int port) throws Exception {
         try (Avr1912 avr = new Avr1912(host, port)) {
             // show all available commands
             avr.printHelp(System.out);
@@ -28,27 +31,25 @@ public class Avr1912Demo {
             avr.connect(1000);
 
             // power control
-            Toggle power = avr.power();
+            ToggleImpl power = avr.power();
             System.out.println("PWON: " + power.switchedOn());
             if (!power.switchedOn()) {
                 // powering on
                 power.toggle();
             }
 
-//            Slider master = avr.masterVolume();
-//            System.out.println("MASTER VOL: " + master.getValue());
-//            master.slideDown();
-//            System.out.println("MASTER VOL: " + master.getValue());
-//            master.set("50");
-//            System.out.println("MASTER VOL: " + master.getValue());
-//            master.slideUp();
-
-            Toggle mute = avr.mute();
+            ToggleImpl mute = avr.mute();
             mute.toggle();
             System.out.println("MUTE ON: " + mute.switchedOn());
+
+            Thread.sleep(200);
             mute.switchOff();
             System.out.println("MUTE OFF: " + mute.switchedOff());
+
+            Thread.sleep(200);
+            avr.selectVideo().select(VideoSource.SAT_CBL);
         }
+        System.out.println("------------DEMO END------------");
     }
 
     public static void main(String[] args) throws Exception {

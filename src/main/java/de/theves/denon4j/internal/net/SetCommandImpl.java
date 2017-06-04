@@ -17,9 +17,7 @@
 
 package de.theves.denon4j.internal.net;
 
-import de.theves.denon4j.net.Command;
 import de.theves.denon4j.net.CommandId;
-import de.theves.denon4j.net.Event;
 import de.theves.denon4j.net.Protocol;
 
 /**
@@ -27,19 +25,17 @@ import de.theves.denon4j.net.Protocol;
  *
  * @author Sascha Theves
  */
-public class RequestCommand extends Command {
-    private Event received;
+public class SetCommandImpl extends CommandImpl {
+    private final MutableParameterImpl mutableParameter;
 
-    public RequestCommand(Protocol protocol, CommandId id, String prefix) {
-        super(protocol, id, prefix, ParameterImpl.REQUEST);
+    public SetCommandImpl(Protocol protocol, CommandId id, String prefix) {
+        super(protocol, id, prefix, new MutableParameterImpl());
+        this.mutableParameter = (MutableParameterImpl) getParameter();
     }
 
-    @Override
-    protected void doSend() {
-        received = protocol.receive(this);
-    }
-
-    public Event getReceived() {
-        return received;
+    public void set(String value) {
+        if (value != null) {
+            mutableParameter.setValue(value);
+        }
     }
 }

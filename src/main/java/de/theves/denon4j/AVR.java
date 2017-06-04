@@ -20,10 +20,15 @@ package de.theves.denon4j;
 import java.io.PrintStream;
 
 /**
- * Class description.
+ * Represents an audio/video receiver.
  *
  * @author Sascha Theves
  */
 public interface AVR extends AutoCloseable {
+    /**
+     * Prints the online help.
+     *
+     * @param writer the writer to print the help.
+     */
     void printHelp(PrintStream writer);
 }

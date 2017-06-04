@@ -1,11 +1,13 @@
-package de.theves.denon4j;
+package de.theves.denon4j.internal;
 
+import de.theves.denon4j.Avr1912;
+import de.theves.denon4j.controls.*;
 import de.theves.denon4j.internal.net.EventImpl;
-import de.theves.denon4j.internal.net.RequestCommand;
 import de.theves.denon4j.net.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -57,36 +59,39 @@ public class ControlsTest {
         // execute control
         si.select(InputSource.SAT_CBL);
 
-        when(protocol.receive(si.getRequestCommand())).thenReturn(event("SISAT/CBL"));
+        when(protocol.receive((RequestCommand) cmd("SI?"))).thenReturn(event("SISAT/CBL"));
         Optional<InputSource> source = si.getSource();
         assertThat(source).hasValue(InputSource.SAT_CBL);
 
-        verify(protocol).send(sig("SISAT/CBL"));
+        Command cmd = cmd("SISAT/CBL");
+        verify(protocol).send(cmd);
+        assertThat(cmd.getExecutedAt()).isAfter(LocalDateTime.MIN);
+
     }
 
     @Test
     public void testPowerControl() {
-        Toggle power = avr1912.power();
+        ToggleImpl power = avr1912.power();
         assertThat(power.getCommands())
                 .hasSize(3)
-                .containsAll(sigs("PWON", "PWSTANDBY", "PW?"));
+                .containsAll(cmds("PWON", "PWSTANDBY", "PW?"));
 
-        when(protocol.receive((RequestCommand) sig("PW?")))
+        when(protocol.receive((RequestCommand) cmd("PW?")))
                 .thenReturn(event("PWSTANDBY"), event("PWON"));
 
         assertThat(power.switchedOff()).isTrue();
         power.toggle();
-        verify(protocol).send(sig("PWON"));
+        verify(protocol).send(cmd("PWON"));
         assertThat(power.switchedOff()).isFalse();
         assertThat(power.switchedOn()).isTrue();
         power.toggle();
-        verify(protocol).send(sig("PWSTANDBY"));
+        verify(protocol).send(cmd("PWSTANDBY"));
     }
 
     @Test
     public void testMuteControl() {
-        Toggle mute = avr1912.mute();
-        assertThat(mute.getCommands()).hasSize(3).containsAll(sigs("MUON", "MUOFF", "MU?"));
+        ToggleImpl mute = avr1912.mute();
+        assertThat(mute.getCommands()).hasSize(3).containsAll(cmds("MUON", "MUOFF", "MU?"));
     }
 
     @Test(expected = CommandNotFoundException.class)
@@ -97,29 +102,33 @@ public class ControlsTest {
     @Test
     public void testMasterSlider() {
         Slider slider = avr1912.masterVolume();
-        assertThat(slider.getCommands()).hasSize(4).containsAll(sigs("MVUP", "MVDOWN", "MV", "MV?"));
-        when(protocol.receive((RequestCommand) sig("MV?"))).thenReturn(event("MV45"));
+        assertThat(slider.getCommands()).hasSize(4).containsAll(cmds("MVUP", "MVDOWN", "MV", "MV?"));
+        when(protocol.receive((RequestCommand) cmd("MV?"))).thenReturn(event("MV45"));
         assertThat(slider.getValue()).isEqualTo("45");
 
         slider.slideUp();
-        verify(protocol).send(sig("MVUP"));
+        verify(protocol).send(cmd("MVUP"));
 
         slider.slideDown();
-        verify(protocol).send(sig("MVDOWN"));
+        verify(protocol).send(cmd("MVDOWN"));
 
         slider.set("55");
-        verify(protocol).send(sig("MV55"));
+        verify(protocol).send(cmd("MV55"));
     }
 
     private Event event(String e) {
         return EventImpl.create(e);
     }
 
-    private List<Command> sigs(String... sig) {
-        return Stream.of(sig).map(s -> sig(s)).collect(Collectors.toList());
+    private List<Command> cmds(String... sig) {
+        return Stream.of(sig).map(this::cmd).collect(Collectors.toList());
     }
 
-    private Command sig(String s) {
-        return registry.findBySignature(() -> s).get();
+    private Command cmd(String s) {
+        return registry.findBySignature(
+                () -> s
+        ).orElseThrow(
+                () -> new CommandNotFoundException("Command with signature '" + s + "' not found")
+        );
     }
 }

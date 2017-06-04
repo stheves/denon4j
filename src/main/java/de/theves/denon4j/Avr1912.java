@@ -17,8 +17,8 @@
 
 package de.theves.denon4j;
 
-import de.theves.denon4j.internal.CommandRegistryImpl;
-import de.theves.denon4j.internal.EventDispatcher;
+import de.theves.denon4j.controls.*;
+import de.theves.denon4j.internal.*;
 import de.theves.denon4j.internal.net.Tcp;
 import de.theves.denon4j.net.Protocol;
 
@@ -34,10 +34,10 @@ public class Avr1912 implements AVR {
     private final Protocol protocol;
     private final CommandRegistry registry;
 
-    private Toggle powerToggle;
+    private ToggleImpl powerToggle;
     private Slider masterSlider;
-    private Toggle muteToggle;
-    private Select<InputSource> selectInput;
+    private ToggleImpl muteToggle;
+    private SelectImpl<InputSource> selectInput;
     private Select<VideoSource> selectVideo;
 
     public Avr1912(String host, int port) {
@@ -51,7 +51,7 @@ public class Avr1912 implements AVR {
         addControls();
     }
 
-    public Toggle power() {
+    public ToggleImpl power() {
         return powerToggle;
     }
 
@@ -59,7 +59,7 @@ public class Avr1912 implements AVR {
         return masterSlider;
     }
 
-    public Toggle mute() {
+    public ToggleImpl mute() {
         return muteToggle;
     }
 
@@ -82,37 +82,37 @@ public class Avr1912 implements AVR {
     }
 
     public void disconnect() {
-        eventDispatcher.getControls().stream().forEach(Control::dispose);
+        eventDispatcher.getControls().forEach(Control::dispose);
         eventDispatcher.getControls().clear();
         protocol.disconnect();
     }
 
     private void addControls() {
         // power control
-        powerToggle = new Toggle(registry, "PW", "ON", "STANDBY");
+        powerToggle = new ToggleImpl(registry, "PW", "ON", "STANDBY");
         powerToggle.init();
         eventDispatcher.addControl(powerToggle);
 
         // master vol. control
-        masterSlider = new Slider(registry, "MV", "UP", "DOWN", "[000-999]");
+        masterSlider = new SliderImpl(registry, "MV", "UP", "DOWN", "[000-999]");
         masterSlider.init();
         eventDispatcher.addControl(masterSlider);
 
         // mute control
-        muteToggle = new Toggle(registry, "MU", "ON", "OFF");
+        muteToggle = new ToggleImpl(registry, "MU", "ON", "OFF");
         muteToggle.init();
         eventDispatcher.addControl(muteToggle);
 
         // select input
-        selectInput = new Select<>(registry, "SI", InputSource.class);
+        selectInput = new SelectImpl<>(registry, "SI", InputSource.class);
         selectInput.init();
 
         // select video
-        selectVideo = new Select<>(registry, "SV", VideoSource.class);
+        selectVideo = new SelectImpl<>(registry, "SV", VideoSource.class);
         selectVideo.init();
     }
 
-    CommandRegistry getRegistry() {
+    public CommandRegistry getRegistry() {
         return registry;
     }
 

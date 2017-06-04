@@ -18,11 +18,12 @@
 package de.theves.denon4j.net;
 
 /**
- * Class description.
+ * An event of an AVR.
  *
  * @author Sascha Theves
  */
 public interface Event extends Buildable {
     String getPrefix();
+
     Parameter getParameter();
 }

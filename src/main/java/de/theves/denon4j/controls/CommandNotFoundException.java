@@ -15,7 +15,7 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j;
+package de.theves.denon4j.controls;
 
 /**
  * Thrown if a given command could not be found in the {@link CommandRegistry}.

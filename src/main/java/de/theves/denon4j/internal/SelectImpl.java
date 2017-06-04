@@ -1,8 +1,11 @@
-package de.theves.denon4j;
+package de.theves.denon4j.internal;
 
-import de.theves.denon4j.internal.AbstractControl;
-import de.theves.denon4j.internal.net.RequestCommand;
+import de.theves.denon4j.controls.CommandRegistry;
+import de.theves.denon4j.controls.InputSource;
+import de.theves.denon4j.controls.Select;
+import de.theves.denon4j.internal.net.ParameterImpl;
 import de.theves.denon4j.net.Parameter;
+import de.theves.denon4j.net.RequestCommand;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,16 +14,16 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Select control.
+ * SelectImpl control.
  *
  * @author Sascha Theves
  */
-public class Select<S extends Enum<S>> extends AbstractControl {
+public class SelectImpl<S extends Enum<S>> extends AbstractControl implements Select<S> {
     private final Class<S> enumCls;
 
     private List<String> paramList;
 
-    Select(CommandRegistry registry, String prefix, Class<S> source) {
+    public SelectImpl(CommandRegistry registry, String prefix, Class<S> source) {
         super(registry, prefix);
         this.enumCls = source;
     }
@@ -33,14 +36,16 @@ public class Select<S extends Enum<S>> extends AbstractControl {
                 ec -> Enum.valueOf(enumCls, ec.name()).toString()
         ).collect(Collectors.toList()));
 
-        paramList.add(Parameter.REQUEST.getValue());
+        paramList.add(ParameterImpl.REQUEST.getValue());
         register(paramList.toArray(new String[paramList.size()]));
     }
 
+    @Override
     public void select(S source) {
         executeCommand(getCommands().get(paramList.indexOf(source.toString())).getId());
     }
 
+    @Override
     public Optional<S> getSource() {
         Parameter state = getState();
         return findSource(state);
