@@ -27,6 +27,7 @@ import de.theves.denon4j.net.Protocol;
 
 import java.io.PrintStream;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Class description.
@@ -102,7 +103,7 @@ public class CommandRegistryImpl implements CommandRegistry {
     @Override
     public Optional<Command> findBySignature(Signature signature) {
         for (Command cmd : commands.values()) {
-            if (cmd.build().equals(signature.signature())) {
+            if (cmd.build().signature().equals(signature.signature())) {
                 return Optional.of(cmd);
             }
         }
@@ -111,12 +112,6 @@ public class CommandRegistryImpl implements CommandRegistry {
 
     @Override
     public List<Command> findByPrefix(String prefix) {
-        List<Command> result = new ArrayList<>();
-        for (Command cmd : commands.values()) {
-            if (cmd.getPrefix().equals(prefix)) {
-                result.add(cmd);
-            }
-        }
-        return result;
+        return commands.values().stream().filter(cmd -> cmd.getPrefix().equals(prefix)).collect(Collectors.toList());
     }
 }
