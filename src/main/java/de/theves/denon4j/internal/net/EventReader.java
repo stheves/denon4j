@@ -74,7 +74,7 @@ public class EventReader extends Thread implements Runnable {
                 }
             }
         } catch (SocketException se) {
-            if (!socket.isClosed() || !socket.isInputShutdown()) {
+            if (!socket.isClosed() && !socket.isInputShutdown()) {
                 throw new ConnectionException("Socket error.", se);
             }
         } catch (Exception e) {
