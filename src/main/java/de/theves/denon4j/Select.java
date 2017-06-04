@@ -1,5 +1,6 @@
 package de.theves.denon4j;
 
+import de.theves.denon4j.internal.AbstractControl;
 import de.theves.denon4j.internal.net.RequestCommand;
 import de.theves.denon4j.net.Command;
 import de.theves.denon4j.net.Parameter;

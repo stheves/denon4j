@@ -15,7 +15,7 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j;
+package de.theves.denon4j.net;
 
 import java.util.Objects;
 import java.util.UUID;

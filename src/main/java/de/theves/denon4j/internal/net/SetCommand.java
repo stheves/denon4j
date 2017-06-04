@@ -17,8 +17,8 @@
 
 package de.theves.denon4j.internal.net;
 
-import de.theves.denon4j.CommandId;
 import de.theves.denon4j.net.Command;
+import de.theves.denon4j.net.CommandId;
 import de.theves.denon4j.net.Protocol;
 
 /**

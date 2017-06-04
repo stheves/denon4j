@@ -17,6 +17,8 @@
 
 package de.theves.denon4j;
 
+import de.theves.denon4j.internal.CommandRegistryImpl;
+import de.theves.denon4j.internal.EventDispatcher;
 import de.theves.denon4j.internal.net.Tcp;
 import de.theves.denon4j.net.Protocol;
 
@@ -27,7 +29,7 @@ import java.io.PrintStream;
  *
  * @author Sascha Theves
  */
-public class Avr1912 implements Receiver {
+public class Avr1912 implements AVR {
     private final EventDispatcher eventDispatcher;
     private final Protocol protocol;
     private final CommandRegistry registry;
@@ -39,7 +41,7 @@ public class Avr1912 implements Receiver {
 
     public Avr1912(String host, int port) {
         protocol = new Tcp(host, port);
-        registry = new CommandRegistry(protocol);
+        registry = new CommandRegistryImpl(protocol);
         eventDispatcher = new EventDispatcher(protocol);
         addControls();
     }

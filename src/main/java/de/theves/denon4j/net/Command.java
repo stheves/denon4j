@@ -17,7 +17,6 @@
 
 package de.theves.denon4j.net;
 
-import de.theves.denon4j.CommandId;
 import de.theves.denon4j.internal.net.EventImpl;
 
 import java.time.LocalDateTime;

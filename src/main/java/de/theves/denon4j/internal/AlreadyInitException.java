@@ -15,7 +15,7 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j;
+package de.theves.denon4j.internal;
 
 /**
  * Class description.

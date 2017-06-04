@@ -24,6 +24,6 @@ import java.io.PrintStream;
  *
  * @author Sascha Theves
  */
-public interface Receiver extends AutoCloseable {
+public interface AVR extends AutoCloseable {
     void printHelp(PrintStream writer);
 }

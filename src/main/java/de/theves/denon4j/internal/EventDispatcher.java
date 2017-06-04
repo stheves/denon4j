@@ -15,8 +15,9 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j;
+package de.theves.denon4j.internal;
 
+import de.theves.denon4j.Control;
 import de.theves.denon4j.net.Event;
 import de.theves.denon4j.net.EventListener;
 import de.theves.denon4j.net.Protocol;
