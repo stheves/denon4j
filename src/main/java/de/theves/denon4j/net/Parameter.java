@@ -20,7 +20,7 @@ package de.theves.denon4j.net;
 /**
  * Represents a parameter of a command.
  *
- * @author Sascha Theves
+ * @author stheves
  */
 public interface Parameter extends Buildable {
     String getValue();

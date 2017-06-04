@@ -27,7 +27,7 @@ import java.util.HashSet;
 import java.util.Objects;
 
 /**
- * @author Sascha Theves
+ * @author stheves
  */
 public class EventDispatcher implements EventListener {
 

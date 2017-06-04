@@ -23,7 +23,7 @@ import de.theves.denon4j.net.Protocol;
 /**
  * Class description.
  *
- * @author Sascha Theves
+ * @author stheves
  */
 public class SetCommandImpl extends CommandImpl {
     private final MutableParameterImpl mutableParameter;

@@ -25,7 +25,7 @@ import de.theves.denon4j.net.RequestCommand;
 /**
  * Request command implementation.
  *
- * @author Sascha Theves
+ * @author stheves
  */
 public class RequestCommandImpl extends CommandImpl implements RequestCommand {
     private Event received;

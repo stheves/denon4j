@@ -20,7 +20,7 @@ package de.theves.denon4j.controls;
 /**
  * Class description.
  *
- * @author Sascha Theves
+ * @author stheves
  */
 public enum SurroundMode {
     MOVIE("MOVIE"),

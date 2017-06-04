@@ -28,7 +28,7 @@ import de.theves.denon4j.net.Protocol;
 /**
  * Factory for commands.
  *
- * @author Sascha Theves
+ * @author stheves
  */
 class CommandFactory {
 

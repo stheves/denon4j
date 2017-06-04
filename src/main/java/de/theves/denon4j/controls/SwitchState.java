@@ -15,15 +15,30 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.internal.net;
+package de.theves.denon4j.controls;
 
 /**
- * Thrown if control`s init-method was called multiple times.
+ * State of a {@link Switch}.
  *
  * @author stheves
  */
-public class AlreadyInitException extends RuntimeException {
-    public AlreadyInitException(String message) {
-        super(message);
+public enum SwitchState {
+    ON("ON"), OFF("OFF"), STANDBY("STANDBY");
+
+    private final String state;
+
+    SwitchState(String state) {
+        this.state = state;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    @Override
+    public String toString() {
+        return "SwitchState{" +
+                "state='" + state + '\'' +
+                '}';
     }
 }

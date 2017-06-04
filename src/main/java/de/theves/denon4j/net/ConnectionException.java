@@ -20,7 +20,7 @@ package de.theves.denon4j.net;
 /**
  * Thrown if connection failures occur.
  *
- * @author Sascha Theves
+ * @author stheves
  */
 public class ConnectionException extends NetException {
     private static final long serialVersionUID = 1L;

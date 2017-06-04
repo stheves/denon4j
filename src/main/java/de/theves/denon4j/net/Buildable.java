@@ -20,7 +20,7 @@ package de.theves.denon4j.net;
 /**
  * An object that can be built.
  *
- * @author Sascha Theves
+ * @author stheves
  */
 public interface Buildable {
     String build();

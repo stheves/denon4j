@@ -27,17 +27,17 @@ import java.io.PrintStream;
 /**
  * Implementation of the Denon AVR 1912 protocol spec.
  *
- * @author Sascha Theves
+ * @author stheves
  */
 public class Avr1912 implements AVR {
     private final EventDispatcher eventDispatcher;
     private final Protocol protocol;
     private final CommandRegistry registry;
 
-    private ToggleImpl powerToggle;
+    private Toggle powerToggle;
     private Slider masterSlider;
-    private ToggleImpl muteToggle;
-    private SelectImpl<InputSource> selectInput;
+    private Toggle muteToggle;
+    private Select<InputSource> selectInput;
     private Select<VideoSource> selectVideo;
 
     public Avr1912(String host, int port) {
@@ -51,7 +51,7 @@ public class Avr1912 implements AVR {
         addControls();
     }
 
-    public ToggleImpl power() {
+    public Toggle power() {
         return powerToggle;
     }
 
@@ -59,7 +59,7 @@ public class Avr1912 implements AVR {
         return masterSlider;
     }
 
-    public ToggleImpl mute() {
+    public Toggle mute() {
         return muteToggle;
     }
 

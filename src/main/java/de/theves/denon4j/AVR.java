@@ -22,7 +22,7 @@ import java.io.PrintStream;
 /**
  * Represents an audio/video receiver.
  *
- * @author Sascha Theves
+ * @author stheves
  */
 public interface AVR extends AutoCloseable {
     /**

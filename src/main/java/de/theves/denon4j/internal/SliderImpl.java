@@ -30,7 +30,7 @@ import java.util.List;
 /**
  * SliderImpl control for volumes.
  *
- * @author Sascha Theves
+ * @author stheves
  */
 public class SliderImpl extends AbstractControl implements Slider {
     private final String up;

@@ -23,7 +23,7 @@ import java.util.UUID;
 /**
  * {@link Command} identifier.
  *
- * @author Sascha Theves
+ * @author stheves
  */
 public class CommandId {
     private String identifier;

@@ -20,7 +20,7 @@ package de.theves.denon4j.net;
 /**
  * Low-level network client for communication with AVR.
  *
- * @author Sascha Theves
+ * @author stheves
  */
 public interface Protocol {
     /**

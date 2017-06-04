@@ -71,7 +71,7 @@ public class ControlsTest {
 
     @Test
     public void testPowerControl() {
-        ToggleImpl power = avr1912.power();
+        Toggle power = avr1912.power();
         assertThat(power.getCommands())
                 .hasSize(3)
                 .containsAll(cmds("PWON", "PWSTANDBY", "PW?"));
@@ -79,18 +79,17 @@ public class ControlsTest {
         when(protocol.receive((RequestCommand) cmd("PW?")))
                 .thenReturn(event("PWSTANDBY"), event("PWON"));
 
-        assertThat(power.switchedOff()).isTrue();
+        assertThat(power.getSwitchState()).isEqualTo(SwitchState.STANDBY);
         power.toggle();
         verify(protocol).send(cmd("PWON"));
-        assertThat(power.switchedOff()).isFalse();
-        assertThat(power.switchedOn()).isTrue();
+        assertThat(power.getSwitchState()).isEqualTo(SwitchState.ON);
         power.toggle();
         verify(protocol).send(cmd("PWSTANDBY"));
     }
 
     @Test
     public void testMuteControl() {
-        ToggleImpl mute = avr1912.mute();
+        Toggle mute = avr1912.mute();
         assertThat(mute.getCommands()).hasSize(3).containsAll(cmds("MUON", "MUOFF", "MU?"));
     }
 

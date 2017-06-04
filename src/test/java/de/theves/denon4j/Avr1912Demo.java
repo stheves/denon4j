@@ -17,8 +17,9 @@
 
 package de.theves.denon4j;
 
+import de.theves.denon4j.controls.SwitchState;
+import de.theves.denon4j.controls.Toggle;
 import de.theves.denon4j.controls.VideoSource;
-import de.theves.denon4j.internal.ToggleImpl;
 
 public class Avr1912Demo {
 
@@ -31,20 +32,20 @@ public class Avr1912Demo {
             avr.connect(1000);
 
             // power control
-            ToggleImpl power = avr.power();
-            System.out.println("PWON: " + power.switchedOn());
-            if (!power.switchedOn()) {
+            Toggle power = avr.power();
+            System.out.println("PWON: " + power.getSwitchState());
+            if (power.getSwitchState() != SwitchState.ON) {
                 // powering on
                 power.toggle();
             }
 
-            ToggleImpl mute = avr.mute();
+            Toggle mute = avr.mute();
             mute.toggle();
-            System.out.println("MUTE ON: " + mute.switchedOn());
+            System.out.println("MUTE ON: " + mute.getSwitchState());
 
             Thread.sleep(200);
             mute.switchOff();
-            System.out.println("MUTE OFF: " + mute.switchedOff());
+            System.out.println("MUTE OFF: " + mute.getSwitchState());
 
             Thread.sleep(200);
             avr.selectVideo().select(VideoSource.SAT_CBL);

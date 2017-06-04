@@ -34,7 +34,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Class description.
  *
- * @author Sascha Theves
+ * @author stheves
  */
 public abstract class AbstractControl implements Control {
     private static final Parameter DIRTY = ParameterImpl.create("");

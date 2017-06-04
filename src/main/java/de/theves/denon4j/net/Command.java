@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 /**
  * Represents a command send to an AVR.
  *
- * @author Sascha Theves
+ * @author stheves
  */
 public interface Command extends Event {
     CommandId getId();

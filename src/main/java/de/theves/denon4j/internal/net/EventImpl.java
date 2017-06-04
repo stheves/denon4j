@@ -25,7 +25,7 @@ import java.util.Objects;
 /**
  * Class description.
  *
- * @author Sascha Theves
+ * @author stheves
  */
 public class EventImpl implements Event {
     private final String prefix;

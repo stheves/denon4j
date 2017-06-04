@@ -20,7 +20,7 @@ package de.theves.denon4j.controls;
 /**
  * Thrown if a given command could not be found in the {@link CommandRegistry}.
  *
- * @author Sascha Theves
+ * @author stheves
  */
 public class CommandNotFoundException extends RuntimeException {
     public CommandNotFoundException(String message) {

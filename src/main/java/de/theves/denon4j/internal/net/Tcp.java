@@ -34,7 +34,7 @@ import java.util.Optional;
 /**
  * Sends the actual bytes of a command to the receiver.
  *
- * @author Sascha Theves
+ * @author stheves
  */
 public final class Tcp implements Protocol {
     private final static char CR = 0x0d; // \r character

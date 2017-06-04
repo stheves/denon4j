@@ -29,7 +29,7 @@ import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
 
 /**
- * @author Sascha Theves
+ * @author stheves
  */
 public class EventReader extends Thread implements Runnable {
 

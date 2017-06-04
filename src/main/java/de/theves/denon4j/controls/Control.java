@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * A control represents a feature of an {@link AVR}.
  *
- * @author Sascha Theves
+ * @author stheves
  */
 public interface Control {
     /**

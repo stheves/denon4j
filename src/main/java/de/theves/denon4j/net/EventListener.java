@@ -20,7 +20,7 @@ package de.theves.denon4j.net;
 /**
  * Main event bus listener.
  *
- * @author Sascha Theves
+ * @author stheves
  */
 public interface EventListener {
     void onEvent(Event event);

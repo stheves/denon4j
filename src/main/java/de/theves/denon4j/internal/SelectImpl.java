@@ -16,7 +16,7 @@ import java.util.stream.Stream;
 /**
  * SelectImpl control.
  *
- * @author Sascha Theves
+ * @author stheves
  */
 public class SelectImpl<S extends Enum<S>> extends AbstractControl implements Select<S> {
     private final Class<S> enumCls;

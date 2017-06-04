@@ -20,7 +20,7 @@ package de.theves.denon4j.net;
 /**
  * Thrown when connection timeout occurs.
  *
- * @author Sascha Theves
+ * @author stheves
  */
 public class TimeoutException extends ConnectionException {
     public TimeoutException(String message, Throwable cause) {

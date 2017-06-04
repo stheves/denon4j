@@ -23,7 +23,7 @@ import de.theves.denon4j.controls.Toggle;
 /**
  * Toggle control implementation.
  *
- * @author Sascha Theves
+ * @author stheves
  */
 public class ToggleImpl extends SwitchImpl implements Toggle {
 
@@ -32,10 +32,10 @@ public class ToggleImpl extends SwitchImpl implements Toggle {
     }
 
     public void toggle() {
-        if (getOnValue().equals(getState().getValue())) {
+        if (onValue.equals(getState().getValue())) {
             switchOff();
         }
-        if (getOffValue().equals(getState().getValue())) {
+        if (offValue.equals(getState().getValue())) {
             switchOn();
         }
     }

@@ -20,7 +20,7 @@ package de.theves.denon4j.net;
 /**
  * Base exception for net i/o.
  *
- * @author Sascha Theves
+ * @author stheves
  */
 public class NetException extends RuntimeException {
     public NetException() {

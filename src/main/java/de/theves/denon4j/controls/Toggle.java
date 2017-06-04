@@ -1,7 +1,13 @@
 package de.theves.denon4j.controls;
 
 /**
- * Created by Elena on 04.06.2017.
+ * Toggle control.
+ *
+ * @author stheves
  */
-public interface Toggle {
+public interface Toggle extends Switch {
+    /**
+     * Toggles this switch.
+     */
+    void toggle();
 }

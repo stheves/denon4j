@@ -22,7 +22,7 @@ import de.theves.denon4j.net.Parameter;
 /**
  * Class description.
  *
- * @author Sascha Theves
+ * @author stheves
  */
 public class ParameterImpl implements Parameter {
     public static final Parameter EMPTY = new ParameterImpl("");

@@ -20,7 +20,7 @@ package de.theves.denon4j.net;
 /**
  * An event of an AVR.
  *
- * @author Sascha Theves
+ * @author stheves
  */
 public interface Event extends Buildable {
     String getPrefix();

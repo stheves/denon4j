@@ -32,7 +32,7 @@ import java.util.List;
 /**
  * Class description.
  *
- * @author Sascha Theves
+ * @author stheves
  */
 public class CommandStackImpl implements CommandStack {
     private final Logger logger = LoggerFactory.getLogger(CommandStackImpl.class);

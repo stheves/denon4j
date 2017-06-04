@@ -31,7 +31,7 @@ import java.util.*;
 /**
  * Class description.
  *
- * @author Sascha Theves
+ * @author stheves
  */
 public class CommandRegistryImpl implements CommandRegistry {
     private final LinkedHashMap<CommandId, Command> commands;

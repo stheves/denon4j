@@ -19,9 +19,11 @@ package de.theves.denon4j.internal;
 
 import de.theves.denon4j.controls.CommandRegistry;
 import de.theves.denon4j.controls.Switch;
+import de.theves.denon4j.controls.SwitchState;
 import de.theves.denon4j.internal.net.ParameterImpl;
 import de.theves.denon4j.net.Command;
 import de.theves.denon4j.net.CommandId;
+import de.theves.denon4j.net.Parameter;
 import de.theves.denon4j.net.RequestCommand;
 
 import java.util.List;
@@ -29,11 +31,11 @@ import java.util.List;
 /**
  * Class description.
  *
- * @author Sascha Theves
+ * @author stheves
  */
 public abstract class SwitchImpl extends AbstractControl implements Switch {
-    private final String onValue;
-    private final String offValue;
+    protected final String onValue;
+    protected final String offValue;
 
     private CommandId onId;
     private CommandId offId;
@@ -56,26 +58,6 @@ public abstract class SwitchImpl extends AbstractControl implements Switch {
     }
 
     @Override
-    public boolean switchedOn() {
-        return onValue.equals(getState().getValue());
-    }
-
-    @Override
-    public boolean switchedOff() {
-        return offValue.equals(getState().getValue());
-    }
-
-    @Override
-    public String getOnValue() {
-        return onValue;
-    }
-
-    @Override
-    public String getOffValue() {
-        return offValue;
-    }
-
-    @Override
     protected void doInit() {
         registerCommands();
     }
@@ -85,6 +67,12 @@ public abstract class SwitchImpl extends AbstractControl implements Switch {
         onId = commands.get(0).getId();
         offId = commands.get(1).getId();
         requestId = commands.get(2).getId();
+    }
+
+    @Override
+    public SwitchState getSwitchState() {
+        Parameter state = getState();
+        return SwitchState.valueOf(state.getValue());
     }
 
     @Override

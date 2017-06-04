@@ -20,7 +20,7 @@ package de.theves.denon4j.controls;
 /**
  * Class description.
  *
- * @author Sascha Theves
+ * @author stheves
  */
 public enum VideoSource {
     DVD("DVD"), BD("BD"), TV("TV"), SAT_CBL("SAT/CBL"), GAME(
