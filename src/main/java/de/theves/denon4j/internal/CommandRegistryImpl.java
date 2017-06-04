@@ -25,7 +25,10 @@ import de.theves.denon4j.net.Parameter;
 import de.theves.denon4j.net.Protocol;
 
 import java.io.PrintStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * Class description.
@@ -33,7 +36,7 @@ import java.util.*;
  * @author Sascha Theves
  */
 public class CommandRegistryImpl implements CommandRegistry {
-    private final Map<CommandId, Command> commands;
+    private final LinkedHashMap<CommandId, Command> commands;
     private final CommandStackImpl commandStackImpl;
     private final Protocol protocol;
 
@@ -49,8 +52,8 @@ public class CommandRegistryImpl implements CommandRegistry {
     }
 
     @Override
-    public Collection<Command> getCommands() {
-        return Collections.unmodifiableCollection(commands.values());
+    public List<Command> getCommands() {
+        return Collections.unmodifiableList(new ArrayList<>(commands.values()));
     }
 
     @Override

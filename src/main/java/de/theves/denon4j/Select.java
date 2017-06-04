@@ -2,42 +2,58 @@ package de.theves.denon4j;
 
 import de.theves.denon4j.internal.AbstractControl;
 import de.theves.denon4j.internal.net.RequestCommand;
-import de.theves.denon4j.net.Command;
 import de.theves.denon4j.net.Parameter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Created by Elena on 04.06.2017.
+ * Select control.
+ *
+ * @author Sascha Theves
  */
 public class Select<S extends Enum<S>> extends AbstractControl {
-    private final Class<S> source;
+    private final Class<S> enumCls;
 
-    private List<Command> commandList;
     private List<String> paramList;
 
-    public Select(CommandRegistry registry, String prefix, Class<S> source) {
+    Select(CommandRegistry registry, String prefix, Class<S> source) {
         super(registry, prefix);
-        this.source = source;
+        this.enumCls = source;
     }
 
     @Override
     protected void doInit() {
         paramList = new ArrayList<>(InputSource.values().length + 1); // +1 for request parameter
-        paramList.addAll(Stream.of(source.getEnumConstants()).map(Enum::name).collect(Collectors.toList()));
+
+        paramList.addAll(Stream.of(enumCls.getEnumConstants()).map(
+                ec -> Enum.valueOf(enumCls, ec.name()).toString()
+        ).collect(Collectors.toList()));
+
         paramList.add(Parameter.REQUEST.getValue());
-        commandList = register(paramList.toArray(new String[paramList.size()]));
+        register(paramList.toArray(new String[paramList.size()]));
     }
 
     public void select(S source) {
-        executeCommand(commandList.get(paramList.indexOf(source.name())).getId());
+        executeCommand(getCommands().get(paramList.indexOf(source.toString())).getId());
+    }
+
+    public Optional<S> getSource() {
+        Parameter state = getState();
+        return findSource(state);
+    }
+
+    private Optional<S> findSource(Parameter state) {
+        return Stream.of(enumCls.getEnumConstants()).filter(
+                ec -> Enum.valueOf(enumCls, ec.name()).toString().equals(state.getValue())
+        ).findFirst();
     }
 
     @Override
     protected RequestCommand getRequestCommand() {
-        return (RequestCommand) getRegistry().getCommand(commandList.get(commandList.size() - 1).getId());
+        return (RequestCommand) getRegistry().getCommand(getCommands().get(getCommands().size() - 1).getId());
     }
 }

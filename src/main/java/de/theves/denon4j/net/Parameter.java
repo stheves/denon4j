@@ -25,8 +25,8 @@ import de.theves.denon4j.internal.net.ParameterImpl;
  * @author Sascha Theves
  */
 public interface Parameter extends Buildable {
-    Parameter EMPTY = create("");
-    Parameter REQUEST = create("?");
+    Parameter EMPTY = new ParameterImpl("");
+    Parameter REQUEST = new ParameterImpl("?");
 
     String getValue();
 

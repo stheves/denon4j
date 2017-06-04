@@ -26,6 +26,7 @@ import de.theves.denon4j.net.Event;
 import de.theves.denon4j.net.Parameter;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -59,6 +60,11 @@ public abstract class AbstractControl implements Control {
         } else {
             throw new AlreadyInitException("This control has already been initialized");
         }
+    }
+
+    @Override
+    public List<Command> getCommands() {
+        return Collections.unmodifiableList(commands);
     }
 
     @Override

@@ -5,7 +5,6 @@ import de.theves.denon4j.net.Command;
 import de.theves.denon4j.net.CommandId;
 
 import java.io.PrintStream;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -24,7 +23,7 @@ public interface CommandRegistry {
      *
      * @return an unmodifiable collection of all commands.
      */
-    Collection<Command> getCommands();
+    List<Command> getCommands();
 
     /**
      * Prints the help of all registered commands to the given PrintStream.
