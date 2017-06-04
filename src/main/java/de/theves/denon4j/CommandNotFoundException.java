@@ -18,20 +18,12 @@
 package de.theves.denon4j;
 
 /**
- * Class description.
+ * Thrown if a given command could not be found in the {@link CommandRegistry}.
  *
  * @author Sascha Theves
  */
 public class CommandNotFoundException extends RuntimeException {
     public CommandNotFoundException(String message) {
         super(message);
-    }
-
-    public CommandNotFoundException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public CommandNotFoundException(Throwable cause) {
-        super(cause);
     }
 }

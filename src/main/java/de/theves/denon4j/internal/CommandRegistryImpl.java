@@ -17,6 +17,7 @@
 
 package de.theves.denon4j.internal;
 
+import de.theves.denon4j.CommandNotFoundException;
 import de.theves.denon4j.CommandRegistry;
 import de.theves.denon4j.net.Command;
 import de.theves.denon4j.net.CommandId;
@@ -61,6 +62,9 @@ public class CommandRegistryImpl implements CommandRegistry {
 
     @Override
     public Command getCommand(CommandId id) {
+        if (!isRegistered(id)) {
+            throw new CommandNotFoundException("No command for ID '" + id + "' found");
+        }
         return commands.get(id);
     }
 

@@ -17,7 +17,6 @@
 
 package de.theves.denon4j.internal;
 
-import de.theves.denon4j.CommandNotFoundException;
 import de.theves.denon4j.CommandRegistry;
 import de.theves.denon4j.CommandStack;
 import de.theves.denon4j.internal.net.SetCommand;
@@ -42,7 +41,7 @@ public class CommandStackImpl implements CommandStack {
 
     private final CommandRegistry commandRegistry;
 
-    public CommandStackImpl(CommandRegistry commandRegistry) {
+    CommandStackImpl(CommandRegistry commandRegistry) {
         this.commandRegistry = commandRegistry;
         commandList = new LinkedList<>();
     }
@@ -51,7 +50,7 @@ public class CommandStackImpl implements CommandStack {
     public Command execute(CommandId commandId, String value) {
         synchronized (commandList) {
             // prepare command
-            Command cmd = assertGetCommand(commandId);
+            Command cmd = commandRegistry.getCommand(commandId);
             prepareSetCommand(value, cmd);
 
             // execute
@@ -89,12 +88,5 @@ public class CommandStackImpl implements CommandStack {
         synchronized (commandList) {
             return commandList.getLast() != null;
         }
-    }
-
-    private Command assertGetCommand(CommandId commandId) {
-        if (!commandRegistry.isRegistered(commandId)) {
-            throw new CommandNotFoundException("Command not found: " + commandId);
-        }
-        return commandRegistry.getCommand(commandId);
     }
 }

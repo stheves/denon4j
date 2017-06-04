@@ -25,6 +25,11 @@ avr.disconnect();
 
 Take a look at the class Avr1912Demo.java in the test directory to view a complete example.
 
+# About the API
+
+- All packages which have 'internal' in their name are not intended to be used from outside
+- Changes to internal packages are made without further notice
+
 # Building
 
 This is a maven style project so `mvn` needs to be on your `$PATH`. To build
