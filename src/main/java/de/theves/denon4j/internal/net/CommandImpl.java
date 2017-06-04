@@ -81,9 +81,9 @@ public class CommandImpl extends EventImpl implements Command {
 
     @Override
     public String toString() {
-        return "CommandImpl{" +
-                "id=" + id +
-                ", cmd=" + build() +
+        return "Command{" +
+                "id=" + id.getId() +
+                ", signature=" + build().signature() +
                 ", executedAt=" + executedAt +
                 '}';
     }

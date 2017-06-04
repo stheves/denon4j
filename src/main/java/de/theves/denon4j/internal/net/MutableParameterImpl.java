@@ -17,6 +17,7 @@
 
 package de.theves.denon4j.internal.net;
 
+import de.theves.denon4j.controls.Signature;
 import de.theves.denon4j.net.Parameter;
 
 /**
@@ -39,7 +40,7 @@ public class MutableParameterImpl implements Parameter {
     }
 
     @Override
-    public String build() {
-        return getValue() != null ? getValue() : "";
+    public Signature build() {
+        return getValue() != null ? this::getValue : () -> "";
     }
 }

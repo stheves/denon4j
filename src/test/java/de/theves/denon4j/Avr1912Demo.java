@@ -17,14 +17,12 @@
 
 package de.theves.denon4j;
 
-import de.theves.denon4j.controls.InputSource;
-import de.theves.denon4j.controls.SwitchState;
-import de.theves.denon4j.controls.Toggle;
-import de.theves.denon4j.controls.VideoSource;
+import de.theves.denon4j.controls.*;
 
 public class Avr1912Demo {
 
     private void demo(String host, int port) throws Exception {
+        System.out.println("------------DEMO START------------");
         try (Avr1912 avr = new Avr1912(host, port)) {
             // show all available commands
             avr.printHelp(System.out);
@@ -48,6 +46,12 @@ public class Avr1912Demo {
             mute.switchOff();
             System.out.println("MUTE OFF: " + mute.getSwitchState());
 
+            Slider masterVolume = avr.masterVolume();
+            masterVolume.slideUp();
+            System.out.println("MASTER VOL: " + masterVolume.getValue());
+            masterVolume.set("25");
+            System.out.println("MASTER VOL: " + masterVolume.getValue());
+
             Thread.sleep(200);
             avr.selectVideo().select(VideoSource.SAT_CBL);
 
@@ -66,6 +70,5 @@ public class Avr1912Demo {
                 args[0], args[1]));
         Avr1912Demo test = new Avr1912Demo();
         test.demo(args[0], Integer.parseInt(args[1]));
-        System.out.println("Demo done.");
     }
 }

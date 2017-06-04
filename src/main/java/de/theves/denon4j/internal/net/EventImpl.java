@@ -17,6 +17,7 @@
 
 package de.theves.denon4j.internal.net;
 
+import de.theves.denon4j.controls.Signature;
 import de.theves.denon4j.net.Event;
 import de.theves.denon4j.net.Parameter;
 
@@ -47,15 +48,15 @@ public class EventImpl implements Event {
     }
 
     @Override
-    public String build() {
-        return getPrefix() + getParameter().build();
+    public Signature build() {
+        return () -> getPrefix() + getParameter().build().signature();
     }
 
     @Override
     public String toString() {
-        return "EventImpl{" +
+        return "Event{" +
                 "prefix='" + prefix + '\'' +
-                ", parameter=" + parameter +
+                ", parameter=" + parameter.build().signature() +
                 '}';
     }
 

@@ -17,6 +17,7 @@
 
 package de.theves.denon4j.internal.net;
 
+import de.theves.denon4j.controls.Signature;
 import de.theves.denon4j.net.Parameter;
 
 /**
@@ -45,14 +46,14 @@ public class ParameterImpl implements Parameter {
 
     @Override
     public String toString() {
-        return "ParameterImpl{" +
+        return "Parameter{" +
                 "value='" + value + '\'' +
                 '}';
     }
 
     @Override
-    public String build() {
-        return getValue();
+    public Signature build() {
+        return this::getValue;
     }
 
     public static Parameter create(String name) {

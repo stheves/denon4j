@@ -146,7 +146,7 @@ public final class Tcp implements Protocol {
 
     private void doSend(Command command) {
         try {
-            writer.write(command.build() + CR);
+            writer.write(command.build().signature() + CR);
             writer.flush();
         } catch (Exception e) {
             throw new ConnectionException("Communication failure.", e);

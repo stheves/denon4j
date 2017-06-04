@@ -22,6 +22,6 @@ package de.theves.denon4j.net;
  *
  * @author stheves
  */
-public interface Parameter extends Buildable {
+public interface Parameter extends SignatureBuilder {
     String getValue();
 }

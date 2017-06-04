@@ -17,11 +17,13 @@
 
 package de.theves.denon4j.net;
 
+import de.theves.denon4j.controls.Signature;
+
 /**
  * An object that can be built.
  *
  * @author stheves
  */
-public interface Buildable {
-    String build();
+public interface SignatureBuilder {
+    Signature build();
 }

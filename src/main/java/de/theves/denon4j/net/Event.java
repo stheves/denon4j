@@ -22,7 +22,7 @@ package de.theves.denon4j.net;
  *
  * @author stheves
  */
-public interface Event extends Buildable {
+public interface Event extends SignatureBuilder {
     String getPrefix();
 
     Parameter getParameter();
