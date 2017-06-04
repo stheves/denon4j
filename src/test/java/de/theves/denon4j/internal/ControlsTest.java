@@ -74,7 +74,7 @@ public class ControlsTest {
         Toggle power = avr1912.power();
         assertThat(power.getCommands())
                 .hasSize(3)
-                .containsExactlyInAnyOrder(cmds("PWON", "PWSTANDBY", "PW?"));
+                .containsExactlyInAnyOrder(commands("PWON", "PWSTANDBY", "PW?"));
 
         when(protocol.receive((RequestCommand) cmd("PW?")))
                 .thenReturn(event("PWSTANDBY"), event("PWON"));
@@ -90,7 +90,7 @@ public class ControlsTest {
     @Test
     public void testMuteControl() {
         Toggle mute = avr1912.mute();
-        assertThat(mute.getCommands()).hasSize(3).containsExactlyInAnyOrder(cmds("MUON", "MUOFF", "MU?"));
+        assertThat(mute.getCommands()).hasSize(3).containsExactlyInAnyOrder(commands("MUON", "MUOFF", "MU?"));
     }
 
     @Test(expected = CommandNotFoundException.class)
@@ -101,7 +101,7 @@ public class ControlsTest {
     @Test
     public void testMasterSlider() {
         Slider slider = avr1912.masterVolume();
-        assertThat(slider.getCommands()).hasSize(4).containsExactlyInAnyOrder(cmds("MVUP", "MVDOWN", "MV", "MV?"));
+        assertThat(slider.getCommands()).hasSize(4).containsExactlyInAnyOrder(commands("MVUP", "MVDOWN", "MV", "MV?"));
         when(protocol.receive((RequestCommand) cmd("MV?"))).thenReturn(event("MV45"));
         assertThat(slider.getValue()).isEqualTo("45");
 
@@ -118,14 +118,41 @@ public class ControlsTest {
     @Test
     public void testMainZoneToggle() {
         Toggle toggle = avr1912.mainZone();
-        assertThat(toggle.getCommands()).hasSize(3).containsExactlyInAnyOrder(cmds("ZMON", "ZMOFF", "ZM?"));
+        assertThat(toggle.getCommands()).hasSize(3).containsExactlyInAnyOrder(commands("ZMON", "ZMOFF", "ZM?"));
+    }
+
+    @Test
+    public void testNetworkControl() {
+        Select<NetControl> selectNetworkControl = avr1912.selectNetworkControl();
+        assertThat(selectNetworkControl.getCommands()).hasSize(20);
+        assertThat(selectNetworkControl.getCommandPrefix()).isEqualTo("NS");
+
+        selectNetworkControl.select(NetControl.CURSOR_DOWN);
+        verify(protocol).send(cmd("NS91"));
+    }
+
+    @Test
+    public void testHealth() {
+        // check all controls initialized
+        assertThat(avr1912.getControls()
+                .stream()
+                .filter(c -> !c.isInitialized())
+                .count()).isEqualTo(0);
+
+        // and added to dispatcher
+        assertThat(avr1912.getEventDispatcher().getControls())
+                .containsExactlyInAnyOrder(
+                        avr1912.getControls()
+                                .stream()
+                                .toArray(value -> new Control[avr1912.getControls().size()])
+                );
     }
 
     private Event event(String e) {
         return EventImpl.create(e);
     }
 
-    private Command[] cmds(String... sig) {
+    private Command[] commands(String... sig) {
         List<Command> commandList = Stream.of(sig).map(this::cmd).collect(Collectors.toList());
         return commandList.toArray(new Command[commandList.size()]);
     }

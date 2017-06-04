@@ -1,7 +1,6 @@
 package de.theves.denon4j.internal;
 
 import de.theves.denon4j.controls.CommandRegistry;
-import de.theves.denon4j.controls.InputSource;
 import de.theves.denon4j.controls.Select;
 import de.theves.denon4j.internal.net.ParameterImpl;
 import de.theves.denon4j.net.Parameter;
@@ -30,11 +29,9 @@ public class SelectImpl<S extends Enum<S>> extends AbstractControl implements Se
 
     @Override
     protected void doInit() {
-        paramList = new ArrayList<>(InputSource.values().length + 1); // +1 for request parameter
+        paramList = new ArrayList<>(enumCls.getEnumConstants().length + 1); // +1 for request parameter
 
-        paramList.addAll(Stream.of(enumCls.getEnumConstants()).map(
-                ec -> Enum.valueOf(enumCls, ec.name()).toString()
-        ).collect(Collectors.toList()));
+        paramList.addAll(Stream.of(enumCls.getEnumConstants()).map(S::toString).collect(Collectors.toList()));
 
         paramList.add(ParameterImpl.REQUEST.getValue());
         register(paramList.toArray(new String[paramList.size()]));

@@ -17,7 +17,11 @@
 
 package de.theves.denon4j;
 
+import de.theves.denon4j.controls.Control;
+import de.theves.denon4j.internal.EventDispatcher;
+
 import java.io.PrintStream;
+import java.util.Collection;
 
 /**
  * Represents an audio/video receiver.
@@ -31,4 +35,18 @@ public interface AVR extends AutoCloseable {
      * @param writer the writer to print the help.
      */
     void printHelp(PrintStream writer);
+
+    /**
+     * Returns a collection of all available controls.
+     *
+     * @return a collection of all controls.
+     */
+    Collection<Control> getControls();
+
+    /**
+     * Returns the event dispatcher for this AVR.
+     *
+     * @return the event dispatcher belonging to this AVR instance.
+     */
+    EventDispatcher getEventDispatcher();
 }

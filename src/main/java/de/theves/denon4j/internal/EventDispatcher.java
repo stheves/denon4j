@@ -22,9 +22,7 @@ import de.theves.denon4j.net.Event;
 import de.theves.denon4j.net.EventListener;
 import de.theves.denon4j.net.Protocol;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @author stheves
@@ -33,12 +31,18 @@ public class EventDispatcher implements EventListener {
 
     private final Collection<Control> controls;
     private final Protocol protocol;
+    private final Set<Event> unhandledEvents;
 
     /**
      */
     public EventDispatcher(Protocol protocol) {
         this.protocol = Objects.requireNonNull(protocol);
         this.controls = new HashSet<>();
+        unhandledEvents = new HashSet<>();
+    }
+
+    public Set<Event> getUnhandledEvents() {
+        return Collections.unmodifiableSet(unhandledEvents);
     }
 
     public void addControl(Control ctrl) {

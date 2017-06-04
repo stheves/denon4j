@@ -21,6 +21,7 @@ import de.theves.denon4j.controls.Signature;
 import de.theves.denon4j.net.Event;
 import de.theves.denon4j.net.Parameter;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 /**
@@ -31,10 +32,12 @@ import java.util.Objects;
 public class EventImpl implements Event {
     private final String prefix;
     private final Parameter parameter;
+    private final LocalDateTime createdAt;
 
     protected EventImpl(String prefix, Parameter parameter) {
         this.prefix = Objects.requireNonNull(prefix);
         this.parameter = Objects.requireNonNull(parameter);
+        this.createdAt = LocalDateTime.now();
     }
 
     @Override
@@ -48,6 +51,11 @@ public class EventImpl implements Event {
     }
 
     @Override
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    @Override
     public Signature build() {
         return () -> getPrefix() + getParameter().build().signature();
     }
@@ -57,6 +65,7 @@ public class EventImpl implements Event {
         return "Event{" +
                 "prefix='" + prefix + '\'' +
                 ", parameter=" + parameter.build().signature() +
+                ", createdAt=" + createdAt +
                 '}';
     }
 
