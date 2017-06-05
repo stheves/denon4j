@@ -45,7 +45,7 @@ public class MutableParameter implements Parameter {
      * @throws InvalidSignatureException if input is invalid.
      */
     public void setValue(String val) throws InvalidSignatureException {
-        validator.checkPattern(val);
+        validator.validate(val);
         this.value = val;
     }
 
@@ -61,11 +61,11 @@ public class MutableParameter implements Parameter {
 
     @Override
     public boolean isValid() {
-        return validator.isValid();
+        return validator.isValid(getValue());
     }
 
     @Override
     public void validate() throws InvalidSignatureException {
-        validator.validate();
+        validator.validate(getValue());
     }
 }

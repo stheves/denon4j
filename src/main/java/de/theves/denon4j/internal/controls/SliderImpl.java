@@ -92,7 +92,7 @@ public class SliderImpl extends AbstractControl implements Slider {
     @Override
     public boolean isValid() {
         // check current value for validity
-        return validator.matches(getValue());
+        return validator.isValid(getValue());
     }
 
     @Override
@@ -103,7 +103,7 @@ public class SliderImpl extends AbstractControl implements Slider {
     @Override
     public void handle(Event event) {
         // check for pattern
-        if (validator.matches(event.getParameter().getValue())) {
+        if (validator.isValid(event.getParameter().getValue())) {
             // handle only valid ones otherwise we would have an invalid <code>state</code>.
             super.handle(event);
         }

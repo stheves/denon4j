@@ -47,13 +47,13 @@ public class EventImpl implements Event {
 
     @Override
     public boolean isValid() {
-        return validator.matches(this.prefix) && parameter.isValid();
+        return validator.isValid(this.prefix) && parameter.isValid();
     }
 
     @Override
     public void validate() throws InvalidSignatureException {
         // check all valid
-        validator.validate();
+        validator.validate(getPrefix());
         parameter.validate();
     }
 

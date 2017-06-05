@@ -5,7 +5,6 @@ package de.theves.denon4j.controls;
  *
  * @author stheves
  */
-@FunctionalInterface
 public interface Signature {
     String signature();
 }

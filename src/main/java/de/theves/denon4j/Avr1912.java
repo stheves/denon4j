@@ -44,8 +44,8 @@ public class AVR1912 implements AVR {
     private final EventDispatcher eventDispatcher;
     private final Protocol protocol;
     private final Collection<Control> controls;
-
     private final CommandRegistry registry;
+
     private String powerTogglePrefix;
     private String masterSliderPrefix;
     private String muteTogglePrefix;
@@ -171,6 +171,7 @@ public class AVR1912 implements AVR {
     }
 
     public void connect(int timeout) {
+        // first start dispatching to make sure we do not miss anything
         eventDispatcher.startDispatching();
         protocol.establishConnection(timeout);
     }

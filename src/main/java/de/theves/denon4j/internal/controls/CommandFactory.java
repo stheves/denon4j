@@ -43,12 +43,12 @@ class CommandFactory {
     static Command createCommand(Protocol protocol, String prefix, String param) {
         if (null != prefix) {
             CommandId commandId = CommandId.random();
-            Parameter parameter = createParameter(param);
             if (param.contains("[")) {
                 return new SetCommandImpl(protocol, commandId, prefix, parsePattern(param));
             } else if (param.equals(ParameterImpl.REQUEST.getValue())) {
                 return new RequestCommandImpl(protocol, commandId, prefix);
             }
+            Parameter parameter = createParameter(param);
             return new CommandImpl(protocol, commandId, prefix, parameter);
         }
         throw new IllegalArgumentException("Command may not be null");

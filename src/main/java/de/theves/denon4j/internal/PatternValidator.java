@@ -18,7 +18,6 @@
 package de.theves.denon4j.internal;
 
 import de.theves.denon4j.controls.InvalidSignatureException;
-import de.theves.denon4j.controls.Valid;
 
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -28,34 +27,21 @@ import java.util.regex.Pattern;
  *
  * @author stheves
  */
-public class PatternValidator implements Valid {
+public class PatternValidator {
     private final Pattern pattern;
-    private String value;
 
     public PatternValidator(Pattern p) {
         pattern = Objects.requireNonNull(p);
     }
 
-    public boolean matches(String value) {
-        this.value = value;
-        return isValid();
-    }
-
-    public void checkPattern(String value) {
-        this.value = value;
-        validate();
-    }
-
-    @Override
-    public void validate() throws InvalidSignatureException {
-        if (!isValid()) {
+    public void validate(String value) throws InvalidSignatureException {
+        if (!isValid(value)) {
             throw new InvalidSignatureException(value, pattern);
         }
     }
 
-    @Override
-    public boolean isValid() {
-        return pattern.matcher(value).matches();
+    public boolean isValid(String value) {
+        return value != null && pattern.matcher(value).matches();
     }
 
     public Pattern getPattern() {

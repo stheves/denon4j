@@ -24,6 +24,7 @@ import de.theves.denon4j.controls.Signature;
  *
  * @author stheves
  */
+@FunctionalInterface
 public interface SignatureBuilder {
     Signature build();
 }

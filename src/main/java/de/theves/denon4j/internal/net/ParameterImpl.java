@@ -39,11 +39,16 @@ public class ParameterImpl implements Parameter {
 
 
     public ParameterImpl(String value) {
-        if (null == value || value.trim().length() > 25) {
-            throw new IllegalArgumentException("Name cannot be null or greater than 25 chars");
-        }
         this.value = value;
-        validator = new PatternValidator(Pattern.compile("[\\w|\\s|\\d]+"));
+        this.validator = new PatternValidator(Pattern.compile("[\\w\\s\\d\\?/\\.]*"));
+        validate();
+    }
+
+    public static Parameter createParameter(String name) {
+        if (REQUEST.getValue().equals(name)) {
+            return REQUEST;
+        }
+        return new ParameterImpl(name);
     }
 
     @Override
@@ -63,20 +68,13 @@ public class ParameterImpl implements Parameter {
         return this::getValue;
     }
 
-    public static Parameter createParameter(String name) {
-        if (REQUEST.getValue().equals(name)) {
-            return REQUEST;
-        }
-        return new ParameterImpl(name);
-    }
-
     @Override
     public boolean isValid() {
-        return validator.isValid();
+        return validator.isValid(getValue());
     }
 
     @Override
     public void validate() throws InvalidSignatureException {
-        validator.validate();
+        validator.validate(getValue());
     }
 }

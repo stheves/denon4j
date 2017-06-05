@@ -39,7 +39,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author stheves
  */
 public abstract class AbstractControl implements Control {
-    private static final Parameter DIRTY = ParameterImpl.createParameter("");
+    private static final Parameter DIRTY = ParameterImpl.createParameter("DIRTY");
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
