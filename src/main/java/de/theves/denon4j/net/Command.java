@@ -8,18 +8,11 @@ import java.time.LocalDateTime;
  * @author stheves
  */
 public interface Command extends Event {
+    LocalDateTime NEVER = LocalDateTime.MIN;
+
     CommandId getId();
 
     LocalDateTime getExecutedAt();
 
     void execute();
-
-    @Override
-    boolean equals(Object o);
-
-    @Override
-    int hashCode();
-
-    @Override
-    String toString();
 }

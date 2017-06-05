@@ -15,11 +15,12 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.internal;
+package de.theves.denon4j.internal.controls;
 
 import de.theves.denon4j.controls.CommandRegistry;
 import de.theves.denon4j.controls.InvalidSignatureException;
 import de.theves.denon4j.controls.Slider;
+import de.theves.denon4j.internal.PatternValidator;
 import de.theves.denon4j.internal.net.ParameterImpl;
 import de.theves.denon4j.net.Command;
 import de.theves.denon4j.net.CommandId;

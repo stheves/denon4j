@@ -19,6 +19,10 @@ package de.theves.denon4j;
 
 import de.theves.denon4j.controls.*;
 import de.theves.denon4j.internal.*;
+import de.theves.denon4j.internal.controls.CommandRegistryImpl;
+import de.theves.denon4j.internal.controls.SelectImpl;
+import de.theves.denon4j.internal.controls.SliderImpl;
+import de.theves.denon4j.internal.controls.ToggleImpl;
 import de.theves.denon4j.internal.net.Tcp;
 import de.theves.denon4j.net.Protocol;
 
@@ -48,7 +52,7 @@ public class Avr1912 implements AVR {
     private Select<InputSource> selectInput;
     private Select<VideoSource> selectVideo;
     private Toggle mainZoneToggle;
-    private Select<ExtendedControls> selectNet;
+    private Select<ExtendedSettings> selectNet;
 
     public Avr1912(String host, int port) {
         this(new Tcp(host, port));
@@ -92,7 +96,7 @@ public class Avr1912 implements AVR {
         return selectInput;
     }
 
-    public Select<ExtendedControls> selectNetworkControl() {
+    public Select<ExtendedSettings> selectNetworkControl() {
         return selectNet;
     }
 
@@ -124,7 +128,7 @@ public class Avr1912 implements AVR {
     private void addControls(Collection<Control> controls) {
         // power control
         powerToggle = new ToggleImpl(registry, "PW", ON, STANDBY);
-        powerToggle.setName("Power switch");
+        powerToggle.setName("Power Switch");
         powerToggle.init();
         controls.add(powerToggle);
 
@@ -148,7 +152,7 @@ public class Avr1912 implements AVR {
 
         // select video
         selectVideo = new SelectImpl<>(registry, "SV", VideoSource.values());
-        selectVideo.setName("Select VIDEO source");
+        selectVideo.setName("Select VIDEO Source");
         selectVideo.init();
         controls.add(selectVideo);
 
@@ -159,7 +163,7 @@ public class Avr1912 implements AVR {
         controls.add(mainZoneToggle);
 
         // network audio/usb/ipod DIRECT extended control
-        selectNet = new SelectImpl<>(registry, "NS", ExtendedControls.values());
+        selectNet = new SelectImpl<>(registry, "NS", ExtendedSettings.values());
         selectNet.setName("Network USB/AUDIO/IPOD Extended Control");
         selectNet.init();
         controls.add(selectNet);

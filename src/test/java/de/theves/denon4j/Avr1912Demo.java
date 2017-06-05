@@ -59,7 +59,7 @@ public class Avr1912Demo {
             avr.selectInput().select(InputSource.IRADIO);
 
             Thread.sleep(200);
-            avr.selectNetworkControl().select(ExtendedControls.CURSOR_DOWN);
+            avr.selectNetworkControl().select(ExtendedSettings.CURSOR_DOWN);
         }
         System.out.println("------------DEMO END------------");
     }

@@ -15,29 +15,17 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.internal;
+package de.theves.denon4j.controls;
 
-import de.theves.denon4j.controls.CommandRegistry;
-import de.theves.denon4j.controls.SwitchState;
-import de.theves.denon4j.controls.Toggle;
+import de.theves.denon4j.net.Event;
+
+import java.util.List;
 
 /**
- * Toggle control implementation.
+ * Class description.
  *
  * @author stheves
  */
-public class ToggleImpl extends SwitchImpl implements Toggle {
-
-    public ToggleImpl(CommandRegistry registry, String prefix, SwitchState on, SwitchState off) {
-        super(registry, prefix, on, off);
-    }
-
-    public void toggle() {
-        if (onValue.getState().equals(getState().getValue())) {
-            switchOff();
-        }
-        if (offValue.getState().equals(getState().getValue())) {
-            switchOn();
-        }
-    }
+public interface Gui extends Control {
+    List<Event> getDisplay();
 }

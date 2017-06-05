@@ -15,7 +15,7 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.internal;
+package de.theves.denon4j.internal.controls;
 
 import de.theves.denon4j.controls.CommandNotFoundException;
 import de.theves.denon4j.controls.CommandRegistry;
@@ -29,7 +29,7 @@ import java.io.PrintStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static de.theves.denon4j.internal.CommandFactory.createCommand;
+import static de.theves.denon4j.internal.controls.CommandFactory.createCommand;
 
 /**
  * Class description.

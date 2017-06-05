@@ -15,7 +15,7 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.internal;
+package de.theves.denon4j.internal.controls;
 
 import de.theves.denon4j.internal.net.CommandImpl;
 import de.theves.denon4j.internal.net.ParameterImpl;

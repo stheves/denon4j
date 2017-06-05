@@ -130,11 +130,11 @@ public class ControlsTest {
 
     @Test
     public void testNetworkControl() {
-        Select<ExtendedControls> selectNetworkControl = avr1912.selectNetworkControl();
+        Select<ExtendedSettings> selectNetworkControl = avr1912.selectNetworkControl();
         assertThat(selectNetworkControl.getCommands()).hasSize(20);
         assertThat(selectNetworkControl.getCommandPrefix()).isEqualTo("NS");
 
-        selectNetworkControl.select(ExtendedControls.CURSOR_DOWN);
+        selectNetworkControl.select(ExtendedSettings.CURSOR_DOWN);
         verify(protocol).send(cmd("NS91"));
     }
 

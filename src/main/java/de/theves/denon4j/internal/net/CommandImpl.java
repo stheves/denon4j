@@ -31,8 +31,6 @@ import java.util.Objects;
  * @author stheves
  */
 public class CommandImpl extends EventImpl implements Command {
-    private final LocalDateTime NEVER = LocalDateTime.MIN;
-
     private final CommandId id;
 
     protected final Protocol protocol;
