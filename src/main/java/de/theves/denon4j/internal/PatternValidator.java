@@ -15,28 +15,50 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.internal.net;
+package de.theves.denon4j.internal;
 
 import de.theves.denon4j.controls.InvalidSignatureException;
-import de.theves.denon4j.net.CommandId;
-import de.theves.denon4j.net.Protocol;
+import de.theves.denon4j.controls.Valid;
 
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 /**
- * Command that sends a mutable value to the AVR.
+ * Class description.
  *
  * @author stheves
  */
-public class SetCommandImpl extends CommandImpl {
-    private final MutableParameter mutableParameter;
+public class PatternValidator implements Valid {
+    private final Pattern pattern;
+    private String value;
 
-    public SetCommandImpl(Protocol protocol, CommandId id, String prefix, Pattern pattern) {
-        super(protocol, id, prefix, new MutableParameter(pattern));
-        this.mutableParameter = (MutableParameter) getParameter();
+    public PatternValidator(Pattern p) {
+        pattern = Objects.requireNonNull(p);
     }
 
-    public void set(String value) throws InvalidSignatureException {
-        mutableParameter.setValue(value);
+    public boolean matches(String value) {
+        this.value = value;
+        return isValid();
+    }
+
+    public void checkPattern(String value) {
+        this.value = value;
+        validate();
+    }
+
+    @Override
+    public void validate() throws InvalidSignatureException {
+        if (!isValid()) {
+            throw new InvalidSignatureException(value, pattern);
+        }
+    }
+
+    @Override
+    public boolean isValid() {
+        return pattern.matcher(value).matches();
+    }
+
+    public Pattern getPattern() {
+        return pattern;
     }
 }

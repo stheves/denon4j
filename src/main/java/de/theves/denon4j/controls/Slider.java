@@ -5,7 +5,7 @@ package de.theves.denon4j.controls;
  *
  * @author stheves
  */
-public interface Slider extends Control {
+public interface Slider extends Control, Valid {
     void slideUp();
 
     void slideDown();

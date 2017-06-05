@@ -17,11 +17,13 @@
 
 package de.theves.denon4j.net;
 
+import de.theves.denon4j.controls.Valid;
+
 /**
  * Represents a parameter of a command.
  *
  * @author stheves
  */
-public interface Parameter extends SignatureBuilder {
+public interface Parameter extends SignatureBuilder, Valid {
     String getValue();
 }

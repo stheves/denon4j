@@ -24,6 +24,8 @@ import de.theves.denon4j.internal.net.AlreadyInitException;
 import de.theves.denon4j.internal.net.ParameterImpl;
 import de.theves.denon4j.internal.net.RequestCommandImpl;
 import de.theves.denon4j.net.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,12 +42,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public abstract class AbstractControl implements Control {
     private static final Parameter DIRTY = ParameterImpl.createParameter("");
 
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
+
     private final String prefix;
     private final CommandRegistry registry;
     private final AtomicBoolean initialized = new AtomicBoolean(false);
     private final List<Command> commands = new ArrayList<>(10);
-    private final Object stateMonitor = new Object();
 
+    private final Object stateMonitor = new Object();
     private Parameter state = DIRTY;
     private String name;
 
@@ -70,6 +74,7 @@ public abstract class AbstractControl implements Control {
         } else {
             throw new AlreadyInitException("This control has already been initialized");
         }
+        logger.debug("Control initialized");
     }
 
     @Override
@@ -93,6 +98,7 @@ public abstract class AbstractControl implements Control {
     public void handle(Event event) {
         checkInitialized();
         state = event.getParameter();
+        logger.debug("Handled event: {}", event);
     }
 
     private void checkInitialized() {
@@ -106,6 +112,8 @@ public abstract class AbstractControl implements Control {
         if (initialized.compareAndSet(true, false)) {
             commands.forEach(command -> registry.deregisterCommand(command.getId()));
         }
+        // ignore if we were not yet initialized
+        logger.debug("Control disposed");
     }
 
     protected abstract RequestCommand getRequestCommand();

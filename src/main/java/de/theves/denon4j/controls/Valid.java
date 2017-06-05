@@ -15,28 +15,25 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.internal.net;
-
-import de.theves.denon4j.controls.InvalidSignatureException;
-import de.theves.denon4j.net.CommandId;
-import de.theves.denon4j.net.Protocol;
-
-import java.util.regex.Pattern;
+package de.theves.denon4j.controls;
 
 /**
- * Command that sends a mutable value to the AVR.
+ * Interface for all elements that need validity checks.
  *
  * @author stheves
  */
-public class SetCommandImpl extends CommandImpl {
-    private final MutableParameter mutableParameter;
+public interface Valid {
+    /**
+     * Returns <code>true</code> if valid and <code>false</code> otherwise.
+     *
+     * @return <code>true</code> if valid.
+     */
+    boolean isValid();
 
-    public SetCommandImpl(Protocol protocol, CommandId id, String prefix, Pattern pattern) {
-        super(protocol, id, prefix, new MutableParameter(pattern));
-        this.mutableParameter = (MutableParameter) getParameter();
-    }
-
-    public void set(String value) throws InvalidSignatureException {
-        mutableParameter.setValue(value);
-    }
+    /**
+     * Checks this element for validity. Throws an {@link InvalidSignatureException} if invalid.
+     *
+     * @throws InvalidSignatureException thrown if invalid.
+     */
+    void validate() throws InvalidSignatureException;
 }

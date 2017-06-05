@@ -17,6 +17,8 @@
 
 package de.theves.denon4j.net;
 
+import de.theves.denon4j.controls.Valid;
+
 import java.time.LocalDateTime;
 
 /**
@@ -24,7 +26,7 @@ import java.time.LocalDateTime;
  *
  * @author stheves
  */
-public interface Event extends SignatureBuilder {
+public interface Event extends SignatureBuilder, Valid {
     String getPrefix();
     Parameter getParameter();
     LocalDateTime getCreatedAt();

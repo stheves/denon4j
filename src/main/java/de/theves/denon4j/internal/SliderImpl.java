@@ -38,7 +38,7 @@ import java.util.regex.Pattern;
 public class SliderImpl extends AbstractControl implements Slider {
     private final String up;
     private final String down;
-    private final Pattern pattern;
+    private final PatternValidator validator;
 
     private CommandId upId;
     private CommandId downId;
@@ -49,12 +49,12 @@ public class SliderImpl extends AbstractControl implements Slider {
         super(registry, prefix);
         this.up = up;
         this.down = down;
-        this.pattern = pattern;
+        validator = new PatternValidator(pattern);
     }
 
     @Override
     protected void doInit() {
-        List<Command> commands = register(up, down, pattern.pattern(), ParameterImpl.REQUEST.getValue());
+        List<Command> commands = register(up, down, "[" + validator.getPattern().pattern() + "]", ParameterImpl.REQUEST.getValue());
         upId = commands.get(0).getId();
         downId = commands.get(1).getId();
         setId = commands.get(2).getId();
@@ -78,18 +78,20 @@ public class SliderImpl extends AbstractControl implements Slider {
 
     @Override
     public void set(String value) {
-        validate(value);
         executeCommand(setId, value);
     }
 
-    public void validate(String value) throws InvalidSignatureException {
-        if (!isValid(value)) {
-            throw new InvalidSignatureException(value, pattern);
+    @Override
+    public void validate() throws InvalidSignatureException {
+        if (!isValid()) {
+            throw new InvalidSignatureException(getValue(), validator.getPattern());
         }
     }
 
-    public boolean isValid(String value) {
-        return pattern.matcher(value).matches();
+    @Override
+    public boolean isValid() {
+        // check current value for validity
+        return validator.matches(getValue());
     }
 
     @Override
@@ -100,9 +102,9 @@ public class SliderImpl extends AbstractControl implements Slider {
     @Override
     public void handle(Event event) {
         // check for pattern
-        validate(event.getParameter().getValue());
-
-        // handle only valid ones
-        super.handle(event);
+        if (validator.matches(event.getParameter().getValue())) {
+            // handle only valid ones otherwise we would have an invalid <code>state</code>.
+            super.handle(event);
+        }
     }
 }

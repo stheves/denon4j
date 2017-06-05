@@ -58,7 +58,7 @@ public class EventReader extends Thread implements Runnable {
 
     private void openStream() {
         try {
-            this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.US_ASCII));
+            this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
         } catch (IOException e) {
             throw new ConnectionException(e);
         }

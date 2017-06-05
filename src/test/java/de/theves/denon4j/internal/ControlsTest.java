@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.mockito.Mockito.*;
 
@@ -92,9 +93,9 @@ public class ControlsTest {
         assertThat(mute.getCommands()).hasSize(3).containsExactlyInAnyOrder(commands("MUON", "MUOFF", "MU?"));
     }
 
-    @Test(expected = CommandNotFoundException.class)
+    @Test
     public void testUnknownCommand() {
-        registry.getCommand(CommandId.random());
+        assertThatThrownBy(() -> registry.getCommand(CommandId.random())).isInstanceOf(CommandNotFoundException.class);
     }
 
     @Test
@@ -112,6 +113,13 @@ public class ControlsTest {
 
         slider.set("55");
         verify(protocol).send(cmd("MV55"));
+
+        // test validity checks
+        assertThat(slider.isValid()).isTrue();
+        assertThatThrownBy(() -> slider.set("invalid")).isInstanceOf(InvalidSignatureException.class);
+        assertThatThrownBy(() -> slider.set("MV55")).isInstanceOf(InvalidSignatureException.class);
+        assertThatThrownBy(() -> slider.set(" 55")).isInstanceOf(InvalidSignatureException.class);
+        assertThatThrownBy(() -> slider.set("5")).isInstanceOf(InvalidSignatureException.class);
     }
 
     @Test

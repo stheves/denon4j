@@ -37,7 +37,7 @@ import java.util.Optional;
  * @author stheves
  */
 public final class Tcp implements Protocol {
-    private final static char CR = 0x0d; // \r character
+    private final static char PAUSE = 0x0d; // \r character
 
     private final Logger logger = LoggerFactory.getLogger(Tcp.class);
     private final Integer port;
@@ -146,7 +146,7 @@ public final class Tcp implements Protocol {
 
     private void doSend(Command command) {
         try {
-            writer.write(command.build().signature() + CR);
+            writer.write(command.build().signature() + PAUSE);
             writer.flush();
         } catch (Exception e) {
             throw new ConnectionException("Communication failure.", e);

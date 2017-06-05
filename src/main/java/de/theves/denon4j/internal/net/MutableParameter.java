@@ -17,8 +17,12 @@
 
 package de.theves.denon4j.internal.net;
 
+import de.theves.denon4j.controls.InvalidSignatureException;
 import de.theves.denon4j.controls.Signature;
+import de.theves.denon4j.internal.PatternValidator;
 import de.theves.denon4j.net.Parameter;
+
+import java.util.regex.Pattern;
 
 /**
  * Mutable implementation of an {@link Parameter}.
@@ -26,12 +30,23 @@ import de.theves.denon4j.net.Parameter;
  * @author stheves
  */
 public class MutableParameter implements Parameter {
+    private final PatternValidator validator;
     private String value;
 
-    public void setValue(String val) {
-        if (val != null) {
-            this.value = val;
-        }
+    public MutableParameter(Pattern pattern) {
+        this.validator = new PatternValidator(pattern);
+    }
+
+    /**
+     * Sets the value of this parameter and validates it with
+     * {@link de.theves.denon4j.controls.Valid#validate()} before setting.
+     *
+     * @param val the value to set.
+     * @throws InvalidSignatureException if input is invalid.
+     */
+    public void setValue(String val) throws InvalidSignatureException {
+        validator.checkPattern(val);
+        this.value = val;
     }
 
     @Override
@@ -42,5 +57,15 @@ public class MutableParameter implements Parameter {
     @Override
     public Signature build() {
         return getValue() != null ? this::getValue : () -> "";
+    }
+
+    @Override
+    public boolean isValid() {
+        return validator.isValid();
+    }
+
+    @Override
+    public void validate() throws InvalidSignatureException {
+        validator.validate();
     }
 }

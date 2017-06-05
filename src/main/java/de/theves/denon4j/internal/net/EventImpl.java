@@ -17,12 +17,15 @@
 
 package de.theves.denon4j.internal.net;
 
+import de.theves.denon4j.controls.InvalidSignatureException;
 import de.theves.denon4j.controls.Signature;
+import de.theves.denon4j.internal.PatternValidator;
 import de.theves.denon4j.net.Event;
 import de.theves.denon4j.net.Parameter;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 /**
  * Class description.
@@ -33,11 +36,25 @@ public class EventImpl implements Event {
     private final String prefix;
     private final Parameter parameter;
     private final LocalDateTime createdAt;
+    private final PatternValidator validator;
 
     protected EventImpl(String prefix, Parameter parameter) {
         this.prefix = Objects.requireNonNull(prefix);
         this.parameter = Objects.requireNonNull(parameter);
         this.createdAt = LocalDateTime.now();
+        validator = new PatternValidator(Pattern.compile("(\\w\\w)")); // validate only the prefix
+    }
+
+    @Override
+    public boolean isValid() {
+        return validator.matches(this.prefix) && parameter.isValid();
+    }
+
+    @Override
+    public void validate() throws InvalidSignatureException {
+        // check all valid
+        validator.validate();
+        parameter.validate();
     }
 
     @Override

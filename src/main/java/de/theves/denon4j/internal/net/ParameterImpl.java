@@ -17,8 +17,12 @@
 
 package de.theves.denon4j.internal.net;
 
+import de.theves.denon4j.controls.InvalidSignatureException;
 import de.theves.denon4j.controls.Signature;
+import de.theves.denon4j.internal.PatternValidator;
 import de.theves.denon4j.net.Parameter;
+
+import java.util.regex.Pattern;
 
 /**
  * Class description.
@@ -29,6 +33,8 @@ public class ParameterImpl implements Parameter {
     public static final Parameter EMPTY = new ParameterImpl("");
     public static final Parameter REQUEST = new ParameterImpl("?");
 
+    private final PatternValidator validator;
+
     private String value;
 
 
@@ -37,6 +43,7 @@ public class ParameterImpl implements Parameter {
             throw new IllegalArgumentException("Name cannot be null or greater than 25 chars");
         }
         this.value = value;
+        validator = new PatternValidator(Pattern.compile("[\\w|\\s|\\d]+"));
     }
 
     @Override
@@ -61,5 +68,15 @@ public class ParameterImpl implements Parameter {
             return REQUEST;
         }
         return new ParameterImpl(name);
+    }
+
+    @Override
+    public boolean isValid() {
+        return validator.isValid();
+    }
+
+    @Override
+    public void validate() throws InvalidSignatureException {
+        validator.validate();
     }
 }

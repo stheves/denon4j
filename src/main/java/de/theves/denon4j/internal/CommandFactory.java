@@ -26,6 +26,8 @@ import de.theves.denon4j.net.CommandId;
 import de.theves.denon4j.net.Parameter;
 import de.theves.denon4j.net.Protocol;
 
+import java.util.regex.Pattern;
+
 import static de.theves.denon4j.internal.net.ParameterImpl.createParameter;
 
 /**
@@ -43,12 +45,18 @@ class CommandFactory {
             CommandId commandId = CommandId.random();
             Parameter parameter = createParameter(param);
             if (param.contains("[")) {
-                return new SetCommandImpl(protocol, commandId, prefix);
+                return new SetCommandImpl(protocol, commandId, prefix, parsePattern(param));
             } else if (param.equals(ParameterImpl.REQUEST.getValue())) {
                 return new RequestCommandImpl(protocol, commandId, prefix);
             }
             return new CommandImpl(protocol, commandId, prefix, parameter);
         }
         throw new IllegalArgumentException("Command may not be null");
+    }
+
+    private static Pattern parsePattern(String param) {
+        int begin = param.indexOf("[");
+        int end = param.lastIndexOf("]");
+        return Pattern.compile(param.substring(begin + 1, end));
     }
 }
