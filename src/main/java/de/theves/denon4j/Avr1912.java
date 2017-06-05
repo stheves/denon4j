@@ -176,7 +176,7 @@ public class AVR1912 implements AVR {
         protocol.establishConnection(timeout);
     }
 
-    public CommandRegistry getRegistry() {
+    CommandRegistry getRegistry() {
         return registry;
     }
 
