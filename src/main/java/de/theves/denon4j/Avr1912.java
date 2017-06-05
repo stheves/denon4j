@@ -18,7 +18,7 @@
 package de.theves.denon4j;
 
 import de.theves.denon4j.controls.*;
-import de.theves.denon4j.internal.*;
+import de.theves.denon4j.internal.EventDispatcher;
 import de.theves.denon4j.internal.controls.CommandRegistryImpl;
 import de.theves.denon4j.internal.controls.SelectImpl;
 import de.theves.denon4j.internal.controls.SliderImpl;
@@ -145,13 +145,13 @@ public class Avr1912 implements AVR {
         controls.add(muteToggle);
 
         // select input
-        selectInput = new SelectImpl<>(registry, "SI", InputSource.values());
+        selectInput = new SelectImpl<>(registry, "SI", InputSource.values(), true);
         selectInput.setName("Select INPUT Source");
         selectInput.init();
         controls.add(selectInput);
 
         // select video
-        selectVideo = new SelectImpl<>(registry, "SV", VideoSource.values());
+        selectVideo = new SelectImpl<>(registry, "SV", VideoSource.values(), true);
         selectVideo.setName("Select VIDEO Source");
         selectVideo.init();
         controls.add(selectVideo);
@@ -163,7 +163,7 @@ public class Avr1912 implements AVR {
         controls.add(mainZoneToggle);
 
         // network audio/usb/ipod DIRECT extended control
-        selectNet = new SelectImpl<>(registry, "NS", ExtendedSettings.values());
+        selectNet = new SelectImpl<>(registry, "NS", ExtendedSettings.values(), false);
         selectNet.setName("Network USB/AUDIO/IPOD Extended Control");
         selectNet.init();
         controls.add(selectNet);

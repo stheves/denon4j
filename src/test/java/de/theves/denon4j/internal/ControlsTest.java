@@ -54,8 +54,8 @@ public class ControlsTest {
     public void testSelectControl() {
         Select<InputSource> si = avr1912.selectInput();
         List<Command> commands = si.getCommands();
-        assertThat(commands.size()).isEqualTo(23);
-        assertThat(registry.findByPrefix("SI")).hasSize(23);
+        assertThat(commands.size()).isEqualTo(InputSource.values().length + 1);
+        assertThat(registry.findByPrefix("SI")).hasSize(InputSource.values().length + 1);
 
         // execute control
         si.select(InputSource.SAT_CBL);
@@ -90,12 +90,13 @@ public class ControlsTest {
     @Test
     public void testMuteControl() {
         Toggle mute = avr1912.mute();
-        assertThat(mute.getCommands()).hasSize(3).containsExactlyInAnyOrder(commands("MUON", "MUOFF", "MU?"));
+        assertThat(mute.getCommands()).containsExactlyInAnyOrder(commands("MUON", "MUOFF", "MU?"));
     }
 
     @Test
     public void testUnknownCommand() {
-        assertThatThrownBy(() -> registry.getCommand(CommandId.random())).isInstanceOf(CommandNotFoundException.class);
+        assertThatThrownBy(() ->
+                registry.getCommand(CommandId.random())).isInstanceOf(CommandNotFoundException.class);
     }
 
     @Test
@@ -131,8 +132,9 @@ public class ControlsTest {
     @Test
     public void testNetworkControl() {
         Select<ExtendedSettings> selectNetworkControl = avr1912.selectNetworkControl();
-        assertThat(selectNetworkControl.getCommands()).hasSize(20);
+        assertThat(selectNetworkControl.getCommands()).hasSize(ExtendedSettings.values().length);
         assertThat(selectNetworkControl.getCommandPrefix()).isEqualTo("NS");
+        assertThat(registry.findBySignature(() -> "NS?")).isEmpty();
 
         selectNetworkControl.select(ExtendedSettings.CURSOR_DOWN);
         verify(protocol).send(cmd("NS91"));

@@ -35,22 +35,24 @@ import java.util.stream.Stream;
  * @author stheves
  */
 public class SelectImpl<S extends Enum> extends AbstractControl implements Select<S> {
-    private final S[] values;
+    private final S[] params;
+    private boolean hasRequest;
 
     private List<String> paramList;
 
-    public SelectImpl(CommandRegistry registry, String prefix, S[] values) {
+    public SelectImpl(CommandRegistry registry, String prefix, S[] params, boolean hasRequestParam) {
         super(registry, prefix);
-        this.values = Objects.requireNonNull(values);
+        this.params = Objects.requireNonNull(params);
+        this.hasRequest = hasRequestParam;
     }
 
     @Override
     protected void doInit() {
-        paramList = new ArrayList<>(values.length + 1); // +1 for request parameter
-
-        paramList.addAll(Stream.of(values).map(Enum::toString).collect(Collectors.toList()));
-
-        paramList.add(ParameterImpl.REQUEST.getValue());
+        paramList = new ArrayList<>(params.length + 1); // +1 for request parameter
+        paramList.addAll(Stream.of(params).map(Enum::toString).collect(Collectors.toList()));
+        if (hasRequest) {
+            paramList.add(ParameterImpl.REQUEST.getValue());
+        }
         register(paramList.toArray(new String[paramList.size()]));
     }
 
@@ -66,7 +68,7 @@ public class SelectImpl<S extends Enum> extends AbstractControl implements Selec
     }
 
     private S findSource(Parameter state) {
-        return Stream.of(values)
+        return Stream.of(params)
                 .filter(e -> state.getValue().equals(e.toString()))
                 .findFirst()
                 .orElseThrow(IllegalStateException::new);
