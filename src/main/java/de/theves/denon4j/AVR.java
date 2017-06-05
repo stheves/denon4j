@@ -42,11 +42,4 @@ public interface AVR extends AutoCloseable {
      * @return a collection of all controls.
      */
     Collection<Control> getControls();
-
-    /**
-     * Returns the event dispatcher for this AVR.
-     *
-     * @return the event dispatcher belonging to this AVR instance.
-     */
-    EventDispatcher getEventDispatcher();
 }

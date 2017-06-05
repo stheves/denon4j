@@ -19,11 +19,11 @@ package de.theves.denon4j;
 
 import de.theves.denon4j.controls.*;
 
-public class Avr1912Demo {
+public class AVR1912Demo {
 
     private void demo(String host, int port) throws Exception {
         System.out.println("------------DEMO START------------");
-        try (Avr1912 avr = new Avr1912(host, port)) {
+        try (AVR1912 avr = new AVR1912(host, port)) {
             // show all available commands
             avr.printHelp(System.out);
 
@@ -69,9 +69,9 @@ public class Avr1912Demo {
             System.err.println("Try java -jar $/path/to/jar $host $port");
             System.exit(1);
         }
-        System.out.println(String.format("Starting demo... Avr1912: %s:%s",
+        System.out.println(String.format("Starting demo... AVR1912: %s:%s",
                 args[0], args[1]));
-        Avr1912Demo test = new Avr1912Demo();
+        AVR1912Demo test = new AVR1912Demo();
         test.demo(args[0], Integer.parseInt(args[1]));
     }
 }

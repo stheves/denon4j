@@ -38,7 +38,7 @@ import static de.theves.denon4j.controls.SwitchState.*;
  *
  * @author stheves
  */
-public class Avr1912 implements AVR {
+public class AVR1912 implements AVR {
     private static final Pattern PATTERN_MASTER_VOL = Pattern.compile("[0-9][0-9][5]?");
 
     private final EventDispatcher eventDispatcher;
@@ -46,7 +46,7 @@ public class Avr1912 implements AVR {
     private final Collection<Control> controls;
 
     private final CommandRegistry registry;
-    private Toggle powerToggle;
+    private String powerTogglePrefix;
     private Slider masterSlider;
     private Toggle muteToggle;
     private Select<InputSource> selectInput;
@@ -54,11 +54,11 @@ public class Avr1912 implements AVR {
     private Toggle mainZoneToggle;
     private Select<ExtendedSettings> selectNet;
 
-    public Avr1912(String host, int port) {
+    public AVR1912(String host, int port) {
         this(new Tcp(host, port));
     }
 
-    public Avr1912(Protocol protocol) {
+    AVR1912(Protocol protocol) {
         this.protocol = protocol;
         this.registry = new CommandRegistryImpl(protocol);
         this.eventDispatcher = new EventDispatcher(protocol);
@@ -67,67 +67,10 @@ public class Avr1912 implements AVR {
         addToDispatcher(this.controls);
     }
 
-    @Override
-    public EventDispatcher getEventDispatcher() {
-        return eventDispatcher;
-    }
-
-    private void addToDispatcher(Collection<Control> controls) {
-        controls.stream().forEach(eventDispatcher::addControl);
-    }
-
-    public Toggle power() {
-        return powerToggle;
-    }
-
-    public Toggle mainZone() {
-        return mainZoneToggle;
-    }
-
-    public Slider masterVolume() {
-        return masterSlider;
-    }
-
-    public Toggle mute() {
-        return muteToggle;
-    }
-
-    public Select<InputSource> selectInput() {
-        return selectInput;
-    }
-
-    public Select<ExtendedSettings> selectNetworkControl() {
-        return selectNet;
-    }
-
-    public Select<VideoSource> selectVideo() {
-        return selectVideo;
-    }
-
-    @Override
-    public void printHelp(PrintStream writer) {
-        registry.printCommands(writer);
-    }
-
-    @Override
-    public Collection<Control> getControls() {
-        return controls;
-    }
-
-    public void connect(int timeout) {
-        protocol.establishConnection(timeout);
-        eventDispatcher.startDispatching();
-    }
-
-    public void disconnect() {
-        getControls().forEach(eventDispatcher::removeControl);
-        getControls().forEach(Control::dispose);
-        protocol.disconnect();
-    }
-
-    private void addControls(Collection<Control> controls) {
+    private void addControls(Collection<? super Control> controls) {
         // power control
-        powerToggle = new ToggleImpl(registry, "PW", ON, STANDBY);
+        powerTogglePrefix = "PW";
+        Toggle powerToggle = new ToggleImpl(registry, powerTogglePrefix, ON, STANDBY);
         powerToggle.setName("Power Switch");
         powerToggle.init();
         controls.add(powerToggle);
@@ -169,6 +112,62 @@ public class Avr1912 implements AVR {
         controls.add(selectNet);
     }
 
+    private void addToDispatcher(Collection<Control> controls) {
+        controls.stream().forEach(eventDispatcher::addControl);
+    }
+
+    EventDispatcher getEventDispatcher() {
+        return eventDispatcher;
+    }
+
+    public Toggle power() {
+        return findControl(powerTogglePrefix);
+    }
+
+    private Toggle findControl(String prefix) {
+        // TODO do not blind cast
+        return (Toggle) controls.stream().filter(control -> control.getCommandPrefix().equals(prefix)).findFirst().orElseThrow(IllegalStateException::new);
+    }
+
+    public Toggle mainZone() {
+        return mainZoneToggle;
+    }
+
+    public Slider masterVolume() {
+        return masterSlider;
+    }
+
+    public Toggle mute() {
+        return muteToggle;
+    }
+
+    public Select<InputSource> selectInput() {
+        return selectInput;
+    }
+
+    public Select<ExtendedSettings> selectNetworkControl() {
+        return selectNet;
+    }
+
+    public Select<VideoSource> selectVideo() {
+        return selectVideo;
+    }
+
+    @Override
+    public void printHelp(PrintStream writer) {
+        registry.printCommands(writer);
+    }
+
+    @Override
+    public Collection<Control> getControls() {
+        return controls;
+    }
+
+    public void connect(int timeout) {
+        eventDispatcher.startDispatching();
+        protocol.establishConnection(timeout);
+    }
+
     public CommandRegistry getRegistry() {
         return registry;
     }
@@ -176,6 +175,12 @@ public class Avr1912 implements AVR {
     @Override
     public void close() throws Exception {
         disconnect();
+    }
+
+    public void disconnect() {
+        getControls().forEach(eventDispatcher::removeControl);
+        getControls().forEach(Control::dispose);
+        protocol.disconnect();
     }
 
     public boolean isConnected() {

@@ -1,12 +1,28 @@
-package de.theves.denon4j.internal;
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
 
-import de.theves.denon4j.Avr1912;
+package de.theves.denon4j;
+
 import de.theves.denon4j.controls.*;
 import de.theves.denon4j.internal.net.EventImpl;
 import de.theves.denon4j.net.*;
-import org.assertj.core.api.AbstractLongAssert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InOrder;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,21 +37,23 @@ import static org.mockito.Mockito.*;
  * Test for basic controls.
  */
 public class ControlsTest {
-    private Avr1912 avr1912;
+    private AVR1912 avr1912;
     private Protocol protocol;
     private CommandRegistry registry;
 
     @Before
     public void setup() {
         protocol = mock(Protocol.class);
-        avr1912 = new Avr1912(protocol);
+        avr1912 = new AVR1912(protocol);
         registry = avr1912.getRegistry();
     }
 
-    @Test(expected = ConnectException.class)
+    @Test
     public void testConnectionHandling() {
         avr1912.connect(100);
-        verify(protocol).establishConnection(100);
+        InOrder order = inOrder(protocol, protocol);
+        order.verify(protocol, times(1)).setListener(avr1912.getEventDispatcher());
+        order.verify(protocol, times(1)).establishConnection(100);
 
         when(protocol.isConnected()).thenReturn(Boolean.TRUE);
         assertThat(avr1912.isConnected()).isTrue();
@@ -47,7 +65,7 @@ public class ControlsTest {
         assertThat(avr1912.isConnected()).isFalse();
 
         doThrow(new ConnectException("Failure")).when(protocol).establishConnection(137);
-        avr1912.connect(137);
+        assertThatThrownBy(() -> avr1912.connect(137)).isInstanceOf(ConnectException.class).withFailMessage("Failure");
     }
 
     @Test
@@ -157,17 +175,17 @@ public class ControlsTest {
         assertControlsInitialized();
 
         // and added to dispatcher
-        assertAddedToDispatcher();
+        assertDispatcherValid();
     }
 
-    private AbstractLongAssert<?> assertControlsInitialized() {
-        return assertThat(avr1912.getControls()
+    private void assertControlsInitialized() {
+        assertThat(avr1912.getControls()
                 .stream()
                 .filter(c -> !c.isInitialized())
                 .count()).isEqualTo(0);
     }
 
-    private void assertAddedToDispatcher() {
+    private void assertDispatcherValid() {
         assertThat(avr1912.getEventDispatcher().getControls())
                 .containsExactlyInAnyOrder(
                         avr1912.getControls()
