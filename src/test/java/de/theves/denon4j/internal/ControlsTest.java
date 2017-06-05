@@ -107,13 +107,23 @@ public class ControlsTest {
         assertThat(slider.getValue()).isEqualTo("45");
 
         slider.slideUp();
+        // fake events
+        avr1912.getEventDispatcher().onEvent(EventImpl.create("MV455"));
+        avr1912.getEventDispatcher().onEvent(EventImpl.create("MVMAX 68"));
         verify(protocol).send(cmd("MVUP"));
+        assertThat(slider.getValue()).isEqualTo("455");
 
         slider.slideDown();
+        avr1912.getEventDispatcher().onEvent(EventImpl.create("MV45"));
+        avr1912.getEventDispatcher().onEvent(EventImpl.create("MVMAX 675"));
         verify(protocol).send(cmd("MVDOWN"));
+        assertThat(slider.getValue()).isEqualTo("45");
 
         slider.set("55");
+        avr1912.getEventDispatcher().onEvent(EventImpl.create("MV55"));
+        avr1912.getEventDispatcher().onEvent(EventImpl.create("MVMAX 72"));
         verify(protocol).send(cmd("MV55"));
+        assertThat(slider.getValue()).isEqualTo("55");
 
         // test validity checks
         assertThat(slider.isValid()).isTrue();
@@ -121,6 +131,7 @@ public class ControlsTest {
         assertThatThrownBy(() -> slider.set("MV55")).isInstanceOf(InvalidSignatureException.class);
         assertThatThrownBy(() -> slider.set(" 55")).isInstanceOf(InvalidSignatureException.class);
         assertThatThrownBy(() -> slider.set("5")).isInstanceOf(InvalidSignatureException.class);
+        assertThatThrownBy(() -> slider.set(" 5 ")).isInstanceOf(InvalidSignatureException.class);
     }
 
     @Test
