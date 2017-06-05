@@ -31,10 +31,8 @@ import java.util.Objects;
  * @author stheves
  */
 public class CommandImpl extends EventImpl implements Command {
-    private final CommandId id;
-
     protected final Protocol protocol;
-
+    private final CommandId id;
     private LocalDateTime executedAt = NEVER;
 
     public CommandImpl(Protocol protocol, CommandId id, String prefix, Parameter parameter) {
@@ -59,8 +57,18 @@ public class CommandImpl extends EventImpl implements Command {
         executedAt = LocalDateTime.now();
     }
 
+    @Override
+    public boolean isDirtying() {
+        return true;
+    }
+
     protected void doSend() {
         protocol.send(this);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
     @Override
@@ -70,12 +78,6 @@ public class CommandImpl extends EventImpl implements Command {
         CommandImpl command = (CommandImpl) o;
         return Objects.equals(id, command.id);
     }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
-
 
     @Override
     public String toString() {

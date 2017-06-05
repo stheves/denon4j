@@ -15,4 +15,6 @@ public interface Command extends Event {
     LocalDateTime getExecutedAt();
 
     void execute();
+
+    boolean isDirtying();
 }

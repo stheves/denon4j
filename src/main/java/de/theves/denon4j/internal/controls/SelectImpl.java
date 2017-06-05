@@ -57,7 +57,7 @@ public class SelectImpl<S extends Enum> extends AbstractControl implements Selec
     }
 
     @Override
-    public void select(S source) {
+    public void source(S source) {
         executeCommand(getCommands().get(paramList.indexOf(source.toString())).getId());
     }
 

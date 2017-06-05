@@ -9,9 +9,9 @@ public interface Select<S extends Enum> extends Control {
     /**
      * Selects the given <code>source</code>.
      *
-     * @param source the source to select.
+     * @param source the source to source.
      */
-    void select(S source);
+    void source(S source);
 
     /**
      * Returns the current active source.

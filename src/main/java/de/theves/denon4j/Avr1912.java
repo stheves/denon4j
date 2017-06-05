@@ -47,12 +47,12 @@ public class AVR1912 implements AVR {
 
     private final CommandRegistry registry;
     private String powerTogglePrefix;
-    private Slider masterSlider;
-    private Toggle muteToggle;
-    private Select<InputSource> selectInput;
-    private Select<VideoSource> selectVideo;
-    private Toggle mainZoneToggle;
-    private Select<ExtendedSettings> selectNet;
+    private String masterSliderPrefix;
+    private String muteTogglePrefix;
+    private String mainZoneTogglePrefix;
+    private String selectNetPrefix;
+    private String selectVideoPrefix;
+    private String selectInputPrefix;
 
     public AVR1912(String host, int port) {
         this(new Tcp(host, port));
@@ -76,37 +76,43 @@ public class AVR1912 implements AVR {
         controls.add(powerToggle);
 
         // master vol. control
-        masterSlider = new SliderImpl(registry, "MV", "UP", "DOWN", PATTERN_MASTER_VOL);
+        masterSliderPrefix = "MV";
+        Slider masterSlider = new SliderImpl(registry, masterSliderPrefix, "UP", "DOWN", PATTERN_MASTER_VOL);
         masterSlider.setName("Master Volume");
         masterSlider.init();
         controls.add(masterSlider);
 
         // mute control
-        muteToggle = new ToggleImpl(registry, "MU", ON, OFF);
+        muteTogglePrefix = "MU";
+        Toggle muteToggle = new ToggleImpl(registry, muteTogglePrefix, ON, OFF);
         muteToggle.setName("Mute Toggle");
         muteToggle.init();
         controls.add(muteToggle);
 
-        // select input
-        selectInput = new SelectImpl<>(registry, "SI", InputSource.values(), true);
+        // source input
+        selectInputPrefix = "SI";
+        Select<InputSource> selectInput = new SelectImpl<>(registry, selectInputPrefix, InputSource.values(), true);
         selectInput.setName("Select INPUT Source");
         selectInput.init();
         controls.add(selectInput);
 
-        // select video
-        selectVideo = new SelectImpl<>(registry, "SV", VideoSource.values(), true);
+        // source video
+        selectVideoPrefix = "SV";
+        Select<VideoSource> selectVideo = new SelectImpl<>(registry, selectVideoPrefix, VideoSource.values(), true);
         selectVideo.setName("Select VIDEO Source");
         selectVideo.init();
         controls.add(selectVideo);
 
         // main zone toggle
-        mainZoneToggle = new ToggleImpl(registry, "ZM", ON, OFF);
+        mainZoneTogglePrefix = "ZM";
+        Toggle mainZoneToggle = new ToggleImpl(registry, mainZoneTogglePrefix, ON, OFF);
         mainZoneToggle.setName("Main Zone Toggle");
         mainZoneToggle.init();
         controls.add(mainZoneToggle);
 
         // network audio/usb/ipod DIRECT extended control
-        selectNet = new SelectImpl<>(registry, "NS", ExtendedSettings.values(), false);
+        selectNetPrefix = "NS";
+        Select<ExtendedSettings> selectNet = new SelectImpl<>(registry, selectNetPrefix, ExtendedSettings.values(), false);
         selectNet.setName("Network USB/AUDIO/IPOD Extended Control");
         selectNet.init();
         controls.add(selectNet);
@@ -121,36 +127,37 @@ public class AVR1912 implements AVR {
     }
 
     public Toggle power() {
-        return findControl(powerTogglePrefix);
+        return findControl(powerTogglePrefix, Toggle.class);
     }
 
-    private Toggle findControl(String prefix) {
-        // TODO do not blind cast
-        return (Toggle) controls.stream().filter(control -> control.getCommandPrefix().equals(prefix)).findFirst().orElseThrow(IllegalStateException::new);
+    private <C extends Control> C findControl(String prefix, Class<C> cls) {
+        return cls.cast(controls.stream()
+                .filter(control -> control.getCommandPrefix().equals(prefix))
+                .findFirst().orElseThrow(IllegalStateException::new));
     }
 
     public Toggle mainZone() {
-        return mainZoneToggle;
+        return findControl(mainZoneTogglePrefix, Toggle.class);
     }
 
     public Slider masterVolume() {
-        return masterSlider;
+        return findControl(masterSliderPrefix, Slider.class);
     }
 
     public Toggle mute() {
-        return muteToggle;
+        return findControl(muteTogglePrefix, Toggle.class);
     }
 
     public Select<InputSource> selectInput() {
-        return selectInput;
+        return findControl(selectInputPrefix, Select.class);
     }
 
     public Select<ExtendedSettings> selectNetworkControl() {
-        return selectNet;
+        return findControl(selectNetPrefix, Select.class);
     }
 
     public Select<VideoSource> selectVideo() {
-        return selectVideo;
+        return findControl(selectVideoPrefix, Select.class);
     }
 
     @Override

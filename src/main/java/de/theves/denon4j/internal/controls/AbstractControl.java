@@ -22,7 +22,6 @@ import de.theves.denon4j.controls.Control;
 import de.theves.denon4j.controls.NotYetInitializedException;
 import de.theves.denon4j.internal.net.AlreadyInitException;
 import de.theves.denon4j.internal.net.ParameterImpl;
-import de.theves.denon4j.internal.net.RequestCommandImpl;
 import de.theves.denon4j.net.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,13 +57,16 @@ public abstract class AbstractControl implements Control {
         this.registry = Objects.requireNonNull(registry);
     }
 
-    public void setName(String name) {
-        this.name = name;
+    @Override
+    public void handle(Event event) {
+        checkInitialized();
+        state = event.getParameter();
+        logger.debug("Handled event: {}", event);
     }
 
     @Override
-    public String getName() {
-        return name;
+    public String getCommandPrefix() {
+        return prefix;
     }
 
     @Override
@@ -74,7 +76,12 @@ public abstract class AbstractControl implements Control {
         } else {
             throw new AlreadyInitException("This control has already been initialized");
         }
-        logger.debug("Control initialized");
+        logger.debug("Control initialized: {}", this);
+    }
+
+    @Override
+    public boolean isInitialized() {
+        return initialized.get();
     }
 
     @Override
@@ -83,43 +90,29 @@ public abstract class AbstractControl implements Control {
     }
 
     @Override
-    public boolean isInitialized() {
-        return initialized.get();
-    }
-
-    protected abstract void doInit();
-
-    @Override
-    public String getCommandPrefix() {
-        return prefix;
-    }
-
-    @Override
-    public void handle(Event event) {
-        checkInitialized();
-        state = event.getParameter();
-        logger.debug("Handled event: {}", event);
-    }
-
-    private void checkInitialized() {
-        if (!initialized.get()) {
-            throw new NotYetInitializedException(this);
-        }
-    }
-
-    @Override
     public void dispose() {
         if (initialized.compareAndSet(true, false)) {
             commands.forEach(command -> registry.deregisterCommand(command.getId()));
         }
         // ignore if we were not yet initialized
-        logger.debug("Control disposed");
+        logger.debug("Control disposed: {}", this);
     }
 
-    protected abstract RequestCommand getRequestCommand();
+    @Override
+    public String getName() {
+        return name;
+    }
 
-    CommandRegistry getRegistry() {
-        return registry;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    protected abstract void doInit();
+
+    private void checkInitialized() {
+        if (!initialized.get()) {
+            throw new NotYetInitializedException(this);
+        }
     }
 
     Parameter getState() {
@@ -141,16 +134,29 @@ public abstract class AbstractControl implements Control {
         executeCommand(commandId, null);
     }
 
+    protected abstract RequestCommand getRequestCommand();
+
+    void executeCommand(CommandId downId, String value) {
+        Command cmd = getRegistry().getCommandStack().execute(downId, value);
+        if(cmd.isDirtying()) {
+            state = DIRTY;
+        }
+    }
+
+    CommandRegistry getRegistry() {
+        return registry;
+    }
+
     List<Command> register(String... parameters) {
         commands.addAll(getRegistry().registerAll(getCommandPrefix(), parameters));
         return commands;
     }
 
-    void executeCommand(CommandId downId, String value) {
-        Command execute = getRegistry().getCommandStack().execute(downId, value);
-        if (execute instanceof RequestCommandImpl) {
-            return;
-        }
-        state = DIRTY;
+    @Override
+    public String toString() {
+        return "Control{" +
+                "prefix='" + prefix + '\'' +
+                ", name='" + name + '\'' +
+                '}';
     }
 }

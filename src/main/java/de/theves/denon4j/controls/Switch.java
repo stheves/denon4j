@@ -10,5 +10,5 @@ public interface Switch extends Control {
 
     void switchOn();
 
-    SwitchState getSwitchState();
+    SwitchState state();
 }

@@ -76,7 +76,7 @@ public class ControlsTest {
         assertThat(registry.findByPrefix("SI")).hasSize(InputSource.values().length + 1);
 
         // execute control
-        si.select(InputSource.SAT_CBL);
+        si.source(InputSource.SAT_CBL);
 
         when(protocol.receive((RequestCommand) cmd("SI?"))).thenReturn(event("SISAT/CBL"));
         InputSource source = si.getSource();
@@ -97,10 +97,10 @@ public class ControlsTest {
         when(protocol.receive((RequestCommand) cmd("PW?")))
                 .thenReturn(event("PWSTANDBY"), event("PWON"));
 
-        assertThat(power.getSwitchState()).isEqualTo(SwitchState.STANDBY);
+        assertThat(power.state()).isEqualTo(SwitchState.STANDBY);
         power.toggle();
         verify(protocol).send(cmd("PWON"));
-        assertThat(power.getSwitchState()).isEqualTo(SwitchState.ON);
+        assertThat(power.state()).isEqualTo(SwitchState.ON);
         power.toggle();
         verify(protocol).send(cmd("PWSTANDBY"));
     }
@@ -165,7 +165,7 @@ public class ControlsTest {
         assertThat(selectNetworkControl.getCommandPrefix()).isEqualTo("NS");
         assertThat(registry.findBySignature(() -> "NS?")).isEmpty();
 
-        selectNetworkControl.select(ExtendedSettings.CURSOR_DOWN);
+        selectNetworkControl.source(ExtendedSettings.CURSOR_DOWN);
         verify(protocol).send(cmd("NS91"));
     }
 
