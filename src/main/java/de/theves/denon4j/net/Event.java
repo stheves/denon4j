@@ -28,6 +28,6 @@ import java.time.LocalDateTime;
  */
 public interface Event extends SignatureBuilder, Valid {
     String getPrefix();
-    Parameter getParameter();
+    Parameter<?> getParameter();
     LocalDateTime getCreatedAt();
 }

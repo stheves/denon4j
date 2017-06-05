@@ -23,6 +23,7 @@ import de.theves.denon4j.net.EventListener;
 import de.theves.denon4j.net.Protocol;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author stheves
@@ -63,9 +64,14 @@ public class EventDispatcher implements EventListener {
 
     @Override
     public void onEvent(Event event) {
-        controls.stream().filter(ctrl ->
-                ctrl.isInitialized() && ctrl.getCommandPrefix().equals(event.getPrefix())).
-                forEach(control -> control.handle(event));
+        List<Control> supporters = controls.stream().filter(ctrl ->
+                ctrl.supports(event)).collect(Collectors.toList());
+        if (supporters.size() == 0) {
+            // nobody cares...
+            unhandledEvents.add(event);
+        } else {
+            supporters.forEach(ctrl -> ctrl.handle(event));
+        }
     }
 
     public void startDispatching() {

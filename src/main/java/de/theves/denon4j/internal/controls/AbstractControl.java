@@ -65,6 +65,11 @@ public abstract class AbstractControl implements Control {
     }
 
     @Override
+    public boolean supports(Event event) {
+        return getCommandPrefix().equals(event.getPrefix());
+    }
+
+    @Override
     public String getCommandPrefix() {
         return prefix;
     }
@@ -115,7 +120,7 @@ public abstract class AbstractControl implements Control {
         }
     }
 
-    Parameter getState() {
+    Parameter<String> getState() {
         checkInitialized();
         synchronized (stateMonitor) {
             initState();

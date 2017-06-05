@@ -15,15 +15,43 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.net;
+package de.theves.denon4j.internal.net;
 
-import de.theves.denon4j.controls.Valid;
+import de.theves.denon4j.controls.InvalidSignatureException;
+import de.theves.denon4j.controls.Signature;
+import de.theves.denon4j.net.Parameter;
 
 /**
- * Represents a parameter of a command.
+ * Class description.
  *
  * @author stheves
  */
-public interface Parameter<T> extends SignatureBuilder, Valid {
-    T getValue();
+public class BinParameter implements Parameter<byte[]> {
+
+    private BinValue binValue;
+
+    public BinParameter(BinValue binValue) {
+
+        this.binValue = binValue;
+    }
+
+    @Override
+    public byte[] getValue() {
+        return new byte[0];
+    }
+
+    @Override
+    public Signature build() {
+        return null;
+    }
+
+    @Override
+    public boolean isValid() {
+        return false;
+    }
+
+    @Override
+    public void validate() throws InvalidSignatureException {
+
+    }
 }

@@ -80,4 +80,12 @@ public interface Control {
      * @param name the name.
      */
     void setName(String name);
+
+    /**
+     * Returns <code>true</code> if this control can handle the <code>event</code>.
+     *
+     * @param event the event to check.
+     * @return <code>true</code> if this control can handle the event.
+     */
+    boolean supports(Event event);
 }

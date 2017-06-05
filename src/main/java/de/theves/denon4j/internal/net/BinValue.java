@@ -15,15 +15,24 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.net;
+package de.theves.denon4j.internal.net;
 
-import de.theves.denon4j.controls.Valid;
+import de.theves.denon4j.net.Value;
 
 /**
- * Represents a parameter of a command.
+ * Class description.
  *
  * @author stheves
  */
-public interface Parameter<T> extends SignatureBuilder, Valid {
-    T getValue();
+public class BinValue implements Value<byte[]> {
+    private final byte[] value;
+
+    public BinValue(byte[] value) {
+        this.value = value;
+    }
+
+    @Override
+    public byte[] getValue() {
+        return value;
+    }
 }

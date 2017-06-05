@@ -72,7 +72,7 @@ public abstract class SwitchImpl extends AbstractControl implements Switch {
     @Override
     public SwitchState state() {
         Parameter state = getState();
-        return SwitchState.valueOf(state.getValue());
+        return SwitchState.valueOf((String) state.getValue());
     }
 
     @Override

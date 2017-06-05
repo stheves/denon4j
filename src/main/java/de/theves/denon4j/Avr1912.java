@@ -19,10 +19,7 @@ package de.theves.denon4j;
 
 import de.theves.denon4j.controls.*;
 import de.theves.denon4j.internal.EventDispatcher;
-import de.theves.denon4j.internal.controls.CommandRegistryImpl;
-import de.theves.denon4j.internal.controls.SelectImpl;
-import de.theves.denon4j.internal.controls.SliderImpl;
-import de.theves.denon4j.internal.controls.ToggleImpl;
+import de.theves.denon4j.internal.controls.*;
 import de.theves.denon4j.internal.net.Tcp;
 import de.theves.denon4j.net.Protocol;
 
@@ -111,8 +108,9 @@ public class AVR1912 implements AVR {
         controls.add(mainZoneToggle);
 
         // network audio/usb/ipod DIRECT extended control
+        // TODO remove prefix or pull up NetSettingsImpl as interface
         selectNetPrefix = "NS";
-        Select<ExtendedSettings> selectNet = new SelectImpl<>(registry, selectNetPrefix, ExtendedSettings.values(), false);
+        Select<ExtendedSettings> selectNet = new NetSettingsImpl(registry);
         selectNet.setName("Network USB/AUDIO/IPOD Extended Control");
         selectNet.init();
         controls.add(selectNet);

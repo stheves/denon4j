@@ -15,15 +15,38 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.net;
+package de.theves.denon4j.controls;
 
-import de.theves.denon4j.controls.Valid;
+import de.theves.denon4j.net.Event;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Represents a parameter of a command.
+ * Class description.
  *
  * @author stheves
  */
-public interface Parameter<T> extends SignatureBuilder, Valid {
-    T getValue();
+public class Message {
+    private final List<Event> events;
+
+    public Message() {
+        events = new ArrayList<>();
+    }
+
+    public void addEvent(Event event) {
+        events.add(event);
+    }
+
+    public List<Event> getEvents() {
+        return events;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder("=======MESSAGE=======");
+        events.stream().forEach(event -> builder.append(event.getParameter().build().signature()));
+        builder.append("=======END=======");
+        return builder.toString();
+    }
 }

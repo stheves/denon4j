@@ -21,7 +21,9 @@ import de.theves.denon4j.controls.InvalidSignatureException;
 import de.theves.denon4j.controls.Signature;
 import de.theves.denon4j.internal.PatternValidator;
 import de.theves.denon4j.net.Parameter;
+import de.theves.denon4j.net.Value;
 
+import java.io.Serializable;
 import java.util.regex.Pattern;
 
 /**
@@ -29,14 +31,13 @@ import java.util.regex.Pattern;
  *
  * @author stheves
  */
-public class ParameterImpl implements Parameter {
-    public static final Parameter EMPTY = new ParameterImpl("");
-    public static final Parameter REQUEST = new ParameterImpl("?");
+public class ParameterImpl implements Parameter<String> {
+    public static final Parameter<String> EMPTY = new ParameterImpl("");
+    public static final Parameter<String> REQUEST = new ParameterImpl("?");
 
     private final PatternValidator validator;
 
     private String value;
-
 
     public ParameterImpl(String value) {
         this.value = value;
@@ -44,16 +45,20 @@ public class ParameterImpl implements Parameter {
         validate();
     }
 
-    public static Parameter createParameter(String name) {
-        if (REQUEST.getValue().equals(name)) {
-            return REQUEST;
-        }
-        return new ParameterImpl(name);
-    }
-
     @Override
     public String getValue() {
         return value;
+    }
+
+    public static Parameter<String> createParameter(String val) {
+        if (REQUEST.getValue().equals(val)) {
+            return REQUEST;
+        }
+        return new ParameterImpl(val);
+    }
+
+    public static Parameter<byte[]> createBinaryParameter(byte[] raw) {
+        return new BinParameter(new BinValue(raw));
     }
 
     @Override
