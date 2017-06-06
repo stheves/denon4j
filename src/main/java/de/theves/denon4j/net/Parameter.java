@@ -24,6 +24,6 @@ import de.theves.denon4j.controls.Valid;
  *
  * @author stheves
  */
-public interface Parameter<T> extends SignatureBuilder, Valid {
-    T getValue();
+public interface Parameter extends SignatureBuilder, Valid {
+    String getValue();
 }

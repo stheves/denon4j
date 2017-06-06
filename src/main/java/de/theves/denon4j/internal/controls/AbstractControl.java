@@ -120,7 +120,7 @@ public abstract class AbstractControl implements Control {
         }
     }
 
-    Parameter<String> getState() {
+    Parameter getState() {
         checkInitialized();
         synchronized (stateMonitor) {
             initState();
