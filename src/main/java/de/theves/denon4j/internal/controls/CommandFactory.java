@@ -45,7 +45,7 @@ class CommandFactory {
             CommandId commandId = CommandId.random();
             if (param.contains("[")) {
                 return new SetCommandImpl(protocol, commandId, prefix, parsePattern(param));
-            } else if (param.equals(ParameterImpl.REQUEST.getValue())) {
+            } else if (isRequest(prefix, param)) {
                 return new RequestCommandImpl(protocol, commandId, prefix);
             }
             Parameter parameter = createParameter(param);
@@ -58,5 +58,9 @@ class CommandFactory {
         int begin = param.indexOf("[");
         int end = param.lastIndexOf("]");
         return Pattern.compile(param.substring(begin + 1, end));
+    }
+
+    private static boolean isRequest(String prefix, String param) {
+        return param.equals(ParameterImpl.REQUEST.getValue()) || "NSE".equals(prefix + param);
     }
 }

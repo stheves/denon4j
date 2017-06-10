@@ -21,20 +21,26 @@ import de.theves.denon4j.controls.CommandRegistry;
 import de.theves.denon4j.controls.Message;
 import de.theves.denon4j.controls.NetControls;
 import de.theves.denon4j.net.Event;
+import de.theves.denon4j.net.RequestCommand;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Class description.
  *
  * @author stheves
  */
-public class NetControlImpl extends SelectImpl<NetControls> {
+public class NetControlImpl extends AbstractControl {
     private Message mostRecentMessage;
     private AtomicBoolean readingMessage = new AtomicBoolean(false);
+    private List<String> paramList;
 
     public NetControlImpl(CommandRegistry registry) {
-        super(registry, "NS", NetControls.values(), false);
+        super(registry, "NS");
     }
 
     @Override
@@ -52,12 +58,30 @@ public class NetControlImpl extends SelectImpl<NetControls> {
 
     }
 
+    @Override
+    protected void doInit() {
+        NetControls[] params = NetControls.values();
+        paramList = new ArrayList<>(params.length + 1); // +1 for request parameter
+        paramList.addAll(Stream.of(params).map(Enum::toString).collect(Collectors.toList()));
+        paramList.add("E");
+        register(paramList.toArray(new String[paramList.size()]));
+    }
+
+    @Override
+    protected RequestCommand getRequestCommand() {
+        return (RequestCommand) getRegistry().getCommand(getCommands().get(getCommands().size() - 1).getId());
+    }
+
     private boolean isOnscreenInformation(Event event) {
         return event.build().signature().startsWith("NSE");
     }
 
     public Message getMostRecentMessage() {
+        getState();
         return mostRecentMessage;
     }
 
+    public void control(NetControls controls) {
+        executeCommand(getCommands().get(paramList.indexOf(controls.toString())).getId());
+    }
 }

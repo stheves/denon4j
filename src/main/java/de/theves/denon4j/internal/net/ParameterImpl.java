@@ -17,12 +17,12 @@
 
 package de.theves.denon4j.internal.net;
 
-import java.util.regex.Pattern;
-
 import de.theves.denon4j.controls.InvalidSignatureException;
 import de.theves.denon4j.controls.Signature;
 import de.theves.denon4j.internal.PatternValidator;
 import de.theves.denon4j.net.Parameter;
+
+import java.util.regex.Pattern;
 
 /**
  * Class description.
@@ -62,8 +62,8 @@ public class ParameterImpl implements Parameter {
     @Override
     public String toString() {
         return "Parameter{" +
-            "value='" + value + '\'' +
-            '}';
+                "value='" + value + '\'' +
+                '}';
     }
 
     @Override

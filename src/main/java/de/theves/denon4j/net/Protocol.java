@@ -23,6 +23,8 @@ package de.theves.denon4j.net;
  * @author stheves
  */
 public interface Protocol {
+    char PAUSE = 0x0d; // \r character
+    char NULL = 0x00;
     /**
      * Sends the command to the receiver (socket) and waits for a response
      * (blocking).

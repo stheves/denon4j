@@ -18,15 +18,14 @@
 package de.theves.denon4j.internal.net;
 
 import de.theves.denon4j.net.ConnectionException;
+import de.theves.denon4j.net.Protocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.net.Socket;
 import java.net.SocketException;
-import java.nio.charset.StandardCharsets;
 
 /**
  * @author stheves
@@ -38,7 +37,7 @@ public class EventReader extends Thread implements Runnable {
     private final Socket socket;
     private final Tcp client;
 
-    private BufferedReader reader;
+    private InputStream reader;
 
     EventReader(Tcp client, Socket socket) {
         super("EventReader");
@@ -58,7 +57,7 @@ public class EventReader extends Thread implements Runnable {
 
     private void openStream() {
         try {
-            this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.US_ASCII));
+            this.reader = socket.getInputStream();
         } catch (IOException e) {
             throw new ConnectionException(e);
         }
@@ -66,8 +65,16 @@ public class EventReader extends Thread implements Runnable {
 
     private void next() {
         try {
-            String lastEvent = reader.readLine();
-            if (null != lastEvent) {
+            int read;
+            StringBuilder buffer = new StringBuilder();
+            while ((read = reader.read()) != -1) {
+                if (Protocol.PAUSE == read || Protocol.NULL == read) {
+                    break;
+                }
+                buffer.append((char) read);
+            }
+            if (buffer.length() > 0) {
+                String lastEvent = buffer.toString();
                 synchronized (this) {
                     client.received(lastEvent);
                     notify();

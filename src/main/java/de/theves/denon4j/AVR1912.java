@@ -88,14 +88,14 @@ public class AVR1912 implements AVR {
 
         // source input
         selectInputPrefix = "SI";
-        Select<InputSource> selectInput = new SelectImpl<>(registry, selectInputPrefix, InputSource.values(), true);
+        Select<InputSource> selectInput = new SelectImpl<>(registry, selectInputPrefix, InputSource.values());
         selectInput.setName("Select INPUT Source");
         selectInput.init();
         controls.add(selectInput);
 
         // source video
         selectVideoPrefix = "SV";
-        Select<VideoSource> selectVideo = new SelectImpl<>(registry, selectVideoPrefix, VideoSource.values(), true);
+        Select<VideoSource> selectVideo = new SelectImpl<>(registry, selectVideoPrefix, VideoSource.values());
         selectVideo.setName("Select VIDEO Source");
         selectVideo.init();
         controls.add(selectVideo);
@@ -110,7 +110,7 @@ public class AVR1912 implements AVR {
         // network audio/usb/ipod DIRECT extended control
         // TODO remove prefix or pull up NetControlImpl as interface
         selectNetPrefix = "NS";
-        Select<NetControls> selectNet = new NetControlImpl(registry);
+        NetControlImpl selectNet = new NetControlImpl(registry);
         selectNet.setName("Network USB/AUDIO/IPOD Extended Control");
         selectNet.init();
         controls.add(selectNet);
@@ -150,8 +150,8 @@ public class AVR1912 implements AVR {
         return findControl(selectInputPrefix, Select.class);
     }
 
-    public Select<NetControls> selectNetworkControl() {
-        return findControl(selectNetPrefix, Select.class);
+    public NetControlImpl selectNetworkControl() {
+        return findControl(selectNetPrefix, NetControlImpl.class);
     }
 
     public Select<VideoSource> video() {

@@ -59,7 +59,8 @@ public class AVR1912Demo {
             avr.input().source(InputSource.IRADIO);
 
             Thread.sleep(200);
-            avr.selectNetworkControl().source(NetControls.CURSOR_DOWN);
+            avr.selectNetworkControl().control(NetControls.CURSOR_DOWN);
+            System.out.println(avr.selectNetworkControl().getMostRecentMessage());
         }
         System.out.println("------------DEMO END------------");
     }
