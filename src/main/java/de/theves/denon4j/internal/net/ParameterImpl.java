@@ -39,7 +39,7 @@ public class ParameterImpl implements Parameter {
 
     public ParameterImpl(String value) {
         this.value = value;
-        this.validator = new PatternValidator(Pattern.compile("[\\w\\s\\d\\?/\\.]*"));
+        this.validator = new PatternValidator(Pattern.compile(".*"));
         validate();
     }
 

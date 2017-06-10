@@ -21,6 +21,17 @@ import de.theves.denon4j.controls.*;
 
 public class AVR1912Demo {
 
+    public static void main(String[] args) throws Exception {
+        if (null == args || args.length != 2) {
+            System.err.println("Try java -jar $/path/to/jar $host $port");
+            System.exit(1);
+        }
+        System.out.println(String.format("Starting demo... AVR1912: %s:%s",
+                args[0], args[1]));
+        AVR1912Demo test = new AVR1912Demo();
+        test.demo(args[0], Integer.parseInt(args[1]));
+    }
+
     private void demo(String host, int port) throws Exception {
         System.out.println("------------DEMO START------------");
         try (AVR1912 avr = new AVR1912(host, port)) {
@@ -60,19 +71,8 @@ public class AVR1912Demo {
 
             Thread.sleep(200);
             avr.selectNetworkControl().control(NetControls.CURSOR_DOWN);
-            System.out.println(avr.selectNetworkControl().getMostRecentMessage());
+            System.out.println("Display: " + avr.selectNetworkControl().getMostRecentMessage());
         }
         System.out.println("------------DEMO END------------");
-    }
-
-    public static void main(String[] args) throws Exception {
-        if (null == args || args.length != 2) {
-            System.err.println("Try java -jar $/path/to/jar $host $port");
-            System.exit(1);
-        }
-        System.out.println(String.format("Starting demo... AVR1912: %s:%s",
-                args[0], args[1]));
-        AVR1912Demo test = new AVR1912Demo();
-        test.demo(args[0], Integer.parseInt(args[1]));
     }
 }
