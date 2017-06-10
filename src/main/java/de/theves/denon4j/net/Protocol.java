@@ -47,7 +47,7 @@ public interface Protocol {
      * @param requestCommand the command to send.
      * @return the response of the command.
      */
-    Event receive(RequestCommand requestCommand);
+    Event request(RequestCommand requestCommand);
 
     /**
      * Connect to the receiver.

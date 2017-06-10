@@ -22,14 +22,14 @@ package de.theves.denon4j.controls;
  *
  * @author stheves
  */
-public enum ExtendedSettings {
+public enum NetControls {
     CURSOR_UP("90"), CURSOR_DOWN("91"), CURSOR_LEFT("92"), CURSOR_RIGHT("93"), ENTER("94"), PLAY("9A"), PAUSE("9B"), STOP("9C"),
     SKIP_PLUS("9D"), SKIP_MINUS("9E"), REPEAT_ONE("9H"), REPEAT_ALL("9I"), REPEAT_OFF("9J"), SHUFFLE_ON("9K"), SHUFFLE_OFF("9M"),
     MODE("9W"), PAGE_NEXT("9X"), PAGE_PREV("9Y"), PARTY_MODE("PT"), INFO_UTF8("E"), INFO_ASCII("A");
 
     private final String control;
 
-    ExtendedSettings(String control) {
+    NetControls(String control) {
         this.control = control;
     }
 

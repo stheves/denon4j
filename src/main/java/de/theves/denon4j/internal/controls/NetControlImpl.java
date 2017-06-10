@@ -18,12 +18,10 @@
 package de.theves.denon4j.internal.controls;
 
 import de.theves.denon4j.controls.CommandRegistry;
-import de.theves.denon4j.controls.ExtendedSettings;
 import de.theves.denon4j.controls.Message;
+import de.theves.denon4j.controls.NetControls;
 import de.theves.denon4j.net.Event;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -31,14 +29,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *
  * @author stheves
  */
-public class NetSettingsImpl extends SelectImpl<ExtendedSettings> {
-    private final List<Message> receivedMessages;
+public class NetControlImpl extends SelectImpl<NetControls> {
     private Message mostRecentMessage;
     private AtomicBoolean readingMessage = new AtomicBoolean(false);
 
-    public NetSettingsImpl(CommandRegistry registry) {
-        super(registry, "NS", ExtendedSettings.values(), false);
-        receivedMessages = new ArrayList<>();
+    public NetControlImpl(CommandRegistry registry) {
+        super(registry, "NS", NetControls.values(), false);
     }
 
     @Override
@@ -51,12 +47,7 @@ public class NetSettingsImpl extends SelectImpl<ExtendedSettings> {
             mostRecentMessage.addEvent(event);
         } else {
             // we assume that the first non-onscreen event is the message pause
-            if (receivedMessages.contains(mostRecentMessage)) {
-                // our assumption does not seem to match
-                throw new IllegalStateException("Unexpected end of message occurred");
-            }
             readingMessage.set(false);
-            receivedMessages.add(mostRecentMessage);
         }
 
     }
@@ -69,7 +60,4 @@ public class NetSettingsImpl extends SelectImpl<ExtendedSettings> {
         return mostRecentMessage;
     }
 
-    public List<Message> getReceivedMessages() {
-        return receivedMessages;
-    }
 }

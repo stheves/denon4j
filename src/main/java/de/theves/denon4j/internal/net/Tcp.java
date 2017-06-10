@@ -56,6 +56,25 @@ public final class Tcp implements Protocol {
         eventReader = new EventReader(this, socket);
     }
 
+    void received(String event) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Event received: {}", event);
+        }
+        Event e = EventImpl.create(event);
+        notify(e);
+        mostRecent = e;
+    }
+
+    private void notify(Event event) {
+        if (null != eventListener) {
+            try {
+                eventListener.onEvent(event);
+            } catch (Exception e) {
+                logger.warn("Error invoking event listener", e);
+            }
+        }
+    }
+
     @Override
     public synchronized void establishConnection(int timeout) throws ConnectException {
         if (isConnected()) {
@@ -74,6 +93,7 @@ public final class Tcp implements Protocol {
             throw new ConnectException("Cannot establishConnection to host/ip " + host + " on port " + port, e);
         }
     }
+
 
     @Override
     public boolean isConnected() {
@@ -106,8 +126,9 @@ public final class Tcp implements Protocol {
     }
 
     @Override
-    public Event receive(RequestCommand requestCommand) {
+    public Event request(RequestCommand requestCommand) {
         synchronized (eventReader) {
+            mostRecent = null;
             send(requestCommand);
             // wait until response is received
             try {
@@ -117,26 +138,9 @@ public final class Tcp implements Protocol {
             }
         }
         // we expecting the last event as result of the request command
-        return mostRecent;
+        return Optional.ofNullable(mostRecent).orElseThrow(IllegalStateException::new);
     }
 
-    void received(String event) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Event received: {}", event);
-        }
-        mostRecent = EventImpl.create(event);
-        notify(mostRecent);
-    }
-
-    private void notify(Event event) {
-        if (null != eventListener) {
-            try {
-                eventListener.onEvent(event);
-            } catch (Exception e) {
-                logger.warn("Error invoking event listener", e);
-            }
-        }
-    }
 
     private void checkConnection() {
         if (!isConnected()) {

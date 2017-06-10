@@ -36,7 +36,7 @@ public class RequestCommandImpl extends CommandImpl implements RequestCommand {
 
     @Override
     protected void doSend() {
-        received = protocol.receive(this);
+        received = protocol.request(this);
     }
 
     @Override

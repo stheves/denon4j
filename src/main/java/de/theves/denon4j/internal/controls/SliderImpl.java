@@ -54,15 +54,6 @@ public class SliderImpl extends AbstractControl implements Slider {
     }
 
     @Override
-    protected void doInit() {
-        List<Command> commands = register(up, down, "[" + validator.getPattern().pattern() + "]", ParameterImpl.REQUEST.getValue());
-        upId = commands.get(0).getId();
-        downId = commands.get(1).getId();
-        setId = commands.get(2).getId();
-        requestId = commands.get(3).getId();
-    }
-
-    @Override
     public void slideUp() {
         executeCommand(upId);
     }
@@ -83,6 +74,25 @@ public class SliderImpl extends AbstractControl implements Slider {
     }
 
     @Override
+    public boolean supports(Event event) {
+        return getCommandPrefix().equals(event.getPrefix()) && validator.isValid(event.getParameter().getValue());
+    }
+
+    @Override
+    protected void doInit() {
+        List<Command> commands = register(up, down, "[" + validator.getPattern().pattern() + "]", ParameterImpl.REQUEST.getValue());
+        upId = commands.get(0).getId();
+        downId = commands.get(1).getId();
+        setId = commands.get(2).getId();
+        requestId = commands.get(3).getId();
+    }
+
+    @Override
+    protected RequestCommand getRequestCommand() {
+        return (RequestCommand) getRegistry().getCommand(requestId);
+    }
+
+    @Override
     public void validate() throws InvalidSignatureException {
         if (!isValid()) {
             throw new InvalidSignatureException(getValue(), validator.getPattern());
@@ -95,17 +105,4 @@ public class SliderImpl extends AbstractControl implements Slider {
         return validator.isValid(getValue());
     }
 
-    @Override
-    protected RequestCommand getRequestCommand() {
-        return (RequestCommand) getRegistry().getCommand(requestId);
-    }
-
-    @Override
-    public void handle(Event event) {
-        // check for pattern
-        if (validator.isValid((String) event.getParameter().getValue())) {
-            // handle only valid ones otherwise we would have an invalid <code>state</code>.
-            super.handle(event);
-        }
-    }
 }

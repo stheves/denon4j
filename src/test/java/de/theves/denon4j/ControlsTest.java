@@ -70,7 +70,7 @@ public class ControlsTest {
 
     @Test
     public void testSelectControl() {
-        Select<InputSource> si = avr1912.selectInput();
+        Select<InputSource> si = avr1912.input();
         List<Command> commands = si.getCommands();
         assertThat(commands.size()).isEqualTo(InputSource.values().length + 1);
         assertThat(registry.findByPrefix("SI")).hasSize(InputSource.values().length + 1);
@@ -78,7 +78,7 @@ public class ControlsTest {
         // execute control
         si.source(InputSource.SAT_CBL);
 
-        when(protocol.receive((RequestCommand) cmd("SI?"))).thenReturn(event("SISAT/CBL"));
+        when(protocol.request((RequestCommand) cmd("SI?"))).thenReturn(event("SISAT/CBL"));
         InputSource source = si.getSource();
         assertThat(source).isEqualTo(InputSource.SAT_CBL);
 
@@ -94,7 +94,7 @@ public class ControlsTest {
                 .hasSize(3)
                 .containsExactlyInAnyOrder(commands("PWON", "PWSTANDBY", "PW?"));
 
-        when(protocol.receive((RequestCommand) cmd("PW?")))
+        when(protocol.request((RequestCommand) cmd("PW?")))
                 .thenReturn(event("PWSTANDBY"), event("PWON"));
 
         assertThat(power.state()).isEqualTo(SwitchState.STANDBY);
@@ -121,7 +121,7 @@ public class ControlsTest {
     public void testMasterSlider() {
         Slider slider = avr1912.masterVolume();
         assertThat(slider.getCommands()).hasSize(4).containsExactlyInAnyOrder(commands("MVUP", "MVDOWN", "MV", "MV?"));
-        when(protocol.receive((RequestCommand) cmd("MV?"))).thenReturn(event("MV45"));
+        when(protocol.request((RequestCommand) cmd("MV?"))).thenReturn(event("MV45"));
         assertThat(slider.getValue()).isEqualTo("45");
 
         slider.slideUp();
@@ -160,12 +160,12 @@ public class ControlsTest {
 
     @Test
     public void testNetworkControl() {
-        Select<ExtendedSettings> selectNetworkControl = avr1912.selectNetworkControl();
-        assertThat(selectNetworkControl.getCommands()).hasSize(ExtendedSettings.values().length);
+        Select<NetControls> selectNetworkControl = avr1912.selectNetworkControl();
+        assertThat(selectNetworkControl.getCommands()).hasSize(NetControls.values().length);
         assertThat(selectNetworkControl.getCommandPrefix()).isEqualTo("NS");
         assertThat(registry.findBySignature(() -> "NS?")).isEmpty();
 
-        selectNetworkControl.source(ExtendedSettings.CURSOR_DOWN);
+        selectNetworkControl.source(NetControls.CURSOR_DOWN);
         verify(protocol).send(cmd("NS91"));
     }
 

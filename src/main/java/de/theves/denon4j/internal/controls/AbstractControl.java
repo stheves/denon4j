@@ -65,11 +65,6 @@ public abstract class AbstractControl implements Control {
     }
 
     @Override
-    public boolean supports(Event event) {
-        return getCommandPrefix().equals(event.getPrefix());
-    }
-
-    @Override
     public String getCommandPrefix() {
         return prefix;
     }
@@ -112,6 +107,11 @@ public abstract class AbstractControl implements Control {
         this.name = name;
     }
 
+    @Override
+    public boolean supports(Event event) {
+        return getCommandPrefix().equals(event.getPrefix());
+    }
+
     protected abstract void doInit();
 
     private void checkInitialized() {
@@ -129,9 +129,17 @@ public abstract class AbstractControl implements Control {
     }
 
     private void initState() {
-        if (DIRTY == state) {
+        int retries = 0;
+        while (state == DIRTY && retries < 3) {
             executeCommand(getRequestCommand().getId());
-            state = getRequestCommand().getReceived().getParameter();
+            Event event = getRequestCommand().getReceived();
+            if (supports(event)) {
+                state = event.getParameter();
+            }
+            retries++;
+        }
+        if (state == DIRTY) {
+            throw new IllegalStateException("Could not get result for request: " + getRequestCommand());
         }
     }
 
@@ -143,7 +151,7 @@ public abstract class AbstractControl implements Control {
 
     void executeCommand(CommandId downId, String value) {
         Command cmd = getRegistry().getCommandStack().execute(downId, value);
-        if(cmd.isDirtying()) {
+        if (cmd.isDirtying()) {
             state = DIRTY;
         }
     }
