@@ -17,10 +17,7 @@
 
 package de.theves.denon4j.internal.controls;
 
-import de.theves.denon4j.internal.net.CommandImpl;
-import de.theves.denon4j.internal.net.ParameterImpl;
-import de.theves.denon4j.internal.net.RequestCommandImpl;
-import de.theves.denon4j.internal.net.SetCommandImpl;
+import de.theves.denon4j.internal.net.*;
 import de.theves.denon4j.net.Command;
 import de.theves.denon4j.net.CommandId;
 import de.theves.denon4j.net.Parameter;
@@ -47,9 +44,10 @@ class CommandFactory {
                 return new SetCommandImpl(protocol, commandId, prefix, parsePattern(param));
             } else if (isRequest(prefix, param)) {
                 return new RequestCommandImpl(protocol, commandId, prefix);
+            } else if (isOnscreenInfoRequest(prefix, param)) {
+                return new OnscreenInfoRequest(protocol, commandId, prefix, createParameter(param));
             }
-            Parameter parameter = createParameter(param);
-            return new CommandImpl(protocol, commandId, prefix, parameter);
+            return new CommandImpl(protocol, commandId, prefix, createParameter(param));
         }
         throw new IllegalArgumentException("Command may not be null");
     }
@@ -61,6 +59,10 @@ class CommandFactory {
     }
 
     private static boolean isRequest(String prefix, String param) {
-        return param.equals(ParameterImpl.REQUEST.getValue()) || "NSE".equals(prefix + param);
+        return param.equals(ParameterImpl.REQUEST.getValue());
+    }
+
+    private static boolean isOnscreenInfoRequest(String prefix, String param) {
+        return "NSE".equals(prefix + param);
     }
 }

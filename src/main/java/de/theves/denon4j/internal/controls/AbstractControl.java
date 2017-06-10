@@ -58,9 +58,12 @@ public abstract class AbstractControl implements Control {
     }
 
     @Override
-    public void handle(Event event) {
+    public final void handle(Event event) {
         checkInitialized();
-        state = event.getParameter();
+        synchronized (stateMonitor) {
+            state = event.getParameter();
+        }
+        doHandle(event);
         logger.debug("Handled event: {}", event);
     }
 
@@ -70,7 +73,7 @@ public abstract class AbstractControl implements Control {
     }
 
     @Override
-    public void init() {
+    public final void init() {
         if (initialized.compareAndSet(false, true)) {
             doInit();
         } else {
@@ -120,26 +123,25 @@ public abstract class AbstractControl implements Control {
         }
     }
 
+    protected void doHandle(Event event) {
+        // sub classes may override
+    }
+
     Parameter getState() {
         checkInitialized();
         synchronized (stateMonitor) {
-            initState();
+            refreshState();
             return state;
         }
     }
 
-    private void initState() {
-        int retries = 0;
-        while (state == DIRTY && retries < 3) {
+    private void refreshState() {
+        if (state == DIRTY) {
+            logger.debug("Refreshing dirty state");
             executeCommand(getRequestCommand().getId());
             Event event = getRequestCommand().getReceived();
-            if (supports(event)) {
-                state = event.getParameter();
-            }
-            retries++;
-        }
-        if (state == DIRTY) {
-            throw new IllegalStateException("Could not get result for request: " + getRequestCommand());
+            state = event.getParameter();
+            logger.debug("State refreshed: {}", state);
         }
     }
 
@@ -152,7 +154,9 @@ public abstract class AbstractControl implements Control {
     void executeCommand(CommandId downId, String value) {
         Command cmd = getRegistry().getCommandStack().execute(downId, value);
         if (cmd.isDirtying()) {
-            state = DIRTY;
+            synchronized (stateMonitor) {
+                state = DIRTY;
+            }
         }
     }
 

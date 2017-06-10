@@ -54,13 +54,13 @@ public final class Tcp implements Protocol {
         eventReader = new EventReader(this, socket);
     }
 
-    void received(String event) {
+    void received(Event event) {
         if (logger.isDebugEnabled()) {
             logger.debug("Event received: {}", event);
         }
-        Event e = EventImpl.create(event);
-        notify(e);
-        mostRecent = e;
+
+        notify(event);
+        mostRecent = event;
     }
 
     private void notify(Event event) {
@@ -74,7 +74,7 @@ public final class Tcp implements Protocol {
     }
 
     @Override
-    public synchronized void establishConnection(int timeout) throws ConnectException {
+    public void establishConnection(int timeout) throws ConnectException {
         if (isConnected()) {
             throw new ConnectException("Already connected.");
         }
@@ -99,7 +99,7 @@ public final class Tcp implements Protocol {
     }
 
     @Override
-    public synchronized void disconnect() {
+    public void disconnect() {
         if (!isConnected()) {
             return;
         }
@@ -134,9 +134,9 @@ public final class Tcp implements Protocol {
             } catch (InterruptedException e) {
                 logger.warn("Receive interrupted", e);
             }
+            // we expecting the last event as result of the request command
+            return Optional.ofNullable(mostRecent).orElseThrow(IllegalStateException::new);
         }
-        // we expecting the last event as result of the request command
-        return Optional.ofNullable(mostRecent).orElseThrow(IllegalStateException::new);
     }
 
 

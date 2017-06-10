@@ -15,14 +15,19 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.net;
+package de.theves.denon4j.internal.net;
+
+import de.theves.denon4j.net.CommandId;
+import de.theves.denon4j.net.Parameter;
+import de.theves.denon4j.net.Protocol;
 
 /**
- * An object that can be built.
+ * Class description.
  *
  * @author stheves
  */
-@FunctionalInterface
-public interface SignatureBuilder {
-    Signature build();
+public class OnscreenInfoRequest extends CommandImpl {
+    public OnscreenInfoRequest(Protocol protocol, CommandId id, String prefix, Parameter param) {
+        super(protocol, id, prefix, param);
+    }
 }

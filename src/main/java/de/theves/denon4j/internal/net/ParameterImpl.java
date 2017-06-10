@@ -18,7 +18,7 @@
 package de.theves.denon4j.internal.net;
 
 import de.theves.denon4j.controls.InvalidSignatureException;
-import de.theves.denon4j.controls.Signature;
+import de.theves.denon4j.net.Signature;
 import de.theves.denon4j.internal.PatternValidator;
 import de.theves.denon4j.net.Parameter;
 
@@ -53,10 +53,6 @@ public class ParameterImpl implements Parameter {
             return REQUEST;
         }
         return new ParameterImpl(val);
-    }
-
-    public static Parameter createBinaryParameter(byte[] raw) {
-        return null;
     }
 
     @Override

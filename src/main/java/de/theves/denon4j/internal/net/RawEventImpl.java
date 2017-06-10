@@ -15,14 +15,24 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.net;
+package de.theves.denon4j.internal.net;
+
+import de.theves.denon4j.net.Parameter;
 
 /**
- * An object that can be built.
+ * Class description.
  *
  * @author stheves
  */
-@FunctionalInterface
-public interface SignatureBuilder {
-    Signature build();
+public class RawEventImpl extends EventImpl {
+    private final byte[] raw;
+
+    protected RawEventImpl(byte[] raw, String prefix, Parameter parameter) {
+        super(prefix, parameter);
+        this.raw = raw;
+    }
+
+    public byte[] getRaw() {
+        return raw;
+    }
 }

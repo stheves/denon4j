@@ -18,8 +18,8 @@
 package de.theves.denon4j.internal.controls;
 
 import de.theves.denon4j.controls.CommandRegistry;
-import de.theves.denon4j.controls.Message;
-import de.theves.denon4j.controls.NetControls;
+import de.theves.denon4j.controls.OnscreenInfo;
+import de.theves.denon4j.controls.InputControls;
 import de.theves.denon4j.net.Event;
 import de.theves.denon4j.net.RequestCommand;
 
@@ -34,23 +34,22 @@ import java.util.stream.Stream;
  *
  * @author stheves
  */
-public class NetControlImpl extends AbstractControl {
-    private Message mostRecentMessage;
+public class InputControl extends AbstractControl {
+    private OnscreenInfo mostRecentOnscreenInfo;
     private AtomicBoolean readingMessage = new AtomicBoolean(false);
     private List<String> paramList;
 
-    public NetControlImpl(CommandRegistry registry) {
+    public InputControl(CommandRegistry registry) {
         super(registry, "NS");
     }
 
     @Override
-    public void handle(Event event) {
-        super.handle(event);
+    public void doHandle(Event event) {
         if (isOnscreenInformation(event)) {
             if (readingMessage.compareAndSet(false, true)) {
-                mostRecentMessage = new Message();
+                mostRecentOnscreenInfo = new OnscreenInfo();
             }
-            mostRecentMessage.addEvent(event);
+            mostRecentOnscreenInfo.addEvent(event);
         } else {
             // we assume that the first non-onscreen event is the message pause
             readingMessage.set(false);
@@ -60,10 +59,9 @@ public class NetControlImpl extends AbstractControl {
 
     @Override
     protected void doInit() {
-        NetControls[] params = NetControls.values();
-        paramList = new ArrayList<>(params.length + 1); // +1 for request parameter
+        InputControls[] params = InputControls.values();
+        paramList = new ArrayList<>(params.length);
         paramList.addAll(Stream.of(params).map(Enum::toString).collect(Collectors.toList()));
-        paramList.add("E");
         register(paramList.toArray(new String[paramList.size()]));
     }
 
@@ -76,12 +74,12 @@ public class NetControlImpl extends AbstractControl {
         return event.build().signature().startsWith("NSE");
     }
 
-    public Message getMostRecentMessage() {
+    public OnscreenInfo getMostRecentOnscreenInfo() {
         getState();
-        return mostRecentMessage;
+        return mostRecentOnscreenInfo;
     }
 
-    public void control(NetControls controls) {
+    public void control(InputControls controls) {
         executeCommand(getCommands().get(paramList.indexOf(controls.toString())).getId());
     }
 }

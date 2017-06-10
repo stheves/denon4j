@@ -18,13 +18,13 @@
 package de.theves.denon4j.internal.net;
 
 import de.theves.denon4j.controls.InvalidSignatureException;
-import de.theves.denon4j.controls.Signature;
 import de.theves.denon4j.internal.PatternValidator;
 import de.theves.denon4j.net.Event;
 import de.theves.denon4j.net.Parameter;
+import de.theves.denon4j.net.Signature;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
@@ -44,24 +44,6 @@ public class EventImpl implements Event {
         this.parameter = Objects.requireNonNull(parameter);
         this.createdAt = LocalDateTime.now();
         validator = new PatternValidator(Pattern.compile("(\\w\\w)")); // validate only the prefix
-    }
-
-    public static Event createFromRawData(byte[] raw) {
-        // check the first 4 chars (these are always ASCII)
-        byte[] prefix = Arrays.copyOfRange(raw, 0, 4);
-
-        // NSE/NSA events do have special parameter values
-        String prefixAscii = new String(prefix);
-        if (prefixAscii.startsWith("NSE")) {
-            Parameter binParam = ParameterImpl.createBinaryParameter(Arrays.copyOfRange(raw, 5, raw.length - 1));
-            return new EventImpl(prefixAscii, binParam);
-        }
-        // all other events should have ASCII
-        return create(new String(raw));
-    }
-
-    public static Event create(String event) {
-        return new EventImpl(event.substring(0, 2), ParameterImpl.createParameter(event.substring(2)));
     }
 
     @Override

@@ -15,38 +15,25 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.controls;
+package de.theves.denon4j.internal.net;
 
 import de.theves.denon4j.net.Event;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Class description.
  *
  * @author stheves
  */
-public class Message {
-    private final List<Event> events;
-
-    public Message() {
-        events = new ArrayList<>();
+public class EventFactory {
+    public static Event create(String event) {
+        return create(event.getBytes(StandardCharsets.US_ASCII));
     }
 
-    public void addEvent(Event event) {
-        events.add(event);
-    }
-
-    public List<Event> getEvents() {
-        return events;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder("=======MESSAGE=======");
-        events.stream().forEach(event -> builder.append(event.getParameter().build().signature()));
-        builder.append("=======END=======");
-        return builder.toString();
+    public static Event create(byte[] raw) {
+        String prefix = new String(raw, 0, 2, StandardCharsets.US_ASCII);
+        String parameter = new String(raw, 2, raw.length - 2, StandardCharsets.UTF_8);
+        return new RawEventImpl(raw, prefix, ParameterImpl.createParameter(parameter));
     }
 }

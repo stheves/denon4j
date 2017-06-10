@@ -108,9 +108,9 @@ public class AVR1912 implements AVR {
         controls.add(mainZoneToggle);
 
         // network audio/usb/ipod DIRECT extended control
-        // TODO remove prefix or pull up NetControlImpl as interface
+        // TODO remove prefix or pull up InputControl as interface
         selectNetPrefix = "NS";
-        NetControlImpl selectNet = new NetControlImpl(registry);
+        InputControl selectNet = new InputControl(registry);
         selectNet.setName("Network USB/AUDIO/IPOD Extended Control");
         selectNet.init();
         controls.add(selectNet);
@@ -150,8 +150,8 @@ public class AVR1912 implements AVR {
         return findControl(selectInputPrefix, Select.class);
     }
 
-    public NetControlImpl selectNetworkControl() {
-        return findControl(selectNetPrefix, NetControlImpl.class);
+    public InputControl inputControl() {
+        return findControl(selectNetPrefix, InputControl.class);
     }
 
     public Select<VideoSource> video() {

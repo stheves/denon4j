@@ -19,7 +19,7 @@ package de.theves.denon4j.internal.controls;
 
 import de.theves.denon4j.controls.CommandNotFoundException;
 import de.theves.denon4j.controls.CommandRegistry;
-import de.theves.denon4j.controls.Signature;
+import de.theves.denon4j.net.Signature;
 import de.theves.denon4j.internal.net.ParameterImpl;
 import de.theves.denon4j.net.Command;
 import de.theves.denon4j.net.CommandId;

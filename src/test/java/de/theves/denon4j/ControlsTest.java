@@ -18,7 +18,8 @@
 package de.theves.denon4j;
 
 import de.theves.denon4j.controls.*;
-import de.theves.denon4j.internal.controls.NetControlImpl;
+import de.theves.denon4j.internal.controls.InputControl;
+import de.theves.denon4j.internal.net.EventFactory;
 import de.theves.denon4j.internal.net.EventImpl;
 import de.theves.denon4j.net.*;
 import org.junit.Before;
@@ -88,6 +89,18 @@ public class ControlsTest {
         assertThat(cmd.getExecutedAt()).isAfter(LocalDateTime.MIN);
     }
 
+    private Command cmd(String s) {
+        return registry.findBySignature(
+                () -> s
+        ).orElseThrow(
+                () -> new CommandNotFoundException("Command with signature '" + s + "' not found")
+        );
+    }
+
+    private Event event(String e) {
+        return EventFactory.create(e);
+    }
+
     @Test
     public void testPowerControl() {
         Toggle power = avr1912.power();
@@ -104,6 +117,11 @@ public class ControlsTest {
         assertThat(power.state()).isEqualTo(SwitchState.ON);
         power.toggle();
         verify(protocol).send(cmd("PWSTANDBY"));
+    }
+
+    private Command[] commands(String... sig) {
+        List<Command> commandList = Stream.of(sig).map(this::cmd).collect(Collectors.toList());
+        return commandList.toArray(new Command[commandList.size()]);
     }
 
     @Test
@@ -127,20 +145,20 @@ public class ControlsTest {
 
         slider.slideUp();
         // fake events
-        avr1912.getEventDispatcher().onEvent(EventImpl.create("MV455"));
-        avr1912.getEventDispatcher().onEvent(EventImpl.create("MVMAX 68"));
+        avr1912.getEventDispatcher().onEvent(EventFactory.create("MV455"));
+        avr1912.getEventDispatcher().onEvent(EventFactory.create("MVMAX 68"));
         verify(protocol).send(cmd("MVUP"));
         assertThat(slider.getValue()).isEqualTo("455");
 
         slider.slideDown();
-        avr1912.getEventDispatcher().onEvent(EventImpl.create("MV45"));
-        avr1912.getEventDispatcher().onEvent(EventImpl.create("MVMAX 675"));
+        avr1912.getEventDispatcher().onEvent(EventFactory.create("MV45"));
+        avr1912.getEventDispatcher().onEvent(EventFactory.create("MVMAX 675"));
         verify(protocol).send(cmd("MVDOWN"));
         assertThat(slider.getValue()).isEqualTo("45");
 
         slider.set("55");
-        avr1912.getEventDispatcher().onEvent(EventImpl.create("MV55"));
-        avr1912.getEventDispatcher().onEvent(EventImpl.create("MVMAX 72"));
+        avr1912.getEventDispatcher().onEvent(EventFactory.create("MV55"));
+        avr1912.getEventDispatcher().onEvent(EventFactory.create("MVMAX 72"));
         verify(protocol).send(cmd("MV55"));
         assertThat(slider.getValue()).isEqualTo("55");
 
@@ -161,12 +179,12 @@ public class ControlsTest {
 
     @Test
     public void testNetworkControl() {
-        NetControlImpl selectNetworkControl = avr1912.selectNetworkControl();
-        assertThat(selectNetworkControl.getCommands()).hasSize(NetControls.values().length);
+        InputControl selectNetworkControl = avr1912.inputControl();
+        assertThat(selectNetworkControl.getCommands()).hasSize(InputControls.values().length);
         assertThat(selectNetworkControl.getCommandPrefix()).isEqualTo("NS");
         assertThat(registry.findBySignature(() -> "NS?")).isEmpty();
 
-        selectNetworkControl.control(NetControls.CURSOR_DOWN);
+        selectNetworkControl.control(InputControls.CURSOR_DOWN);
         verify(protocol).send(cmd("NS91"));
     }
 
@@ -193,22 +211,5 @@ public class ControlsTest {
                                 .stream()
                                 .toArray(value -> new Control[avr1912.getControls().size()])
                 );
-    }
-
-    private Event event(String e) {
-        return EventImpl.create(e);
-    }
-
-    private Command[] commands(String... sig) {
-        List<Command> commandList = Stream.of(sig).map(this::cmd).collect(Collectors.toList());
-        return commandList.toArray(new Command[commandList.size()]);
-    }
-
-    private Command cmd(String s) {
-        return registry.findBySignature(
-                () -> s
-        ).orElseThrow(
-                () -> new CommandNotFoundException("Command with signature '" + s + "' not found")
-        );
     }
 }

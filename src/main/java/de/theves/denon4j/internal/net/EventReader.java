@@ -18,14 +18,18 @@
 package de.theves.denon4j.internal.net;
 
 import de.theves.denon4j.net.ConnectionException;
+import de.theves.denon4j.net.Event;
 import de.theves.denon4j.net.Protocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.net.SocketException;
+import java.nio.ByteBuffer;
 
 /**
  * @author stheves
@@ -66,17 +70,17 @@ public class EventReader extends Thread implements Runnable {
     private void next() {
         try {
             int read;
-            StringBuilder buffer = new StringBuilder();
+            ByteBuffer rawBuffer = ByteBuffer.allocate(135);
             while ((read = reader.read()) != -1) {
                 if (Protocol.PAUSE == read || Protocol.NULL == read) {
                     break;
                 }
-                buffer.append((char) read);
+                rawBuffer.put((byte) read);
             }
-            if (buffer.length() > 0) {
-                String lastEvent = buffer.toString();
+            if (rawBuffer.arrayOffset() > 0) {
+                Event e = EventFactory.create(rawBuffer.array());
                 synchronized (this) {
-                    client.received(lastEvent);
+                    client.received(e);
                     notify();
                 }
             }
