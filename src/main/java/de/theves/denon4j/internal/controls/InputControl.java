@@ -18,8 +18,8 @@
 package de.theves.denon4j.internal.controls;
 
 import de.theves.denon4j.controls.CommandRegistry;
-import de.theves.denon4j.controls.OnscreenInfo;
 import de.theves.denon4j.controls.InputControls;
+import de.theves.denon4j.controls.OnscreenInfo;
 import de.theves.denon4j.net.Event;
 import de.theves.denon4j.net.RequestCommand;
 
@@ -44,6 +44,14 @@ public class InputControl extends AbstractControl {
     }
 
     @Override
+    protected void doInit() {
+        InputControls[] params = InputControls.values();
+        paramList = new ArrayList<>(params.length);
+        paramList.addAll(Stream.of(params).map(Enum::toString).collect(Collectors.toList()));
+        register(paramList.toArray(new String[paramList.size()]));
+    }
+
+    @Override
     public void doHandle(Event event) {
         if (isOnscreenInformation(event)) {
             if (readingMessage.compareAndSet(false, true)) {
@@ -58,25 +66,31 @@ public class InputControl extends AbstractControl {
     }
 
     @Override
-    protected void doInit() {
-        InputControls[] params = InputControls.values();
-        paramList = new ArrayList<>(params.length);
-        paramList.addAll(Stream.of(params).map(Enum::toString).collect(Collectors.toList()));
-        register(paramList.toArray(new String[paramList.size()]));
-    }
-
-    @Override
     protected RequestCommand getRequestCommand() {
+        // TODO find the request command by prefix
         return (RequestCommand) getRegistry().getCommand(getCommands().get(getCommands().size() - 1).getId());
     }
 
     private boolean isOnscreenInformation(Event event) {
+        // TODO support also NSA events
         return event.build().signature().startsWith("NSE");
     }
 
-    public OnscreenInfo getMostRecentOnscreenInfo() {
-        getState();
+    public OnscreenInfo getOnscreenInfo() {
+        readOnscreenInfo();
         return mostRecentOnscreenInfo;
+    }
+
+    private void readOnscreenInfo() {
+        getState();
+        // wait until all events are received
+        while (readingMessage.get()) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                // ignore
+            }
+        }
     }
 
     public void control(InputControls controls) {

@@ -71,7 +71,7 @@ public class AVR1912Demo {
 
             Thread.sleep(200);
             avr.inputControl().control(InputControls.CURSOR_DOWN);
-            System.out.println("Display: " + avr.inputControl().getMostRecentOnscreenInfo());
+            System.out.println("Display: " + avr.inputControl().getOnscreenInfo());
         }
         System.out.println("------------DEMO END------------");
     }

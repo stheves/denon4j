@@ -22,6 +22,7 @@ import de.theves.denon4j.net.CommandId;
 import de.theves.denon4j.net.Parameter;
 import de.theves.denon4j.net.Protocol;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -36,7 +37,7 @@ public class CommandImpl extends EventImpl implements Command {
     private LocalDateTime executedAt = NEVER;
 
     public CommandImpl(Protocol protocol, CommandId id, String prefix, Parameter parameter) {
-        super(prefix, parameter);
+        super((prefix + parameter.build().signature()).getBytes(StandardCharsets.US_ASCII), prefix, parameter);
         this.id = Objects.requireNonNull(id);
         this.protocol = Objects.requireNonNull(protocol);
     }

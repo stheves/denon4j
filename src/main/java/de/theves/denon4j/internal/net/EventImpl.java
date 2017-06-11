@@ -38,12 +38,18 @@ public class EventImpl implements Event {
     private final Parameter parameter;
     private final LocalDateTime createdAt;
     private final PatternValidator validator;
+    private final byte[] raw;
 
-    protected EventImpl(String prefix, Parameter parameter) {
+    protected EventImpl(byte[] raw,String prefix, Parameter parameter) {
+        this.raw = Objects.requireNonNull(raw);
         this.prefix = Objects.requireNonNull(prefix);
         this.parameter = Objects.requireNonNull(parameter);
         this.createdAt = LocalDateTime.now();
         validator = new PatternValidator(Pattern.compile("(\\w\\w)")); // validate only the prefix
+    }
+
+    public byte[] getRaw() {
+        return raw;
     }
 
     @Override

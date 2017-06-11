@@ -19,8 +19,10 @@ package de.theves.denon4j.controls;
 
 import de.theves.denon4j.net.Event;
 
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * Class description.
@@ -28,34 +30,36 @@ import java.util.LinkedHashMap;
  * @author stheves
  */
 public class OnscreenInfo {
-    private final LinkedHashMap<String, Event> events;
+    private final LinkedHashMap<Integer, Line> lines;
 
     public OnscreenInfo() {
-        events = new LinkedHashMap<>();
+        lines = new LinkedHashMap<>();
     }
 
     public void addEvent(Event event) {
         if (!event.build().signature().startsWith("NSE")) {
             throw new IllegalArgumentException("Only NSE events are supported at the moment");
         }
-        events.put(getIndex(event), event);
+        Line line = new Line(event);
+        lines.put(line.getIndex(), line);
 
-        // TODO check 5th byte of raw data, this must be the cursor&playable information data byte
     }
 
-    private String getIndex(Event event) {
-        return event.getParameter().getValue().substring(1, 2);
-    }
-
-    public Collection<Event> getEvents() {
-        return events.values();
+    public Line lineAt(int index) {
+        return lines.get(index);
     }
 
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder("=======MESSAGE=======\r");
-        events.values().stream().forEach(event -> builder.append(event.getParameter().build().signature()));
+        getLines().stream().forEach(line -> builder.append(line.getDisplayLine()));
         builder.append("=======END=======\r");
         return builder.toString();
+    }
+
+    public List<Line> getLines() {
+        List<Line> lines = new ArrayList<>(this.lines.values());
+        Collections.sort(lines);
+        return lines;
     }
 }

@@ -28,12 +28,12 @@ import java.nio.charset.StandardCharsets;
  */
 public class EventFactory {
     public static Event create(String event) {
-        return create(event.getBytes(StandardCharsets.US_ASCII));
+        return create(event.getBytes(StandardCharsets.UTF_8));
     }
 
     public static Event create(byte[] raw) {
         String prefix = new String(raw, 0, 2, StandardCharsets.US_ASCII);
         String parameter = new String(raw, 2, raw.length - 2, StandardCharsets.UTF_8);
-        return new RawEventImpl(raw, prefix, ParameterImpl.createParameter(parameter));
+        return new EventImpl(raw, prefix, ParameterImpl.createParameter(parameter));
     }
 }
