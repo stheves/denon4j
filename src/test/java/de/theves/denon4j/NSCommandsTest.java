@@ -35,7 +35,7 @@ public class NSCommandsTest {
         byte dataByte = 0b00001001; // playable music + cursor select bit set
         Event event = EventFactory.create("NSE1" + (char) dataByte + "Come Away With Mö");
         Line aLine = new Line(event);
-        assertThat(aLine.getDisplayLine()).isEqualTo("Come Away With Mö");
+        assertThat(aLine.getDisplayLine()).contains("Come Away With Mö");
         assertThat(aLine.getIndex()).isEqualTo(1);
         assertThat(aLine.isCursorSelect()).isTrue();
         assertThat(aLine.isDirectory()).isFalse();
