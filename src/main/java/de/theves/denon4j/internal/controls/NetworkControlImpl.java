@@ -33,12 +33,13 @@ import java.util.stream.Stream;
  *
  * @author stheves
  */
-public class NetworkControlImpl extends AbstractControl implements de.theves.denon4j.controls.NetworkControl {
+public class NetworkControlImpl extends StatefulControl implements de.theves.denon4j.controls.NetworkControl {
     private OnscreenInfo mostRecentOnscreenInfo;
     private List<String> paramList;
 
     public NetworkControlImpl(CommandRegistry registry) {
         super(registry, "NS");
+        setName("Network USB/AUDIO/IPOD Extended Control");
     }
 
     @Override

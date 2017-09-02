@@ -35,7 +35,7 @@ import java.util.stream.Stream;
  *
  * @author stheves
  */
-public class SelectImpl<S extends Enum> extends AbstractControl implements Select<S> {
+public class SelectImpl<S extends Enum> extends StatefulControl implements Select<S> {
     private final S[] params;
 
     private List<String> paramList;

@@ -33,7 +33,7 @@ import java.util.List;
  *
  * @author stheves
  */
-public abstract class SwitchImpl extends AbstractControl implements Switch {
+public abstract class SwitchImpl extends StatefulControl implements Switch {
     protected final SwitchState onValue;
     protected final SwitchState offValue;
 

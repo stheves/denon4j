@@ -64,14 +64,23 @@ public class AVR1912Demo {
             System.out.println("MASTER VOL: " + masterVolume.getValue());
 
             Thread.sleep(200);
-            avr.video().source(VideoSource.SAT_CBL);
+            avr.video().source(VideoSource.SOURCE);
 
             Thread.sleep(200);
-            avr.input().source(InputSource.IRADIO);
+            avr.input().source(InputSource.NET_UBS);
 
             Thread.sleep(200);
-            avr.inputControl().control(NetworkControls.STOP);
-            System.out.println("Display: " + avr.inputControl().getOnscreenInfo());
+            avr.networkControl().control(NetworkControls.CURSOR_RIGHT);
+            System.out.println("Display: " + avr.networkControl().getOnscreenInfo());
+
+            Thread.sleep(200);
+            avr.menu().control(MenuControls.MENU_ON);
+
+            Thread.sleep(200);
+            avr.menu().control(MenuControls.CURSOR_DOWN);
+
+            Thread.sleep(200);
+            avr.menu().control(MenuControls.MENU_OFF);
         }
         System.out.println("------------DEMO END------------");
     }

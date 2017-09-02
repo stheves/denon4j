@@ -178,7 +178,7 @@ public class ControlsTest {
 
     @Test
     public void testNetworkControl() {
-        NetworkControlImpl selectNetworkControl = avr1912.inputControl();
+        NetworkControl selectNetworkControl = avr1912.networkControl();
         assertThat(selectNetworkControl.getCommands()).hasSize(NetworkControls.values().length);
         assertThat(selectNetworkControl.getCommandPrefix()).isEqualTo("NS");
         assertThat(registry.findBySignature(() -> "NS?")).isEmpty();

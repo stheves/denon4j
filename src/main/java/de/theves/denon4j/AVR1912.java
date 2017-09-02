@@ -50,6 +50,7 @@ public class AVR1912 implements AVR {
     private String selectNetPrefix;
     private String selectVideoPrefix;
     private String selectInputPrefix;
+    private String menuPrefix;
 
     public AVR1912(String host, int port) {
         this(new Tcp(host, port));
@@ -109,11 +110,15 @@ public class AVR1912 implements AVR {
 
         // network audio/usb/ipod DIRECT extended control
         // TODO remove prefix or pull up NetworkControlImpl as interface
-        selectNetPrefix = "NS";
         NetworkControlImpl selectNet = new NetworkControlImpl(registry);
-        selectNet.setName("Network USB/AUDIO/IPOD Extended Control");
+        selectNetPrefix = selectNet.getCommandPrefix();
         selectNet.init();
         controls.add(selectNet);
+
+        Menu menu = new Menu(registry);
+        menuPrefix = menu.getCommandPrefix();
+        menu.init();
+        controls.add(menu);
     }
 
     private void addToDispatcher(Collection<Control> controls) {
@@ -150,13 +155,19 @@ public class AVR1912 implements AVR {
         return findControl(selectInputPrefix, Select.class);
     }
 
-    public NetworkControlImpl inputControl() {
-        return findControl(selectNetPrefix, NetworkControlImpl.class);
+    public NetworkControl networkControl() {
+        return findControl(selectNetPrefix, NetworkControl.class);
     }
 
     public Select<VideoSource> video() {
         return findControl(selectVideoPrefix, Select.class);
     }
+
+    public Menu menu() {
+        return findControl(menuPrefix, Menu.class);
+    }
+
+    ;
 
     @Override
     public void printHelp(PrintStream writer) {

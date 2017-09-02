@@ -55,9 +55,11 @@ public class OnscreenInfo {
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder("=======MESSAGE=======\r");
-        getLines().stream().forEach(line -> builder.append(line.getDisplayLine()));
-        builder.append("=======END=======\r");
+        StringBuilder builder = new StringBuilder("=======MESSAGE=======" + System.lineSeparator());
+        builder.append(System.lineSeparator());
+        getLines().stream().forEach(line -> builder.append(line.getDisplayLine()).append(System.lineSeparator()));
+        builder.append(System.lineSeparator());
+        builder.append("=======END=======" + System.lineSeparator());
         return builder.toString();
     }
 

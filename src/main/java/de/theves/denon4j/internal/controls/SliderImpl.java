@@ -36,7 +36,7 @@ import java.util.regex.Pattern;
  *
  * @author stheves
  */
-public class SliderImpl extends AbstractControl implements Slider {
+public class SliderImpl extends StatefulControl implements Slider {
     private final String up;
     private final String down;
     private final PatternValidator validator;

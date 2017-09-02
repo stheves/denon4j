@@ -38,7 +38,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *
  * @author stheves
  */
-public abstract class AbstractControl implements Control {
+public abstract class StatefulControl implements Control {
     private static final Parameter DIRTY = ParameterImpl.createParameter("DIRTY");
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
@@ -51,7 +51,7 @@ public abstract class AbstractControl implements Control {
     private Parameter state = DIRTY;
     private String name;
 
-    AbstractControl(CommandRegistry registry, String prefix) {
+    public StatefulControl(CommandRegistry registry, String prefix) {
         this.prefix = Objects.requireNonNull(prefix);
         this.registry = Objects.requireNonNull(registry);
     }
@@ -140,7 +140,7 @@ public abstract class AbstractControl implements Control {
         }
     }
 
-    void executeCommand(CommandId commandId) {
+    protected void executeCommand(CommandId commandId) {
         executeCommand(commandId, null);
     }
 
@@ -157,7 +157,7 @@ public abstract class AbstractControl implements Control {
         return registry;
     }
 
-    List<Command> register(String... parameters) {
+    protected List<Command> register(String... parameters) {
         commands.addAll(getRegistry().registerAll(getCommandPrefix(), parameters));
         return commands;
     }

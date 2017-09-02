@@ -22,8 +22,31 @@ package de.theves.denon4j.controls;
  *
  * @author stheves
  */
-public interface NetworkControl extends Control {
-    OnscreenInfo getOnscreenInfo();
+public enum MenuControls {
+    CURSOR_UP("CUP"),
+    CURSOR_DOWN("CDN"),
+    CURSOR_LEFT("CLT"),
+    CURSOR_RIGHT("CRT"),
+    ENTER("ENT"),
+    RETURN("RTN"),
+    MENU_ON("MEN ON"),
+    MENU_OFF("MEN OFF"),
+    SOURCE_ON("SRC ON"),
+    SOURCE_OFF("SRC OFF");
 
-    void control(NetworkControls controls);
+
+    private final String control;
+
+    MenuControls(String control) {
+        this.control = control;
+    }
+
+    @Override
+    public String toString() {
+        return getControl();
+    }
+
+    public String getControl() {
+        return control;
+    }
 }
