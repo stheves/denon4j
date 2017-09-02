@@ -113,7 +113,6 @@ public class AVR1912 implements AVR {
         controls.add(mainZoneToggle);
 
         // network audio/usb/ipod DIRECT extended control
-        // TODO remove prefix or pull up NetworkControlImpl as interface
         NetworkControlImpl selectNet = new NetworkControlImpl(registry);
         selectNetPrefix = selectNet.getCommandPrefix();
         selectNet.init();
