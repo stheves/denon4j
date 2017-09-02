@@ -19,10 +19,7 @@ deploy:
   on:
     repo: stheves/denon4j
     tags: true
-
-branches:
-  only:
-  - master
+    all_branches: true
 
 notifications:
   email:
