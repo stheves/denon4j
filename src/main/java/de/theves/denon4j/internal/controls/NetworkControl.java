@@ -33,11 +33,11 @@ import java.util.stream.Stream;
  *
  * @author stheves
  */
-public class InputControl extends AbstractControl {
+public class NetworkControl extends AbstractControl {
     private OnscreenInfo mostRecentOnscreenInfo;
     private List<String> paramList;
 
-    public InputControl(CommandRegistry registry) {
+    public NetworkControl(CommandRegistry registry) {
         super(registry, "NS");
     }
 
