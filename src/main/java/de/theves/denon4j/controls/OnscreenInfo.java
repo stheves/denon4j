@@ -49,6 +49,10 @@ public class OnscreenInfo {
         return lines.get(index);
     }
 
+    public Line getCursor() {
+        return lines.values().stream().filter(line -> line.isCursorSelect()).findFirst().orElse(null);
+    }
+
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder("=======MESSAGE=======\r");
