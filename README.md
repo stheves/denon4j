@@ -19,7 +19,8 @@ Contributions are welcome!
 ```
 Avr1912 avr = new Avr1912(192.168.0.102, 23);
 avr.connect(1000);
-avr.volumeUp();
+Slider masterVolume = avr.masterVolume();
+masterVolume.slideUp();
 avr.disconnect();
 ```
 
@@ -36,12 +37,6 @@ This is a maven style project so `mvn` needs to be on your `$PATH`. To build
 from scratch just type:
 
 > mvn clean package
-
-This builds the executable JAR file that can be used on command line.
-
-# Command Line Usage
-
-NOT YET IMPLEMENTED
 
 # License
 

@@ -88,7 +88,6 @@
     </dependencies>
 
     <build>
-        <finalName>denon4j</finalName>
         <pluginManagement>
             <plugins>
                 <plugin>
