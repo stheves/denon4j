@@ -5,7 +5,7 @@ jdk:
 sudo: false
 
 before_script:
-- export MAVEN_OPTS="-Xmx512m -XX:MaxMetspaceSize=512m"
+- export MAVEN_OPTS="-Xmx512m -XX:MaxMetaspaceSize=512m"
 script: mvn -q -B -e clean package
 
 before_deploy:
