@@ -18,6 +18,7 @@
 package de.theves.denon4j.internal.net;
 
 import de.theves.denon4j.controls.ExecutionException;
+import de.theves.denon4j.internal.EventDispatcher;
 import de.theves.denon4j.net.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +44,7 @@ public final class Tcp implements Protocol {
     private final String host;
     private final EventReader eventReader;
 
-    private EventListener eventListener;
+    private EventDispatcher eventDispatcher;
     private Socket socket;
     private Writer writer;
     private Event mostRecent;
@@ -65,9 +66,9 @@ public final class Tcp implements Protocol {
     }
 
     private void notify(Event event) {
-        if (null != eventListener) {
+        if (null != eventDispatcher) {
             try {
-                eventListener.onEvent(event);
+                eventDispatcher.onEvent(event);
             } catch (Exception e) {
                 logger.warn("Error invoking event listener", e);
             }
@@ -120,9 +121,10 @@ public final class Tcp implements Protocol {
     }
 
     @Override
-    public void setListener(EventListener participant) {
-        this.eventListener = participant;
+    public void setDispatcher(EventDispatcher eventDispatcher) {
+        this.eventDispatcher = eventDispatcher;
     }
+
 
     @Override
     public Event request(RequestCommand requestCommand) {

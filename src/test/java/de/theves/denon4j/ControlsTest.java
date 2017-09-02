@@ -53,7 +53,7 @@ public class ControlsTest {
     public void testConnectionHandling() {
         avr1912.connect(100);
         InOrder order = inOrder(protocol, protocol);
-        order.verify(protocol, times(1)).setListener(avr1912.getEventDispatcher());
+        order.verify(protocol, times(1)).setDispatcher(avr1912.getEventDispatcher());
         order.verify(protocol, times(1)).establishConnection(100);
 
         when(protocol.isConnected()).thenReturn(Boolean.TRUE);

@@ -19,25 +19,24 @@ package de.theves.denon4j.internal;
 
 import de.theves.denon4j.controls.Control;
 import de.theves.denon4j.net.Event;
-import de.theves.denon4j.net.EventListener;
 import de.theves.denon4j.net.Protocol;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 /**
+ * Receives events from an AVR and dispatches them to the controls.
+ *
  * @author stheves
  */
-public class EventDispatcher implements EventListener {
+public class EventDispatcher {
 
     private final Collection<Control> controls;
-    private final Protocol protocol;
     private final Set<Event> unhandledEvents;
 
     /**
      */
-    public EventDispatcher(Protocol protocol) {
-        this.protocol = Objects.requireNonNull(protocol);
+    public EventDispatcher() {
         this.controls = new HashSet<>();
         unhandledEvents = new HashSet<>();
     }
@@ -62,7 +61,6 @@ public class EventDispatcher implements EventListener {
         return controls;
     }
 
-    @Override
     public void onEvent(Event event) {
         List<Control> supporters = controls.stream().filter(ctrl ->
                 ctrl.supports(event)).collect(Collectors.toList());
@@ -72,9 +70,5 @@ public class EventDispatcher implements EventListener {
         } else {
             supporters.forEach(ctrl -> ctrl.handle(event));
         }
-    }
-
-    public void startDispatching() {
-        this.protocol.setListener(this);
     }
 }

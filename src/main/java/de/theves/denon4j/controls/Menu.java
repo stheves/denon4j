@@ -17,8 +17,8 @@
 
 package de.theves.denon4j.controls;
 
-import de.theves.denon4j.internal.controls.StatefulControl;
-import de.theves.denon4j.net.RequestCommand;
+import de.theves.denon4j.internal.controls.AbstractControl;
+import de.theves.denon4j.net.Event;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,12 +30,17 @@ import java.util.stream.Stream;
  *
  * @author stheves
  */
-public class Menu extends StatefulControl {
+public class Menu extends AbstractControl {
     private List<String> paramList;
 
     public Menu(CommandRegistry registry) {
-        super(registry, "MN");
+        super("MN", registry);
         setName("Main Menu");
+    }
+
+    @Override
+    protected void doHandle(Event event) {
+        // not needed
     }
 
     @Override
@@ -44,11 +49,6 @@ public class Menu extends StatefulControl {
         paramList = new ArrayList<>(params.length);
         paramList.addAll(Stream.of(params).map(Enum::toString).collect(Collectors.toList()));
         register(paramList.toArray(new String[paramList.size()]));
-    }
-
-    @Override
-    protected RequestCommand getRequestCommand() {
-        return null;
     }
 
     public void control(MenuControls controls) {

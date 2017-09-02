@@ -26,6 +26,7 @@ import de.theves.denon4j.net.Protocol;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 import static de.theves.denon4j.controls.SwitchState.*;
@@ -57,10 +58,13 @@ public class AVR1912 implements AVR {
     }
 
     AVR1912(Protocol protocol) {
-        this.protocol = protocol;
+        this.protocol = Objects.requireNonNull(protocol);
         this.registry = new CommandRegistryImpl(protocol);
-        this.eventDispatcher = new EventDispatcher(protocol);
+        this.eventDispatcher = new EventDispatcher();
         this.controls = new ArrayList<>();
+
+        this.protocol.setDispatcher(eventDispatcher);
+
         addControls(this.controls);
         addToDispatcher(this.controls);
     }
@@ -180,8 +184,6 @@ public class AVR1912 implements AVR {
     }
 
     public void connect(int timeout) {
-        // first start dispatching to make sure we do not miss anything
-        eventDispatcher.startDispatching();
         protocol.establishConnection(timeout);
     }
 

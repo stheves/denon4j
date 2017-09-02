@@ -17,6 +17,8 @@
 
 package de.theves.denon4j.net;
 
+import de.theves.denon4j.internal.EventDispatcher;
+
 /**
  * Low-level network client for communication with AVR.
  *
@@ -25,6 +27,7 @@ package de.theves.denon4j.net;
 public interface Protocol {
     char PAUSE = 0x0d; // \r character
     char NULL = 0x00;
+
     /**
      * Sends the command to the receiver (socket) and waits for a response
      * (blocking).
@@ -35,12 +38,12 @@ public interface Protocol {
     void send(Command command);
 
     /**
-     * Sets the event listener for this protocol.
-     * The event listener is registered to the event bus for receiving all events of the AVR.
+     * Sets the event dispatcher for this protocol.
+     * The event dispatcher is registered to the event bus for receiving all events of the AVR.
      *
-     * @param eventListener the event listener to use.
+     * @param eventDispatcher the event dispatcher to use.
      */
-    void setListener(EventListener eventListener);
+    void setDispatcher(EventDispatcher eventDispatcher);
 
     /**
      * Sends a request command.

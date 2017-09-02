@@ -18,19 +18,8 @@
 package de.theves.denon4j.internal.controls;
 
 import de.theves.denon4j.controls.CommandRegistry;
-import de.theves.denon4j.controls.Control;
-import de.theves.denon4j.controls.NotYetInitializedException;
-import de.theves.denon4j.internal.net.AlreadyInitException;
 import de.theves.denon4j.internal.net.ParameterImpl;
 import de.theves.denon4j.net.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 
 /**
@@ -38,93 +27,30 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *
  * @author stheves
  */
-public abstract class StatefulControl implements Control {
+public abstract class StatefulControl extends AbstractControl {
     private static final Parameter DIRTY = ParameterImpl.createParameter("DIRTY");
 
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
-
-    private final String prefix;
-    private final CommandRegistry registry;
-    private final AtomicBoolean initialized = new AtomicBoolean(false);
-    private final List<Command> commands = new ArrayList<>(10);
-
     private Parameter state = DIRTY;
-    private String name;
 
     public StatefulControl(CommandRegistry registry, String prefix) {
-        this.prefix = Objects.requireNonNull(prefix);
-        this.registry = Objects.requireNonNull(registry);
+        super(prefix, registry);
     }
 
     @Override
-    public final void handle(Event event) {
-        checkInitialized();
+    public void doHandle(Event event) {
         state = event.getParameter();
-        doHandle(event);
-        logger.debug("Handled event: {}", event);
     }
 
     @Override
-    public String getCommandPrefix() {
-        return prefix;
-    }
-
-    @Override
-    public final void init() {
-        if (initialized.compareAndSet(false, true)) {
-            doInit();
-        } else {
-            throw new AlreadyInitException("This control has already been initialized");
+    protected Command executeCommand(CommandId downId, String value) {
+        Command cmd = super.executeCommand(downId, value);
+        if (cmd.isDirtying()) {
+            state = StatefulControl.DIRTY;
         }
-        logger.debug("Control initialized: {}", this);
+        return cmd;
     }
 
-    @Override
-    public boolean isInitialized() {
-        return initialized.get();
-    }
-
-    @Override
-    public List<Command> getCommands() {
-        return Collections.unmodifiableList(commands);
-    }
-
-    @Override
-    public void dispose() {
-        if (initialized.compareAndSet(true, false)) {
-            commands.forEach(command -> registry.deregisterCommand(command.getId()));
-        }
-        // ignore if we were not yet initialized
-        logger.debug("Control disposed: {}", this);
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public boolean supports(Event event) {
-        return getCommandPrefix().equals(event.getPrefix());
-    }
-
-    protected abstract void doInit();
-
-    private void checkInitialized() {
-        if (!initialized.get()) {
-            throw new NotYetInitializedException(this);
-        }
-    }
-
-    protected void doHandle(Event event) {
-        // sub classes may override
-    }
-
-    Parameter getState() {
+    public Parameter getState() {
         checkInitialized();
         refreshState();
         return state;
@@ -140,33 +66,6 @@ public abstract class StatefulControl implements Control {
         }
     }
 
-    protected void executeCommand(CommandId commandId) {
-        executeCommand(commandId, null);
-    }
-
     protected abstract RequestCommand getRequestCommand();
 
-    void executeCommand(CommandId downId, String value) {
-        Command cmd = getRegistry().getCommandStack().execute(downId, value);
-        if (cmd.isDirtying()) {
-            state = DIRTY;
-        }
-    }
-
-    CommandRegistry getRegistry() {
-        return registry;
-    }
-
-    protected List<Command> register(String... parameters) {
-        commands.addAll(getRegistry().registerAll(getCommandPrefix(), parameters));
-        return commands;
-    }
-
-    @Override
-    public String toString() {
-        return "Control{" +
-                "prefix='" + prefix + '\'' +
-                ", name='" + name + '\'' +
-                '}';
-    }
 }
