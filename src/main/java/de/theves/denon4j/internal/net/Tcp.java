@@ -17,6 +17,7 @@
 
 package de.theves.denon4j.internal.net;
 
+import de.theves.denon4j.controls.ExecutionException;
 import de.theves.denon4j.net.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -130,12 +131,12 @@ public final class Tcp implements Protocol {
             send(requestCommand);
             // wait until response is received
             try {
-                eventReader.wait(200);
+                eventReader.wait();
             } catch (InterruptedException e) {
                 logger.warn("Receive interrupted", e);
             }
             // we expecting the last event as result of the request command
-            return Optional.ofNullable(mostRecent).orElseThrow(IllegalStateException::new);
+            return Optional.ofNullable(mostRecent).orElseThrow(() -> new ExecutionException("Could not get response"));
         }
     }
 

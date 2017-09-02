@@ -26,8 +26,8 @@ import de.theves.denon4j.net.Protocol;
  *
  * @author stheves
  */
-public class OnscreenInfoRequest extends CommandImpl {
-    public OnscreenInfoRequest(Protocol protocol, CommandId id, String prefix, Parameter param) {
-        super(protocol, id, prefix, param);
+public class OnscreenInfoRequest extends RequestCommandImpl {
+    public OnscreenInfoRequest(Protocol protocol, CommandId id, String prefix, Parameter parameter) {
+        super(protocol, id, prefix, parameter);
     }
 }

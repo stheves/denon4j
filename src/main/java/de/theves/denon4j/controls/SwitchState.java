@@ -31,7 +31,7 @@ public enum SwitchState {
         this.state = state;
     }
 
-    public String getState() {
+    public String get() {
         return state;
     }
 

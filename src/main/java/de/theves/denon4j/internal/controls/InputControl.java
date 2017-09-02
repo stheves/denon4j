@@ -25,7 +25,6 @@ import de.theves.denon4j.net.RequestCommand;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -36,7 +35,6 @@ import java.util.stream.Stream;
  */
 public class InputControl extends AbstractControl {
     private OnscreenInfo mostRecentOnscreenInfo;
-    private AtomicBoolean readingMessage = new AtomicBoolean(false);
     private List<String> paramList;
 
     public InputControl(CommandRegistry registry) {
@@ -54,13 +52,10 @@ public class InputControl extends AbstractControl {
     @Override
     public void doHandle(Event event) {
         if (isOnscreenInformation(event)) {
-            if (readingMessage.compareAndSet(false, true)) {
+            if (mostRecentOnscreenInfo == null || mostRecentOnscreenInfo.isComplete()) {
                 mostRecentOnscreenInfo = new OnscreenInfo();
             }
             mostRecentOnscreenInfo.addEvent(event);
-        } else {
-            // we assume that the first non-onscreen event is the message pause
-            readingMessage.set(false);
         }
 
     }
@@ -84,7 +79,7 @@ public class InputControl extends AbstractControl {
     private void readOnscreenInfo() {
         getState();
         // wait until all events are received
-        while (readingMessage.get()) {
+        while (mostRecentOnscreenInfo == null || !mostRecentOnscreenInfo.isComplete()) {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {

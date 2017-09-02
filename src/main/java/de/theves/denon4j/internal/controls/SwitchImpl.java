@@ -63,7 +63,7 @@ public abstract class SwitchImpl extends AbstractControl implements Switch {
     }
 
     private void registerCommands() {
-        List<Command> commands = register(onValue.getState(), offValue.getState(), ParameterImpl.REQUEST.getValue());
+        List<Command> commands = register(onValue.get(), offValue.get(), ParameterImpl.REQUEST.getValue());
         onId = commands.get(0).getId();
         offId = commands.get(1).getId();
         requestId = commands.get(2).getId();

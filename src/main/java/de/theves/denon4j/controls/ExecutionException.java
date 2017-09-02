@@ -15,33 +15,23 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.internal.net;
-
-import de.theves.denon4j.net.*;
+package de.theves.denon4j.controls;
 
 /**
- * Request command implementation.
+ * Thrown if a command execution failed.
  *
  * @author stheves
  */
-public class RequestCommandImpl extends CommandImpl implements RequestCommand {
-    private Event received;
-
-    public RequestCommandImpl(Protocol protocol, CommandId id, String prefix) {
-        super(protocol, id, prefix, ParameterImpl.REQUEST);
+public class ExecutionException extends RuntimeException {
+    public ExecutionException(String message) {
+        super(message);
     }
 
-    public RequestCommandImpl(Protocol protocol, CommandId id, String prefix, Parameter param) {
-        super(protocol, id, prefix, param);
+    public ExecutionException(String message, Throwable cause) {
+        super(message, cause);
     }
 
-    @Override
-    protected void doSend() {
-        received = protocol.request(this);
-    }
-
-    @Override
-    public Event getReceived() {
-        return received;
+    public ExecutionException(Throwable cause) {
+        super(cause);
     }
 }

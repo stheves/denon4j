@@ -40,17 +40,15 @@ public class Line implements Comparable<Line> {
 
     private void parseDataByte(Event event) {
         byte[] raw = event.getRaw();
-        byte data = raw[4];
-        if (isDataByte(data)) {
+        if (raw.length > 4 && isDataByte(raw[4])) {
+            byte data = raw[4];
             // data byte available
             playable = isSet(data, 0);
             directory = isSet(data, 1);
             cursorSelect = isSet(data, 3);
             picture = isSet(data, 6);
-            this.displayLine = event.getParameter().getValue().substring(3);
-        } else {
-            this.displayLine = event.getParameter().getValue().substring(2);
         }
+        this.displayLine = event.getParameter().getValue().substring(2);
         this.index = Integer.valueOf(event.getParameter().getValue().substring(1, 2));
     }
 

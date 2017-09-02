@@ -48,7 +48,6 @@ public abstract class AbstractControl implements Control {
     private final AtomicBoolean initialized = new AtomicBoolean(false);
     private final List<Command> commands = new ArrayList<>(10);
 
-    private final Object stateMonitor = new Object();
     private Parameter state = DIRTY;
     private String name;
 
@@ -60,9 +59,7 @@ public abstract class AbstractControl implements Control {
     @Override
     public final void handle(Event event) {
         checkInitialized();
-        synchronized (stateMonitor) {
-            state = event.getParameter();
-        }
+        state = event.getParameter();
         doHandle(event);
         logger.debug("Handled event: {}", event);
     }
@@ -129,10 +126,8 @@ public abstract class AbstractControl implements Control {
 
     Parameter getState() {
         checkInitialized();
-        synchronized (stateMonitor) {
-            refreshState();
-            return state;
-        }
+        refreshState();
+        return state;
     }
 
     private void refreshState() {
@@ -154,9 +149,7 @@ public abstract class AbstractControl implements Control {
     void executeCommand(CommandId downId, String value) {
         Command cmd = getRegistry().getCommandStack().execute(downId, value);
         if (cmd.isDirtying()) {
-            synchronized (stateMonitor) {
-                state = DIRTY;
-            }
+            state = DIRTY;
         }
     }
 

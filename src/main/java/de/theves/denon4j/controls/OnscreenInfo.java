@@ -62,4 +62,8 @@ public class OnscreenInfo {
         Collections.sort(lines);
         return lines;
     }
+
+    public boolean isComplete() {
+        return lines.size() == 9;
+    }
 }

@@ -43,19 +43,19 @@ public class AVR1912Demo {
 
             // power control
             Toggle power = avr.power();
-            System.out.println("PWON: " + power.state().getState());
+            System.out.println("PWON: " + power.state().get());
             if (power.state() != SwitchState.ON) {
                 // powering on
                 power.toggle();
             }
 
-//            Toggle mute = avr.mute();
-//            mute.toggle();
-//            System.out.println("MUTE ON: " + mute.state().getState());
-//
-//            Thread.sleep(200);
-//            mute.switchOff();
-//            System.out.println("MUTE OFF: " + mute.state().getState());
+            Toggle mute = avr.mute();
+            mute.toggle();
+            System.out.println("MUTE ON: " + mute.state().get());
+
+            Thread.sleep(200);
+            mute.switchOff();
+            System.out.println("MUTE OFF: " + mute.state().get());
 
             Slider masterVolume = avr.masterVolume();
             masterVolume.slideUp();
@@ -70,7 +70,7 @@ public class AVR1912Demo {
             avr.input().source(InputSource.IRADIO);
 
             Thread.sleep(200);
-            avr.inputControl().control(InputControls.CURSOR_DOWN);
+            avr.inputControl().control(InputControls.STOP);
             System.out.println("Display: " + avr.inputControl().getOnscreenInfo());
         }
         System.out.println("------------DEMO END------------");

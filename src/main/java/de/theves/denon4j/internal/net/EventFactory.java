@@ -32,6 +32,7 @@ public class EventFactory {
     }
 
     public static Event create(byte[] raw) {
+        // TODO this does not work for NS commands
         String prefix = new String(raw, 0, 2, StandardCharsets.US_ASCII);
         String parameter = new String(raw, 2, raw.length - 2, StandardCharsets.UTF_8);
         return new EventImpl(raw, prefix, ParameterImpl.createParameter(parameter));

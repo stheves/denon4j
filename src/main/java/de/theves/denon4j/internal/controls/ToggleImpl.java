@@ -33,10 +33,10 @@ public class ToggleImpl extends SwitchImpl implements Toggle {
     }
 
     public void toggle() {
-        if (onValue.getState().equals(getState().getValue())) {
+        if (onValue.get().equals(getState().getValue())) {
             switchOff();
         }
-        if (offValue.getState().equals(getState().getValue())) {
+        if (offValue.get().equals(getState().getValue())) {
             switchOn();
         }
     }

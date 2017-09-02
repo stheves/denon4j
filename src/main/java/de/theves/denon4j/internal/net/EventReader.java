@@ -23,13 +23,12 @@ import de.theves.denon4j.net.Protocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.Socket;
 import java.net.SocketException;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 /**
  * @author stheves
@@ -77,8 +76,8 @@ public class EventReader extends Thread implements Runnable {
                 }
                 rawBuffer.put((byte) read);
             }
-            if (rawBuffer.arrayOffset() > 0) {
-                Event e = EventFactory.create(rawBuffer.array());
+            if (rawBuffer.position() > 0) {
+                Event e = EventFactory.create(Arrays.copyOfRange(rawBuffer.array(), 0, rawBuffer.position()));
                 synchronized (this) {
                     client.received(e);
                     notify();

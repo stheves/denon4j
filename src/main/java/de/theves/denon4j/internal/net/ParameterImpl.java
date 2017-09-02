@@ -18,9 +18,9 @@
 package de.theves.denon4j.internal.net;
 
 import de.theves.denon4j.controls.InvalidSignatureException;
-import de.theves.denon4j.net.Signature;
 import de.theves.denon4j.internal.PatternValidator;
 import de.theves.denon4j.net.Parameter;
+import de.theves.denon4j.net.Signature;
 
 import java.util.regex.Pattern;
 
@@ -39,7 +39,7 @@ public class ParameterImpl implements Parameter {
 
     public ParameterImpl(String value) {
         this.value = value;
-        this.validator = new PatternValidator(Pattern.compile(".*"));
+        this.validator = new PatternValidator(Pattern.compile(".*", Pattern.DOTALL));
         validate();
     }
 

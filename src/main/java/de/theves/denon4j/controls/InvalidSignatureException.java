@@ -26,6 +26,6 @@ import java.util.regex.Pattern;
  */
 public class InvalidSignatureException extends RuntimeException {
     public InvalidSignatureException(String value, Pattern pattern) {
-        super(String.format("Value %s must match pattern %s", value, pattern.pattern()));
+        super(String.format("Value '%s' must match pattern '%s'", value, pattern.pattern()));
     }
 }
