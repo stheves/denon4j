@@ -17,12 +17,7 @@
 
 package de.theves.denon4j.internal.net;
 
-import de.theves.denon4j.controls.InvalidSignatureException;
-import de.theves.denon4j.internal.PatternValidator;
 import de.theves.denon4j.net.Parameter;
-import de.theves.denon4j.net.Signature;
-
-import java.util.regex.Pattern;
 
 /**
  * Class description.
@@ -30,22 +25,15 @@ import java.util.regex.Pattern;
  * @author stheves
  */
 public class ParameterImpl implements Parameter {
-    public static final Parameter EMPTY = new ParameterImpl("");
     public static final Parameter REQUEST = new ParameterImpl("?");
 
-    private final PatternValidator validator;
+    protected String value;
 
-    private String value;
+    public ParameterImpl() {
+    }
 
     public ParameterImpl(String value) {
         this.value = value;
-        this.validator = new PatternValidator(Pattern.compile(".*", Pattern.DOTALL));
-        validate();
-    }
-
-    @Override
-    public String getValue() {
-        return value;
     }
 
     public static Parameter createParameter(String val) {
@@ -56,24 +44,14 @@ public class ParameterImpl implements Parameter {
     }
 
     @Override
+    public String getValue() {
+        return value == null ? "" : value;
+    }
+
+    @Override
     public String toString() {
         return "Parameter{" +
                 "value='" + value + '\'' +
                 '}';
-    }
-
-    @Override
-    public Signature build() {
-        return this::getValue;
-    }
-
-    @Override
-    public boolean isValid() {
-        return validator.isValid(getValue());
-    }
-
-    @Override
-    public void validate() throws InvalidSignatureException {
-        validator.validate(getValue());
     }
 }

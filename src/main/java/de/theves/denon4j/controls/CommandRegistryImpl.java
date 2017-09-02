@@ -15,12 +15,8 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.internal.controls;
+package de.theves.denon4j.controls;
 
-import de.theves.denon4j.controls.CommandNotFoundException;
-import de.theves.denon4j.controls.CommandRegistry;
-import de.theves.denon4j.net.Signature;
-import de.theves.denon4j.internal.net.ParameterImpl;
 import de.theves.denon4j.net.Command;
 import de.theves.denon4j.net.CommandId;
 import de.theves.denon4j.net.Protocol;
@@ -29,7 +25,8 @@ import java.io.PrintStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static de.theves.denon4j.internal.controls.CommandFactory.createCommand;
+import static de.theves.denon4j.controls.CommandFactory.createCommand;
+
 
 /**
  * Class description.
@@ -87,12 +84,8 @@ public class CommandRegistryImpl implements CommandRegistry {
     @Override
     public List<Command> registerAll(String prefix, String... parameters) {
         List<Command> result = new ArrayList<>(parameters.length + 1);
-        if (parameters.length == 0) {
-            result.add(register(prefix, ParameterImpl.EMPTY.getValue()));
-        } else {
-            for (String param : parameters) {
-                result.add(register(prefix, param));
-            }
+        for (String param : parameters) {
+            result.add(register(prefix, param));
         }
         return result;
     }
@@ -103,9 +96,9 @@ public class CommandRegistryImpl implements CommandRegistry {
     }
 
     @Override
-    public Optional<Command> findBySignature(Signature signature) {
+    public Optional<Command> findBySignature(String signature) {
         for (Command cmd : commands.values()) {
-            if (cmd.build().signature().equals(signature.signature())) {
+            if (cmd.signature().equals(signature)) {
                 return Optional.of(cmd);
             }
         }

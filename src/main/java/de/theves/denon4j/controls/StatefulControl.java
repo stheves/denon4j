@@ -15,9 +15,8 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.internal.controls;
+package de.theves.denon4j.controls;
 
-import de.theves.denon4j.controls.CommandRegistry;
 import de.theves.denon4j.internal.net.ParameterImpl;
 import de.theves.denon4j.net.*;
 
@@ -66,6 +65,13 @@ public abstract class StatefulControl extends AbstractControl {
         }
     }
 
-    protected abstract RequestCommand getRequestCommand();
+    protected RequestCommand getRequestCommand() {
+        return (RequestCommand) getCommands()
+                .stream()
+                .filter(cmd -> cmd instanceof RequestCommand)
+                .findFirst()
+                .orElseThrow(() -> new CommandNotFoundException("No request command found"));
+    }
+
 
 }

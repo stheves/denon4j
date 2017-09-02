@@ -18,7 +18,6 @@
 package de.theves.denon4j;
 
 import de.theves.denon4j.controls.*;
-import de.theves.denon4j.internal.controls.NetworkControlImpl;
 import de.theves.denon4j.internal.net.EventFactory;
 import de.theves.denon4j.net.*;
 import org.junit.Before;
@@ -89,11 +88,10 @@ public class ControlsTest {
     }
 
     private Command cmd(String s) {
-        return registry.findBySignature(
-                () -> s
-        ).orElseThrow(
-                () -> new CommandNotFoundException("Command with signature '" + s + "' not found")
-        );
+        return registry.findBySignature(s)
+                .orElseThrow(() ->
+                        new CommandNotFoundException("Command with get '" + s + "' not found")
+                );
     }
 
     private Event event(String e) {
@@ -144,30 +142,22 @@ public class ControlsTest {
 
         slider.slideUp();
         // fake events
-        avr1912.getEventDispatcher().onEvent(EventFactory.create("MV455"));
-        avr1912.getEventDispatcher().onEvent(EventFactory.create("MVMAX 68"));
+        avr1912.getEventDispatcher().dispatch(EventFactory.create("MV455"));
+        avr1912.getEventDispatcher().dispatch(EventFactory.create("MVMAX 68"));
         verify(protocol).send(cmd("MVUP"));
         assertThat(slider.getValue()).isEqualTo("455");
 
         slider.slideDown();
-        avr1912.getEventDispatcher().onEvent(EventFactory.create("MV45"));
-        avr1912.getEventDispatcher().onEvent(EventFactory.create("MVMAX 675"));
+        avr1912.getEventDispatcher().dispatch(EventFactory.create("MV45"));
+        avr1912.getEventDispatcher().dispatch(EventFactory.create("MVMAX 675"));
         verify(protocol).send(cmd("MVDOWN"));
         assertThat(slider.getValue()).isEqualTo("45");
 
         slider.set("55");
-        avr1912.getEventDispatcher().onEvent(EventFactory.create("MV55"));
-        avr1912.getEventDispatcher().onEvent(EventFactory.create("MVMAX 72"));
+        avr1912.getEventDispatcher().dispatch(EventFactory.create("MV55"));
+        avr1912.getEventDispatcher().dispatch(EventFactory.create("MVMAX 72"));
         verify(protocol).send(cmd("MV55"));
         assertThat(slider.getValue()).isEqualTo("55");
-
-        // test validity checks
-        assertThat(slider.isValid()).isTrue();
-        assertThatThrownBy(() -> slider.set("invalid")).isInstanceOf(InvalidSignatureException.class);
-        assertThatThrownBy(() -> slider.set("MV55")).isInstanceOf(InvalidSignatureException.class);
-        assertThatThrownBy(() -> slider.set(" 55")).isInstanceOf(InvalidSignatureException.class);
-        assertThatThrownBy(() -> slider.set("5")).isInstanceOf(InvalidSignatureException.class);
-        assertThatThrownBy(() -> slider.set(" 5 ")).isInstanceOf(InvalidSignatureException.class);
     }
 
     @Test
@@ -181,7 +171,7 @@ public class ControlsTest {
         NetworkControl selectNetworkControl = avr1912.networkControl();
         assertThat(selectNetworkControl.getCommands()).hasSize(NetworkControls.values().length);
         assertThat(selectNetworkControl.getCommandPrefix()).isEqualTo("NS");
-        assertThat(registry.findBySignature(() -> "NS?")).isEmpty();
+        assertThat(registry.findBySignature("NS?")).isEmpty();
 
         selectNetworkControl.control(NetworkControls.CURSOR_DOWN);
         verify(protocol).send(cmd("NS91"));

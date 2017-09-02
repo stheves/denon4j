@@ -52,7 +52,7 @@ public interface Protocol {
      * @param requestCommand the command to send.
      * @return the response of the command.
      */
-    Event request(RequestCommand requestCommand);
+    Event request(Command requestCommand);
 
     /**
      * Connect to the receiver.

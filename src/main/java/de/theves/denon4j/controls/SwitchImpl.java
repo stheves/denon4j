@@ -15,11 +15,8 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.internal.controls;
+package de.theves.denon4j.controls;
 
-import de.theves.denon4j.controls.CommandRegistry;
-import de.theves.denon4j.controls.Switch;
-import de.theves.denon4j.controls.SwitchState;
 import de.theves.denon4j.internal.net.ParameterImpl;
 import de.theves.denon4j.net.Command;
 import de.theves.denon4j.net.CommandId;
@@ -41,7 +38,7 @@ public abstract class SwitchImpl extends StatefulControl implements Switch {
     private CommandId offId;
     private CommandId requestId;
 
-    SwitchImpl(CommandRegistry registry, String prefix, SwitchState onValue, SwitchState offValue) {
+    public SwitchImpl(CommandRegistry registry, String prefix, SwitchState onValue, SwitchState offValue) {
         super(registry, prefix);
         this.onValue = onValue;
         this.offValue = offValue;

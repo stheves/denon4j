@@ -5,6 +5,6 @@ package de.theves.denon4j.net;
  *
  * @author stheves
  */
-public interface RequestCommand extends Event, Command {
+public interface RequestCommand extends Command {
     Event getReceived();
 }

@@ -8,8 +8,6 @@ import java.time.LocalDateTime;
  * @author stheves
  */
 public interface Command extends Event {
-    LocalDateTime NEVER = LocalDateTime.MIN;
-
     CommandId getId();
 
     LocalDateTime getExecutedAt();
@@ -17,4 +15,6 @@ public interface Command extends Event {
     void execute();
 
     boolean isDirtying();
+
+    String signature();
 }

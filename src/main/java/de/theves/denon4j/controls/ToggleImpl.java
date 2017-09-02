@@ -15,11 +15,7 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.internal.controls;
-
-import de.theves.denon4j.controls.CommandRegistry;
-import de.theves.denon4j.controls.SwitchState;
-import de.theves.denon4j.controls.Toggle;
+package de.theves.denon4j.controls;
 
 /**
  * Toggle control implementation.

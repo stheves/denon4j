@@ -17,16 +17,11 @@
 
 package de.theves.denon4j.internal.net;
 
-import de.theves.denon4j.controls.InvalidSignatureException;
-import de.theves.denon4j.internal.PatternValidator;
 import de.theves.denon4j.net.Event;
 import de.theves.denon4j.net.Parameter;
-import de.theves.denon4j.net.Signature;
 
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Objects;
-import java.util.regex.Pattern;
 
 /**
  * Class description.
@@ -37,36 +32,22 @@ public class EventImpl implements Event {
     private final String prefix;
     private final Parameter parameter;
     private final LocalDateTime createdAt;
-    private final PatternValidator validator;
     private final byte[] raw;
 
-    protected EventImpl(byte[] raw,String prefix, Parameter parameter) {
+    protected EventImpl(byte[] raw, String prefix, Parameter parameter) {
         this.raw = Objects.requireNonNull(raw);
         this.prefix = Objects.requireNonNull(prefix);
         this.parameter = Objects.requireNonNull(parameter);
         this.createdAt = LocalDateTime.now();
-        validator = new PatternValidator(Pattern.compile("(\\w\\w)")); // validate only the prefix
-    }
-
-    public byte[] getRaw() {
-        return raw;
-    }
-
-    @Override
-    public boolean isValid() {
-        return validator.isValid(this.prefix) && parameter.isValid();
-    }
-
-    @Override
-    public void validate() throws InvalidSignatureException {
-        // check all valid
-        validator.validate(getPrefix());
-        parameter.validate();
     }
 
     @Override
     public String getPrefix() {
         return prefix;
+    }
+
+    public byte[] getRaw() {
+        return raw;
     }
 
     @Override
@@ -80,15 +61,10 @@ public class EventImpl implements Event {
     }
 
     @Override
-    public Signature build() {
-        return () -> getPrefix() + getParameter().build().signature();
-    }
-
-    @Override
     public String toString() {
         return "Event{" +
                 "prefix='" + prefix + '\'' +
-                ", parameter=" + parameter.build().signature() +
+                ", parameter=" + parameter +
                 ", createdAt=" + createdAt +
                 '}';
     }

@@ -15,13 +15,9 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.internal.controls;
+package de.theves.denon4j.controls;
 
-import de.theves.denon4j.controls.CommandRegistry;
-import de.theves.denon4j.controls.NetworkControls;
-import de.theves.denon4j.controls.OnscreenInfo;
 import de.theves.denon4j.net.Event;
-import de.theves.denon4j.net.RequestCommand;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,15 +58,8 @@ public class NetworkControlImpl extends StatefulControl implements de.theves.den
 
     }
 
-    @Override
-    protected RequestCommand getRequestCommand() {
-        // TODO find the request command by prefix
-        return (RequestCommand) getRegistry().getCommand(getCommands().get(getCommands().size() - 1).getId());
-    }
-
     private boolean isOnscreenInformation(Event event) {
-        // TODO support also NSA events
-        return event.build().signature().startsWith("NSE");
+        return event.getPrefix().startsWith("NS");
     }
 
     @Override

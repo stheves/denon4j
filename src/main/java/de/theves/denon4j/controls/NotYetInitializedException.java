@@ -23,9 +23,8 @@ package de.theves.denon4j.controls;
  * @author stheves
  */
 public class NotYetInitializedException extends RuntimeException {
-    private Control notInitialzed;
 
-    public NotYetInitializedException(Control control) {
+    public NotYetInitializedException(AbstractControl control) {
         super(String.format("Control %s not initialized", control.getName()));
     }
 }

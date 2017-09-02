@@ -18,8 +18,6 @@
 package de.theves.denon4j;
 
 import de.theves.denon4j.controls.Control;
-import de.theves.denon4j.controls.Toggle;
-import de.theves.denon4j.internal.EventDispatcher;
 
 import java.io.PrintStream;
 import java.util.Collection;

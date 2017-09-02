@@ -15,7 +15,7 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.internal.controls;
+package de.theves.denon4j.controls;
 
 import de.theves.denon4j.controls.CommandRegistry;
 import de.theves.denon4j.controls.Control;

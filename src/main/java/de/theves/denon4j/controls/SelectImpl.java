@@ -15,14 +15,10 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.internal.controls;
+package de.theves.denon4j.controls;
 
-import de.theves.denon4j.controls.CommandRegistry;
-import de.theves.denon4j.controls.Select;
 import de.theves.denon4j.internal.net.ParameterImpl;
-import de.theves.denon4j.net.Command;
 import de.theves.denon4j.net.Parameter;
-import de.theves.denon4j.net.RequestCommand;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,15 +47,6 @@ public class SelectImpl<S extends Enum> extends StatefulControl implements Selec
         paramList.addAll(Stream.of(params).map(Enum::toString).collect(Collectors.toList()));
         paramList.add(ParameterImpl.REQUEST.getValue());
         register(paramList.toArray(new String[paramList.size()]));
-    }
-
-    @Override
-    protected RequestCommand getRequestCommand() {
-        Command command = getRegistry().getCommand(getCommands().get(getCommands().size() - 1).getId());
-        if (command instanceof RequestCommand) {
-            return (RequestCommand) command;
-        }
-        throw new IllegalStateException("Request command not found");
     }
 
     @Override

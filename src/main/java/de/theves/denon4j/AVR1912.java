@@ -19,7 +19,7 @@ package de.theves.denon4j;
 
 import de.theves.denon4j.controls.*;
 import de.theves.denon4j.internal.EventDispatcher;
-import de.theves.denon4j.internal.controls.*;
+import de.theves.denon4j.controls.CommandRegistryImpl;
 import de.theves.denon4j.internal.net.Tcp;
 import de.theves.denon4j.net.Protocol;
 
@@ -27,7 +27,6 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
-import java.util.regex.Pattern;
 
 import static de.theves.denon4j.controls.SwitchState.*;
 
@@ -37,8 +36,6 @@ import static de.theves.denon4j.controls.SwitchState.*;
  * @author stheves
  */
 public class AVR1912 implements AVR {
-    private static final Pattern PATTERN_MASTER_VOL = Pattern.compile("[0-9][0-9][5]?");
-
     private final EventDispatcher eventDispatcher;
     private final Protocol protocol;
     private final Collection<Control> controls;
@@ -79,7 +76,7 @@ public class AVR1912 implements AVR {
 
         // master vol. control
         masterSliderPrefix = "MV";
-        Slider masterSlider = new SliderImpl(registry, masterSliderPrefix, "UP", "DOWN", PATTERN_MASTER_VOL);
+        Slider masterSlider = new SliderImpl(registry, masterSliderPrefix, "UP", "DOWN");
         masterSlider.setName("Master Volume");
         masterSlider.init();
         controls.add(masterSlider);

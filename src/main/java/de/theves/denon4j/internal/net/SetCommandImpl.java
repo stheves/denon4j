@@ -17,11 +17,8 @@
 
 package de.theves.denon4j.internal.net;
 
-import de.theves.denon4j.controls.InvalidSignatureException;
 import de.theves.denon4j.net.CommandId;
 import de.theves.denon4j.net.Protocol;
-
-import java.util.regex.Pattern;
 
 /**
  * Command that sends a mutable value to the AVR.
@@ -31,12 +28,12 @@ import java.util.regex.Pattern;
 public class SetCommandImpl extends CommandImpl {
     private final MutableParameter mutableParameter;
 
-    public SetCommandImpl(Protocol protocol, CommandId id, String prefix, Pattern pattern) {
-        super(protocol, id, prefix, new MutableParameter(pattern));
+    public SetCommandImpl(Protocol protocol, CommandId id, String prefix) {
+        super(protocol, id, prefix, new MutableParameter());
         this.mutableParameter = (MutableParameter) getParameter();
     }
 
-    public void set(String value) throws InvalidSignatureException {
+    public void set(String value) {
         mutableParameter.setValue(value);
     }
 }

@@ -68,7 +68,7 @@ public final class Tcp implements Protocol {
     private void notify(Event event) {
         if (null != eventDispatcher) {
             try {
-                eventDispatcher.onEvent(event);
+                eventDispatcher.dispatch(event);
             } catch (Exception e) {
                 logger.warn("Error invoking event listener", e);
             }
@@ -127,7 +127,7 @@ public final class Tcp implements Protocol {
 
 
     @Override
-    public Event request(RequestCommand requestCommand) {
+    public Event request(Command requestCommand) {
         synchronized (eventReader) {
             mostRecent = null;
             send(requestCommand);
@@ -152,7 +152,7 @@ public final class Tcp implements Protocol {
     private void doSend(Command command) {
         synchronized (eventReader) {
             try {
-                writer.write(command.build().signature() + PAUSE);
+                writer.write(command.signature() + PAUSE);
                 writer.flush();
             } catch (Exception e) {
                 throw new ConnectionException("Communication failure.", e);

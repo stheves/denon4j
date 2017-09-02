@@ -37,9 +37,6 @@ public class OnscreenInfo {
     }
 
     public void addEvent(Event event) {
-        if (!event.build().signature().startsWith("NSE")) {
-            throw new IllegalArgumentException("Only NSE events are supported at the moment");
-        }
         Line line = new Line(event);
         lines.put(line.getIndex(), line);
 
@@ -55,7 +52,7 @@ public class OnscreenInfo {
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder("=======MESSAGE=======" + System.lineSeparator());
+        StringBuilder builder = new StringBuilder("=======DISPLAY INFO=======" + System.lineSeparator());
         builder.append(System.lineSeparator());
         getLines().stream().forEach(line -> builder.append(line.getDisplayLine()).append(System.lineSeparator()));
         builder.append(System.lineSeparator());

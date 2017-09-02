@@ -2,7 +2,6 @@ package de.theves.denon4j.controls;
 
 import de.theves.denon4j.net.Command;
 import de.theves.denon4j.net.CommandId;
-import de.theves.denon4j.net.Signature;
 
 import java.io.PrintStream;
 import java.util.List;
@@ -76,12 +75,12 @@ public interface CommandRegistry {
     CommandStack getCommandStack();
 
     /**
-     * Find a command by it`s signature.
+     * Find a command by it`s get.
      *
-     * @param signature the signature of the command.
-     * @return the command found by the signature or an empty optional.
+     * @param signature the get of the command.
+     * @return the command found by the get or an empty optional.
      */
-    Optional<Command> findBySignature(Signature signature);
+    Optional<Command> findBySignature(String signature);
 
     /**
      * Finds all commands with the given <code>prefix</code>.

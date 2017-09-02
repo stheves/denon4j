@@ -34,10 +34,10 @@ import java.util.Objects;
 public class CommandImpl extends EventImpl implements Command {
     protected final Protocol protocol;
     private final CommandId id;
-    private LocalDateTime executedAt = NEVER;
+    private LocalDateTime executedAt = LocalDateTime.MIN;
 
     public CommandImpl(Protocol protocol, CommandId id, String prefix, Parameter parameter) {
-        super((prefix + parameter.build().signature()).getBytes(StandardCharsets.US_ASCII), prefix, parameter);
+        super((prefix + parameter.getValue()).getBytes(StandardCharsets.US_ASCII), prefix, parameter);
         this.id = Objects.requireNonNull(id);
         this.protocol = Objects.requireNonNull(protocol);
     }
@@ -63,6 +63,11 @@ public class CommandImpl extends EventImpl implements Command {
         return true;
     }
 
+    @Override
+    public String signature() {
+        return getPrefix() + getParameter().getValue();
+    }
+
     protected void doSend() {
         protocol.send(this);
     }
@@ -82,10 +87,6 @@ public class CommandImpl extends EventImpl implements Command {
 
     @Override
     public String toString() {
-        return "Command{" +
-                "id=" + id.getId() +
-                ", signature=" + build().signature() +
-                ", executedAt=" + executedAt +
-                '}';
+        return "Command{" + signature() + '}';
     }
 }

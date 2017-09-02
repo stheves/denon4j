@@ -15,12 +15,8 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.internal.controls;
+package de.theves.denon4j.controls;
 
-import de.theves.denon4j.controls.CommandRegistry;
-import de.theves.denon4j.controls.InvalidSignatureException;
-import de.theves.denon4j.controls.Slider;
-import de.theves.denon4j.internal.PatternValidator;
 import de.theves.denon4j.internal.net.ParameterImpl;
 import de.theves.denon4j.net.Command;
 import de.theves.denon4j.net.CommandId;
@@ -28,7 +24,6 @@ import de.theves.denon4j.net.Event;
 import de.theves.denon4j.net.RequestCommand;
 
 import java.util.List;
-import java.util.regex.Pattern;
 
 
 /**
@@ -39,18 +34,16 @@ import java.util.regex.Pattern;
 public class SliderImpl extends StatefulControl implements Slider {
     private final String up;
     private final String down;
-    private final PatternValidator validator;
 
     private CommandId upId;
     private CommandId downId;
     private CommandId setId;
     private CommandId requestId;
 
-    public SliderImpl(CommandRegistry registry, String prefix, String up, String down, Pattern pattern) {
+    public SliderImpl(CommandRegistry registry, String prefix, String up, String down) {
         super(registry, prefix);
         this.up = up;
         this.down = down;
-        validator = new PatternValidator(pattern);
     }
 
     @Override
@@ -75,12 +68,12 @@ public class SliderImpl extends StatefulControl implements Slider {
 
     @Override
     public boolean supports(Event event) {
-        return getCommandPrefix().equals(event.getPrefix()) && validator.isValid(event.getParameter().getValue());
+        return getCommandPrefix().equals(event.getPrefix());
     }
 
     @Override
     protected void doInit() {
-        List<Command> commands = register(up, down, "[" + validator.getPattern().pattern() + "]", ParameterImpl.REQUEST.getValue());
+        List<Command> commands = register(up, down, "[*]", ParameterImpl.REQUEST.getValue());
         upId = commands.get(0).getId();
         downId = commands.get(1).getId();
         setId = commands.get(2).getId();
@@ -88,21 +81,17 @@ public class SliderImpl extends StatefulControl implements Slider {
     }
 
     @Override
-    protected RequestCommand getRequestCommand() {
-        return (RequestCommand) getRegistry().getCommand(requestId);
-    }
-
-    @Override
-    public void validate() throws InvalidSignatureException {
-        if (!isValid()) {
-            throw new InvalidSignatureException(getValue(), validator.getPattern());
+    public void doHandle(Event event) {
+        String value = event.getParameter().getValue();
+        if (value.startsWith("MAX")) {
+            // TODO handle MAX?
+        } else {
+            super.doHandle(event);
         }
     }
 
     @Override
-    public boolean isValid() {
-        // check current value for validity
-        return validator.isValid(getValue());
+    protected RequestCommand getRequestCommand() {
+        return (RequestCommand) getRegistry().getCommand(requestId);
     }
-
 }

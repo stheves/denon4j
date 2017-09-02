@@ -15,7 +15,7 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.internal.controls;
+package de.theves.denon4j.controls;
 
 import de.theves.denon4j.internal.net.*;
 import de.theves.denon4j.net.Command;
@@ -41,7 +41,7 @@ class CommandFactory {
         if (null != prefix) {
             CommandId commandId = CommandId.random();
             if (param.contains("[")) {
-                return new SetCommandImpl(protocol, commandId, prefix, parsePattern(param));
+                return new SetCommandImpl(protocol, commandId, prefix);
             } else if (isRequest(prefix, param)) {
                 return new RequestCommandImpl(protocol, commandId, prefix);
             } else if (isOnscreenInfoRequest(prefix, param)) {
@@ -50,12 +50,6 @@ class CommandFactory {
             return new CommandImpl(protocol, commandId, prefix, createParameter(param));
         }
         throw new IllegalArgumentException("Command may not be null");
-    }
-
-    private static Pattern parsePattern(String param) {
-        int begin = param.indexOf("[");
-        int end = param.lastIndexOf("]");
-        return Pattern.compile(param.substring(begin + 1, end));
     }
 
     private static boolean isRequest(String prefix, String param) {

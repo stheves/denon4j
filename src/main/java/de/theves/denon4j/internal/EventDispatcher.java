@@ -61,7 +61,7 @@ public class EventDispatcher {
         return controls;
     }
 
-    public void onEvent(Event event) {
+    public void dispatch(Event event) {
         List<Control> supporters = controls.stream().filter(ctrl ->
                 ctrl.supports(event)).collect(Collectors.toList());
         if (supporters.size() == 0) {
