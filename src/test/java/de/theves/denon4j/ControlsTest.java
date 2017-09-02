@@ -18,7 +18,7 @@
 package de.theves.denon4j;
 
 import de.theves.denon4j.controls.*;
-import de.theves.denon4j.internal.controls.NetworkControl;
+import de.theves.denon4j.internal.controls.NetworkControlImpl;
 import de.theves.denon4j.internal.net.EventFactory;
 import de.theves.denon4j.net.*;
 import org.junit.Before;
@@ -178,12 +178,12 @@ public class ControlsTest {
 
     @Test
     public void testNetworkControl() {
-        NetworkControl selectNetworkControl = avr1912.inputControl();
-        assertThat(selectNetworkControl.getCommands()).hasSize(InputControls.values().length);
+        NetworkControlImpl selectNetworkControl = avr1912.inputControl();
+        assertThat(selectNetworkControl.getCommands()).hasSize(NetworkControls.values().length);
         assertThat(selectNetworkControl.getCommandPrefix()).isEqualTo("NS");
         assertThat(registry.findBySignature(() -> "NS?")).isEmpty();
 
-        selectNetworkControl.control(InputControls.CURSOR_DOWN);
+        selectNetworkControl.control(NetworkControls.CURSOR_DOWN);
         verify(protocol).send(cmd("NS91"));
     }
 

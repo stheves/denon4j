@@ -70,7 +70,7 @@ public class AVR1912Demo {
             avr.input().source(InputSource.IRADIO);
 
             Thread.sleep(200);
-            avr.inputControl().control(InputControls.STOP);
+            avr.inputControl().control(NetworkControls.STOP);
             System.out.println("Display: " + avr.inputControl().getOnscreenInfo());
         }
         System.out.println("------------DEMO END------------");

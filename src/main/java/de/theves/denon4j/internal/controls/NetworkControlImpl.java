@@ -18,7 +18,7 @@
 package de.theves.denon4j.internal.controls;
 
 import de.theves.denon4j.controls.CommandRegistry;
-import de.theves.denon4j.controls.InputControls;
+import de.theves.denon4j.controls.NetworkControls;
 import de.theves.denon4j.controls.OnscreenInfo;
 import de.theves.denon4j.net.Event;
 import de.theves.denon4j.net.RequestCommand;
@@ -33,17 +33,17 @@ import java.util.stream.Stream;
  *
  * @author stheves
  */
-public class NetworkControl extends AbstractControl {
+public class NetworkControlImpl extends AbstractControl implements de.theves.denon4j.controls.NetworkControl {
     private OnscreenInfo mostRecentOnscreenInfo;
     private List<String> paramList;
 
-    public NetworkControl(CommandRegistry registry) {
+    public NetworkControlImpl(CommandRegistry registry) {
         super(registry, "NS");
     }
 
     @Override
     protected void doInit() {
-        InputControls[] params = InputControls.values();
+        NetworkControls[] params = NetworkControls.values();
         paramList = new ArrayList<>(params.length);
         paramList.addAll(Stream.of(params).map(Enum::toString).collect(Collectors.toList()));
         register(paramList.toArray(new String[paramList.size()]));
@@ -53,6 +53,7 @@ public class NetworkControl extends AbstractControl {
     public void doHandle(Event event) {
         if (isOnscreenInformation(event)) {
             if (mostRecentOnscreenInfo == null || mostRecentOnscreenInfo.isComplete()) {
+                // init a new info message
                 mostRecentOnscreenInfo = new OnscreenInfo();
             }
             mostRecentOnscreenInfo.addEvent(event);
@@ -71,6 +72,7 @@ public class NetworkControl extends AbstractControl {
         return event.build().signature().startsWith("NSE");
     }
 
+    @Override
     public OnscreenInfo getOnscreenInfo() {
         readOnscreenInfo();
         return mostRecentOnscreenInfo;
@@ -88,7 +90,8 @@ public class NetworkControl extends AbstractControl {
         }
     }
 
-    public void control(InputControls controls) {
+    @Override
+    public void control(NetworkControls controls) {
         executeCommand(getCommands().get(paramList.indexOf(controls.toString())).getId());
     }
 }
