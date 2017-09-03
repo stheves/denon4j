@@ -129,7 +129,7 @@ public class ControlsTest {
         NetworkControl selectNetworkControl = avr1912.networkControl();
         assertThat(selectNetworkControl.getCommandPrefix()).isEqualTo("NS");
 
-        selectNetworkControl.control(NetworkControls.CURSOR_DOWN);
+        selectNetworkControl.select(NetworkControls.CURSOR_DOWN);
         verify(protocol).send(cmd("NS91"));
     }
 

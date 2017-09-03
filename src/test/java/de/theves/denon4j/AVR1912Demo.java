@@ -70,8 +70,8 @@ public class AVR1912Demo {
             avr.input().select(InputSource.NET_UBS);
 
             Thread.sleep(200);
-            avr.networkControl().control(NetworkControls.CURSOR_RIGHT);
-            System.out.println("Display: " + avr.networkControl().getOnscreenInfo());
+            avr.networkControl().select(NetworkControls.CURSOR_RIGHT);
+            System.out.println("Display: " + avr.networkControl().getDisplay());
 
             Thread.sleep(200);
             avr.menu().control(MenuControls.MENU_ON);

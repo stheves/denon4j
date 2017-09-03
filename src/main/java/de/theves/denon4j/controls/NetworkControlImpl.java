@@ -28,23 +28,23 @@ import java.util.List;
  *
  * @author stheves
  */
-public class NetworkControlImpl extends AbstractControl implements de.theves.denon4j.controls.NetworkControl {
-    private OnscreenInfo mostRecentOnscreenInfo;
+public class NetworkControlImpl extends SelectImpl<NetworkControls> implements de.theves.denon4j.controls.NetworkControl {
+    private DisplayInfo mostRecentDisplayInfo;
     private List<String> paramList;
 
     public NetworkControlImpl(Protocol protocol) {
-        super("NS", protocol);
+        super(protocol, "NS", NetworkControls.values());
         setName("Network USB/AUDIO/IPOD Extended Control");
     }
 
     @Override
     public void doHandle(Event event) {
-        if (isOnscreenInformation(event)) {
-            if (mostRecentOnscreenInfo == null || mostRecentOnscreenInfo.isComplete()) {
+        if (isDisplayInfoEvent(event)) {
+            if (mostRecentDisplayInfo == null || mostRecentDisplayInfo.isComplete()) {
                 // init a new info message
-                mostRecentOnscreenInfo = new OnscreenInfo();
+                mostRecentDisplayInfo = new DisplayInfo();
             }
-            mostRecentOnscreenInfo.addEvent(event);
+            mostRecentDisplayInfo.addEvent(event);
         }
 
     }
@@ -53,32 +53,26 @@ public class NetworkControlImpl extends AbstractControl implements de.theves.den
     protected void doInit() {
     }
 
-    private boolean isOnscreenInformation(Event event) {
+    private boolean isDisplayInfoEvent(Event event) {
         return event.getPrefix().startsWith("NS");
     }
 
     @Override
-    public OnscreenInfo getOnscreenInfo() {
+    public DisplayInfo getDisplay() {
         readOnscreenInfo();
-        return mostRecentOnscreenInfo;
+        return mostRecentDisplayInfo;
     }
 
     private void readOnscreenInfo() {
         Command nse = Command.createCommand(protocol, prefix, "E");
         nse.execute();
         // wait until all events are received
-        while (mostRecentOnscreenInfo == null || !mostRecentOnscreenInfo.isComplete()) {
+        while (mostRecentDisplayInfo == null || !mostRecentDisplayInfo.isComplete()) {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
                 // ignore
             }
         }
-    }
-
-    @Override
-    public void control(NetworkControls controls) {
-        Command command = Command.createCommand(protocol, prefix, controls.toString());
-        command.execute();
     }
 }

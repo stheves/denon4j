@@ -30,10 +30,10 @@ import java.util.List;
  *
  * @author stheves
  */
-public class OnscreenInfo {
+public class DisplayInfo {
     private final LinkedHashMap<Integer, Line> lines;
 
-    public OnscreenInfo() {
+    public DisplayInfo() {
         lines = new LinkedHashMap<>();
     }
 

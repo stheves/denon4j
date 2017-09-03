@@ -22,8 +22,6 @@ package de.theves.denon4j.controls;
  *
  * @author stheves
  */
-public interface NetworkControl extends Control {
-    OnscreenInfo getOnscreenInfo();
-
-    void control(NetworkControls controls);
+public interface NetworkControl extends Select<NetworkControls> {
+    DisplayInfo getDisplay();
 }
