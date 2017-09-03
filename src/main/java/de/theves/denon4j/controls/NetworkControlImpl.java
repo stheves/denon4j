@@ -17,6 +17,7 @@
 
 package de.theves.denon4j.controls;
 
+import de.theves.denon4j.net.Command;
 import de.theves.denon4j.net.Event;
 
 import java.util.ArrayList;
@@ -29,21 +30,13 @@ import java.util.stream.Stream;
  *
  * @author stheves
  */
-public class NetworkControlImpl extends StatefulControl implements de.theves.denon4j.controls.NetworkControl {
+public class NetworkControlImpl extends AbstractControl implements de.theves.denon4j.controls.NetworkControl {
     private OnscreenInfo mostRecentOnscreenInfo;
     private List<String> paramList;
 
     public NetworkControlImpl(CommandRegistry registry) {
-        super(registry, "NS");
+        super("NS", registry);
         setName("Network USB/AUDIO/IPOD Extended Control");
-    }
-
-    @Override
-    protected void doInit() {
-        NetworkControls[] params = NetworkControls.values();
-        paramList = new ArrayList<>(params.length);
-        paramList.addAll(Stream.of(params).map(Enum::toString).collect(Collectors.toList()));
-        register(paramList.toArray(new String[paramList.size()]));
     }
 
     @Override
@@ -58,6 +51,14 @@ public class NetworkControlImpl extends StatefulControl implements de.theves.den
 
     }
 
+    @Override
+    protected void doInit() {
+        NetworkControls[] params = NetworkControls.values();
+        paramList = new ArrayList<>(params.length);
+        paramList.addAll(Stream.of(params).map(Enum::toString).collect(Collectors.toList()));
+        register(paramList.toArray(new String[paramList.size()]));
+    }
+
     private boolean isOnscreenInformation(Event event) {
         return event.getPrefix().startsWith("NS");
     }
@@ -69,7 +70,8 @@ public class NetworkControlImpl extends StatefulControl implements de.theves.den
     }
 
     private void readOnscreenInfo() {
-        getState();
+        Command nse = getCommands().stream().filter(cmd -> cmd.signature().equals("NSE")).findFirst().orElseThrow(() -> new CommandNotFoundException("NSE command not found"));
+        nse.execute();
         // wait until all events are received
         while (mostRecentOnscreenInfo == null || !mostRecentOnscreenInfo.isComplete()) {
             try {

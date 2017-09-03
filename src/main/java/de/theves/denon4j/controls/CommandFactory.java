@@ -44,8 +44,6 @@ class CommandFactory {
                 return new SetCommandImpl(protocol, commandId, prefix);
             } else if (isRequest(prefix, param)) {
                 return new RequestCommandImpl(protocol, commandId, prefix);
-            } else if (isOnscreenInfoRequest(prefix, param)) {
-                return new OnscreenInfoRequest(protocol, commandId, prefix, createParameter(param));
             }
             return new CommandImpl(protocol, commandId, prefix, createParameter(param));
         }
@@ -54,9 +52,5 @@ class CommandFactory {
 
     private static boolean isRequest(String prefix, String param) {
         return param.equals(ParameterImpl.REQUEST.getValue());
-    }
-
-    private static boolean isOnscreenInfoRequest(String prefix, String param) {
-        return "NSE".equals(prefix + param);
     }
 }

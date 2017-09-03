@@ -33,7 +33,7 @@ import java.util.Arrays;
 /**
  * @author stheves
  */
-public class EventReader extends Thread implements Runnable {
+public class EventReader extends Thread {
 
     private final Logger logger = LoggerFactory.getLogger(EventReader.class);
 
