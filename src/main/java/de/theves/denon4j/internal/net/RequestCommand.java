@@ -28,7 +28,7 @@ public class RequestCommand extends Command {
     private Event received;
 
     public RequestCommand(Protocol protocol, String prefix) {
-        super(protocol, prefix, ParameterImpl.REQUEST);
+        super(protocol, prefix, Parameter.REQUEST);
     }
 
     @Override

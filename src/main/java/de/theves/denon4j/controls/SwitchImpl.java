@@ -19,7 +19,6 @@ package de.theves.denon4j.controls;
 
 import de.theves.denon4j.internal.net.Command;
 import de.theves.denon4j.internal.net.Event;
-import de.theves.denon4j.internal.net.ParameterImpl;
 import de.theves.denon4j.internal.net.RequestCommand;
 import de.theves.denon4j.net.Protocol;
 

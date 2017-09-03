@@ -17,14 +17,13 @@
 
 package de.theves.denon4j.internal.net;
 
-import de.theves.denon4j.net.Parameter;
 
 /**
  * Mutable implementation of an {@link Parameter}.
  *
  * @author stheves
  */
-public class MutableParameter extends ParameterImpl {
+public class MutableParameter extends Parameter {
     /**
      * Sets the value of this parameter.
      *

@@ -17,7 +17,6 @@
 
 package de.theves.denon4j.internal.net;
 
-import de.theves.denon4j.net.Parameter;
 import de.theves.denon4j.net.Protocol;
 
 import java.nio.charset.StandardCharsets;
@@ -43,10 +42,10 @@ public class Command extends Event {
     }
 
     public static Command createCommand(Protocol protocol, String prefix, String param) {
-        if (ParameterImpl.REQUEST.getValue().equals(param)) {
+        if (Parameter.REQUEST.getValue().equals(param)) {
             return createRequestCommand(protocol, prefix);
         }
-        return new Command(protocol, prefix, ParameterImpl.createParameter(param));
+        return new Command(protocol, prefix, Parameter.createParameter(param));
     }
 
     public static RequestCommand createRequestCommand(Protocol protocol, String prefix) {

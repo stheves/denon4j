@@ -17,22 +17,21 @@
 
 package de.theves.denon4j.internal.net;
 
-import de.theves.denon4j.net.Parameter;
 
 /**
  * Class description.
  *
  * @author stheves
  */
-public class ParameterImpl implements Parameter {
-    public static final Parameter REQUEST = new ParameterImpl("?");
+public class Parameter {
+    public static final Parameter REQUEST = new Parameter("?");
 
     protected String value;
 
-    public ParameterImpl() {
+    public Parameter() {
     }
 
-    public ParameterImpl(String value) {
+    public Parameter(String value) {
         this.value = value;
     }
 
@@ -40,10 +39,9 @@ public class ParameterImpl implements Parameter {
         if (REQUEST.getValue().equals(val)) {
             return REQUEST;
         }
-        return new ParameterImpl(val);
+        return new Parameter(val);
     }
 
-    @Override
     public String getValue() {
         return value == null ? "" : value;
     }

@@ -17,7 +17,6 @@
 
 package de.theves.denon4j.internal.net;
 
-import de.theves.denon4j.net.Parameter;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -49,7 +48,7 @@ public class Event {
         // TODO this does not work for NS commands
         String prefix = new String(raw, 0, 2, StandardCharsets.US_ASCII);
         String parameter = new String(raw, 2, raw.length - 2, StandardCharsets.UTF_8);
-        return new Event(raw, prefix, ParameterImpl.createParameter(parameter));
+        return new Event(raw, prefix, Parameter.createParameter(parameter));
     }
 
     public String getPrefix() {
