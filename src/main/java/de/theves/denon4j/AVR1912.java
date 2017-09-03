@@ -19,8 +19,8 @@ package de.theves.denon4j;
 
 import de.theves.denon4j.controls.*;
 import de.theves.denon4j.net.EventDispatcher;
-import de.theves.denon4j.net.Tcp;
 import de.theves.denon4j.net.Protocol;
+import de.theves.denon4j.net.Tcp;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -38,15 +38,14 @@ public class AVR1912 implements AVR {
     private final EventDispatcher eventDispatcher;
     private final Protocol protocol;
     private final Collection<Control> controls;
-
-    private String powerTogglePrefix;
-    private String masterSliderPrefix;
-    private String muteTogglePrefix;
-    private String mainZoneTogglePrefix;
-    private String selectNetPrefix;
-    private String selectVideoPrefix;
-    private String selectInputPrefix;
-    private String menuPrefix;
+    private ToggleImpl powerToggle;
+    private SliderImpl masterSlider;
+    private ToggleImpl mainZoneToggle;
+    private ToggleImpl muteToggle;
+    private SelectImpl<InputSource> selectInput;
+    private SelectImpl<VideoSource> selectVideo;
+    private NetworkControlImpl selectNet;
+    private Menu menu;
 
     public AVR1912(String host, int port) {
         this(new Tcp(host, port));
@@ -65,55 +64,47 @@ public class AVR1912 implements AVR {
 
     private void addControls(Collection<? super Control> controls) {
         // power control
-        powerTogglePrefix = "PW";
-        Toggle powerToggle = new ToggleImpl(protocol, powerTogglePrefix, ON, STANDBY);
+        powerToggle = new ToggleImpl(protocol, "PW", ON, STANDBY);
         powerToggle.setName("Power Switch");
         powerToggle.init();
         controls.add(powerToggle);
 
         // master vol. control
-        masterSliderPrefix = "MV";
-        Slider masterSlider = new SliderImpl(protocol, masterSliderPrefix, "UP", "DOWN");
+        masterSlider = new SliderImpl(protocol, "MV", "UP", "DOWN");
         masterSlider.setName("Master Volume");
         masterSlider.init();
         controls.add(masterSlider);
 
         // mute control
-        muteTogglePrefix = "MU";
-        Toggle muteToggle = new ToggleImpl(protocol, muteTogglePrefix, ON, OFF);
+        muteToggle = new ToggleImpl(protocol, "MU", ON, OFF);
         muteToggle.setName("Mute Toggle");
         muteToggle.init();
         controls.add(muteToggle);
 
         // source input
-        selectInputPrefix = "SI";
-        Select<InputSource> selectInput = new SelectImpl<>(protocol, selectInputPrefix, InputSource.values());
+        selectInput = new SelectImpl<>(protocol, "SI", InputSource.values());
         selectInput.setName("Select INPUT Source");
         selectInput.init();
         controls.add(selectInput);
 
         // source video
-        selectVideoPrefix = "SV";
-        Select<VideoSource> selectVideo = new SelectImpl<>(protocol, selectVideoPrefix, VideoSource.values());
+        selectVideo = new SelectImpl<>(protocol, "SV", VideoSource.values());
         selectVideo.setName("Select VIDEO Source");
         selectVideo.init();
         controls.add(selectVideo);
 
         // main zone toggle
-        mainZoneTogglePrefix = "ZM";
-        Toggle mainZoneToggle = new ToggleImpl(protocol, mainZoneTogglePrefix, ON, OFF);
+        mainZoneToggle = new ToggleImpl(protocol, "ZM", ON, OFF);
         mainZoneToggle.setName("Main Zone Toggle");
         mainZoneToggle.init();
         controls.add(mainZoneToggle);
 
         // network audio/usb/ipod DIRECT extended control
-        NetworkControlImpl selectNet = new NetworkControlImpl(protocol);
-        selectNetPrefix = selectNet.getCommandPrefix();
+        selectNet = new NetworkControlImpl(protocol);
         selectNet.init();
         controls.add(selectNet);
 
-        Menu menu = new Menu(protocol);
-        menuPrefix = menu.getCommandPrefix();
+        menu = new Menu(protocol);
         menu.init();
         controls.add(menu);
     }
@@ -127,41 +118,35 @@ public class AVR1912 implements AVR {
     }
 
     public Toggle power() {
-        return findControl(powerTogglePrefix, Toggle.class);
-    }
-
-    private <C extends Control> C findControl(String prefix, Class<C> cls) {
-        return cls.cast(controls.stream()
-                .filter(control -> control.getCommandPrefix().equals(prefix))
-                .findFirst().orElseThrow(IllegalStateException::new));
+        return powerToggle;
     }
 
     public Toggle mainZone() {
-        return findControl(mainZoneTogglePrefix, Toggle.class);
+        return mainZoneToggle;
     }
 
     public Slider masterVolume() {
-        return findControl(masterSliderPrefix, Slider.class);
+        return masterSlider;
     }
 
     public Toggle mute() {
-        return findControl(muteTogglePrefix, Toggle.class);
+        return muteToggle;
     }
 
     public Select<InputSource> input() {
-        return findControl(selectInputPrefix, Select.class);
+        return selectInput;
     }
 
     public NetworkControl networkControl() {
-        return findControl(selectNetPrefix, NetworkControl.class);
+        return selectNet;
     }
 
     public Select<VideoSource> video() {
-        return findControl(selectVideoPrefix, Select.class);
+        return selectVideo;
     }
 
     public Menu menu() {
-        return findControl(menuPrefix, Menu.class);
+        return menu;
     }
 
     @Override
