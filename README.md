@@ -29,7 +29,7 @@ Take a look at the class Avr1912Demo.java in the test directory to view a comple
 # Command line usage
 
 ```
-java -jar denon4j-[version].jar 192.168.0.12 23
+java -jar denon4j-[version]-cli.jar 192.168.0.12 23
 Enter a command ('?' for help, 'q' for quit):
 > ?
 

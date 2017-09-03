@@ -6,7 +6,7 @@ before_script:
 - export MAVEN_OPTS="-Xmx512m -XX:MaxMetaspaceSize=512m"
 script: mvn -q -B -e clean package
 before_deploy:
-- export ARTIFACT=$(ls target/denon4j-*.jar)
+- export ARTIFACT=$(ls target/denon4j.jar)
 deploy:
   skip_cleanup: true
   provider: releases
