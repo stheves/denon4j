@@ -19,6 +19,7 @@ package de.theves.denon4j.internal.net;
 
 import de.theves.denon4j.net.Parameter;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -38,6 +39,17 @@ public class Event {
         this.prefix = Objects.requireNonNull(prefix);
         this.parameter = Objects.requireNonNull(parameter);
         this.createdAt = LocalDateTime.now();
+    }
+
+    public static Event create(String event) {
+        return create(event.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public static Event create(byte[] raw) {
+        // TODO this does not work for NS commands
+        String prefix = new String(raw, 0, 2, StandardCharsets.US_ASCII);
+        String parameter = new String(raw, 2, raw.length - 2, StandardCharsets.UTF_8);
+        return new Event(raw, prefix, ParameterImpl.createParameter(parameter));
     }
 
     public String getPrefix() {

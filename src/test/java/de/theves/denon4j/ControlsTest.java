@@ -19,7 +19,6 @@ package de.theves.denon4j;
 
 import de.theves.denon4j.controls.*;
 import de.theves.denon4j.internal.net.Command;
-import de.theves.denon4j.internal.net.EventFactory;
 import de.theves.denon4j.internal.net.Event;
 import de.theves.denon4j.internal.net.RequestCommand;
 import de.theves.denon4j.net.ConnectException;
@@ -91,7 +90,7 @@ public class ControlsTest {
     }
 
     private Event event(String e) {
-        return EventFactory.create(e);
+        return Event.create(e);
     }
 
     @Test
@@ -122,20 +121,20 @@ public class ControlsTest {
 
         slider.slideUp();
         // fake events
-        avr1912.getEventDispatcher().dispatch(EventFactory.create("MV455"));
-        avr1912.getEventDispatcher().dispatch(EventFactory.create("MVMAX 68"));
+        avr1912.getEventDispatcher().dispatch(Event.create("MV455"));
+        avr1912.getEventDispatcher().dispatch(Event.create("MVMAX 68"));
         verify(protocol).send(cmd("MVUP"));
         assertThat(slider.getValue()).isEqualTo("455");
 
         slider.slideDown();
-        avr1912.getEventDispatcher().dispatch(EventFactory.create("MV45"));
-        avr1912.getEventDispatcher().dispatch(EventFactory.create("MVMAX 675"));
+        avr1912.getEventDispatcher().dispatch(Event.create("MV45"));
+        avr1912.getEventDispatcher().dispatch(Event.create("MVMAX 675"));
         verify(protocol).send(cmd("MVDOWN"));
         assertThat(slider.getValue()).isEqualTo("45");
 
         slider.set("55");
-        avr1912.getEventDispatcher().dispatch(EventFactory.create("MV55"));
-        avr1912.getEventDispatcher().dispatch(EventFactory.create("MVMAX 72"));
+        avr1912.getEventDispatcher().dispatch(Event.create("MV55"));
+        avr1912.getEventDispatcher().dispatch(Event.create("MVMAX 72"));
         verify(protocol).send(cmd("MV55"));
         assertThat(slider.getValue()).isEqualTo("55");
     }

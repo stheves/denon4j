@@ -18,7 +18,6 @@
 package de.theves.denon4j;
 
 import de.theves.denon4j.controls.Line;
-import de.theves.denon4j.internal.net.EventFactory;
 import de.theves.denon4j.internal.net.Event;
 import org.junit.Test;
 
@@ -33,7 +32,7 @@ public class NSCommandsTest {
     @Test
     public void testParseDataByte() {
         byte dataByte = 0b00001001; // playable music + cursor select bit set
-        Event event = EventFactory.create("NSE1" + (char) dataByte + "Come Away With Mö");
+        Event event = Event.create("NSE1" + (char) dataByte + "Come Away With Mö");
         Line aLine = new Line(event);
         assertThat(aLine.getDisplayLine()).contains("Come Away With Mö");
         assertThat(aLine.getIndex()).isEqualTo(1);
@@ -45,7 +44,7 @@ public class NSCommandsTest {
 
     @Test
     public void testParseWithoutDataByte() {
-        Event event = EventFactory.create("NSE0Now Playing Usb");
+        Event event = Event.create("NSE0Now Playing Usb");
         Line aLine = new Line(event);
         assertThat(aLine.getDisplayLine()).isEqualTo("Now Playing Usb");
         assertThat(aLine.getIndex()).isEqualTo(0);

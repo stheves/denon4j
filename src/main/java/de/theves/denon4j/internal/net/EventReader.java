@@ -76,7 +76,7 @@ public class EventReader extends Thread {
                 rawBuffer.put((byte) read);
             }
             if (rawBuffer.position() > 0) {
-                Event e = EventFactory.create(Arrays.copyOfRange(rawBuffer.array(), 0, rawBuffer.position()));
+                Event e = Event.create(Arrays.copyOfRange(rawBuffer.array(), 0, rawBuffer.position()));
                 synchronized (this) {
                     client.received(e);
                     notify();
