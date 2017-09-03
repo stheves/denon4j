@@ -17,10 +17,10 @@
 
 package de.theves.denon4j.controls;
 
+import de.theves.denon4j.internal.net.Event;
 import de.theves.denon4j.internal.net.ParameterImpl;
 import de.theves.denon4j.internal.net.RequestCommand;
 import de.theves.denon4j.internal.net.SetCommand;
-import de.theves.denon4j.net.Event;
 import de.theves.denon4j.net.Protocol;
 
 
@@ -71,11 +71,9 @@ public class SliderImpl extends AbstractControl implements Slider {
         setCommand.execute();
     }
 
-    @Override
     public void doHandle(Event event) {
     }
 
-    @Override
     public boolean supports(Event event) {
         return getCommandPrefix().equals(event.getPrefix());
     }

@@ -18,10 +18,7 @@
 package de.theves.denon4j.controls;
 
 import de.theves.denon4j.AVR;
-import de.theves.denon4j.net.Command;
-import de.theves.denon4j.net.Event;
-
-import java.util.List;
+import de.theves.denon4j.internal.net.Event;
 
 /**
  * A control represents a feature of an {@link AVR}.

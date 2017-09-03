@@ -17,7 +17,8 @@
 
 package de.theves.denon4j.controls;
 
-import de.theves.denon4j.net.Event;
+
+import de.theves.denon4j.internal.net.Event;
 
 /**
  * Class description.

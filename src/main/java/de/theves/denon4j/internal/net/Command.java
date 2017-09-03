@@ -29,7 +29,7 @@ import java.util.Objects;
  *
  * @author stheves
  */
-public class Command extends EventImpl {
+public class Command extends Event {
     protected final Protocol protocol;
     private LocalDateTime executedAt = LocalDateTime.MIN;
 

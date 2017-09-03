@@ -18,8 +18,7 @@
 package de.theves.denon4j.internal;
 
 import de.theves.denon4j.controls.Control;
-import de.theves.denon4j.net.Event;
-import de.theves.denon4j.net.Protocol;
+import de.theves.denon4j.internal.net.Event;
 
 import java.util.*;
 import java.util.stream.Collectors;

@@ -19,7 +19,10 @@ package de.theves.denon4j.internal.net;
 
 import de.theves.denon4j.controls.ExecutionException;
 import de.theves.denon4j.internal.EventDispatcher;
-import de.theves.denon4j.net.*;
+import de.theves.denon4j.net.ConnectException;
+import de.theves.denon4j.net.ConnectionException;
+import de.theves.denon4j.net.Protocol;
+import de.theves.denon4j.net.TimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -17,7 +17,6 @@
 
 package de.theves.denon4j.internal.net;
 
-import de.theves.denon4j.net.Event;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

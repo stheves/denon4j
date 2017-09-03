@@ -17,7 +17,6 @@
 
 package de.theves.denon4j.internal.net;
 
-import de.theves.denon4j.net.Event;
 import de.theves.denon4j.net.Parameter;
 
 import java.time.LocalDateTime;
@@ -28,20 +27,19 @@ import java.util.Objects;
  *
  * @author stheves
  */
-public class EventImpl implements Event {
+public class Event {
     private final String prefix;
     private final Parameter parameter;
     private final LocalDateTime createdAt;
     private final byte[] raw;
 
-    protected EventImpl(byte[] raw, String prefix, Parameter parameter) {
+    protected Event(byte[] raw, String prefix, Parameter parameter) {
         this.raw = Objects.requireNonNull(raw);
         this.prefix = Objects.requireNonNull(prefix);
         this.parameter = Objects.requireNonNull(parameter);
         this.createdAt = LocalDateTime.now();
     }
 
-    @Override
     public String getPrefix() {
         return prefix;
     }
@@ -50,12 +48,10 @@ public class EventImpl implements Event {
         return raw;
     }
 
-    @Override
     public Parameter getParameter() {
         return parameter;
     }
 
-    @Override
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }

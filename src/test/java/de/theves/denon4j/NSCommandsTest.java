@@ -19,7 +19,7 @@ package de.theves.denon4j;
 
 import de.theves.denon4j.controls.Line;
 import de.theves.denon4j.internal.net.EventFactory;
-import de.theves.denon4j.net.Event;
+import de.theves.denon4j.internal.net.Event;
 import org.junit.Test;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
