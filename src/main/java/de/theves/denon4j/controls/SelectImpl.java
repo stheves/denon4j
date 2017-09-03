@@ -17,11 +17,7 @@
 
 package de.theves.denon4j.controls;
 
-import de.theves.denon4j.net.Command;
-import de.theves.denon4j.net.Event;
-import de.theves.denon4j.net.Parameter;
-import de.theves.denon4j.net.RequestCommand;
-import de.theves.denon4j.net.Protocol;
+import de.theves.denon4j.net.*;
 
 import java.util.Objects;
 import java.util.stream.Stream;
