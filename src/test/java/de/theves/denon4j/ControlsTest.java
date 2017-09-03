@@ -34,13 +34,13 @@ import static org.mockito.Mockito.*;
  * Test for basic controls.
  */
 public class ControlsTest {
-    private AVR1912 avr1912;
+    private Avr1912 avr1912;
     private Protocol protocol;
 
     @Before
     public void setup() {
         protocol = mock(Protocol.class);
-        avr1912 = new AVR1912(protocol);
+        avr1912 = new Avr1912(protocol);
     }
 
     @Test

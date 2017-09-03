@@ -41,6 +41,13 @@ public class Command extends Event {
         return new SetCommand(protocol, prefix);
     }
 
+    public static Command createCommand(Protocol protocol, String command) {
+        if (command == null || command.length() < 2) {
+            throw new IllegalArgumentException("Command length must be > 2");
+        }
+        return createCommand(protocol, command.substring(0, 2), command.substring(2));
+    }
+
     public static Command createCommand(Protocol protocol, String prefix, String param) {
         if (Parameter.REQUEST.getValue().equals(param)) {
             return createRequestCommand(protocol, prefix);
@@ -53,16 +60,16 @@ public class Command extends Event {
     }
 
     @Override
+    public int hashCode() {
+        return Objects.hash(signature);
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Command command = (Command) o;
         return Objects.equals(signature, command.signature);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(signature);
     }
 
     public LocalDateTime getExecutedAt() {

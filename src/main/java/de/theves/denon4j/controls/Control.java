@@ -17,11 +17,11 @@
 
 package de.theves.denon4j.controls;
 
-import de.theves.denon4j.AVR;
+import de.theves.denon4j.Avr;
 import de.theves.denon4j.net.Event;
 
 /**
- * A control represents a feature of an {@link AVR}.
+ * A control represents a feature of an {@link Avr}.
  *
  * @author stheves
  */

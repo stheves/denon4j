@@ -1,4 +1,4 @@
-#denon4j Java API
+# denon4j Java API
 
 [![Build Status](https://travis-ci.org/stheves/denon4j.svg?branch=master)](https://travis-ci.org/stheves/denon4j)
 
@@ -25,6 +25,26 @@ avr.disconnect();
 ```
 
 Take a look at the class Avr1912Demo.java in the test directory to view a complete example.
+
+# Command line usage
+
+```
+java -jar denon4j-[version].jar 192.168.0.12 23
+Enter a command ('?' for help, 'q' for quit):
+> ?
+
+The following options are available:
+
+?			Prints this help
+q			Quits the program
+<cmd>		Executes a generic command e.g. PW?
+PW?			Returns the power state
+PWON		Turns power on
+
+See the Denon AVR protocol for a full list of commands.
+> MU?
+OFF
+```
 
 # About the API
 

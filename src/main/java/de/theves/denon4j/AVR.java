@@ -19,7 +19,6 @@ package de.theves.denon4j;
 
 import de.theves.denon4j.controls.Control;
 
-import java.io.PrintStream;
 import java.util.Collection;
 
 /**
@@ -27,18 +26,20 @@ import java.util.Collection;
  *
  * @author stheves
  */
-public interface AVR extends AutoCloseable {
+public interface Avr extends AutoCloseable {
     /**
-     * Prints the online help.
+     * Sends the command to the receiver.
      *
-     * @param writer the writer to print the help.
+     * @param command the command to send.
      */
-    void printHelp(PrintStream writer);
-
+    String send(String command);
     /**
      * Returns a collection of all available controls.
      *
      * @return a collection of all controls.
      */
     Collection<Control> getControls();
+
+    @Override
+    void close();
 }

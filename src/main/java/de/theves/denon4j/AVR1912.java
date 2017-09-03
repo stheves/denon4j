@@ -18,11 +18,8 @@
 package de.theves.denon4j;
 
 import de.theves.denon4j.controls.*;
-import de.theves.denon4j.net.EventDispatcher;
-import de.theves.denon4j.net.Protocol;
-import de.theves.denon4j.net.Tcp;
+import de.theves.denon4j.net.*;
 
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
@@ -34,7 +31,7 @@ import static de.theves.denon4j.controls.SwitchState.*;
  *
  * @author stheves
  */
-public class AVR1912 implements AVR {
+public class Avr1912 implements Avr {
     private final EventDispatcher eventDispatcher;
     private final Protocol protocol;
     private final Collection<Control> controls;
@@ -48,11 +45,11 @@ public class AVR1912 implements AVR {
     private Menu menu;
     private SelectImpl<SurroundMode> selectSurround;
 
-    public AVR1912(String host, int port) {
+    public Avr1912(String host, int port) {
         this(new Tcp(host, port));
     }
 
-    AVR1912(Protocol protocol) {
+    Avr1912(Protocol protocol) {
         this.protocol = Objects.requireNonNull(protocol);
         this.eventDispatcher = new EventDispatcher();
         this.controls = new ArrayList<>();
@@ -159,8 +156,13 @@ public class AVR1912 implements AVR {
     }
 
     @Override
-    public void printHelp(PrintStream writer) {
-
+    public String send(String command) {
+        Command cmd = Command.createCommand(protocol, command);
+        cmd.execute();
+        if (cmd instanceof RequestCommand) {
+            return ((RequestCommand) cmd).getReceived().getParameter().getValue();
+        }
+        return null;
     }
 
     @Override
@@ -168,12 +170,8 @@ public class AVR1912 implements AVR {
         return controls;
     }
 
-    public void connect(int timeout) {
-        protocol.establishConnection(timeout);
-    }
-
     @Override
-    public void close() throws Exception {
+    public void close() {
         disconnect();
     }
 
@@ -181,6 +179,10 @@ public class AVR1912 implements AVR {
         getControls().forEach(eventDispatcher::removeControl);
         getControls().forEach(Control::dispose);
         protocol.disconnect();
+    }
+
+    public void connect(int timeout) {
+        protocol.establishConnection(timeout);
     }
 
     public boolean isConnected() {
