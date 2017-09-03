@@ -60,7 +60,6 @@ public abstract class SwitchImpl extends AbstractControl implements Switch {
 
     @Override
     protected void doHandle(Event event) {
-
     }
 
     @Override

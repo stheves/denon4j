@@ -19,18 +19,12 @@ package de.theves.denon4j;
 
 import de.theves.denon4j.controls.*;
 import de.theves.denon4j.net.Command;
-import de.theves.denon4j.net.Event;
-import de.theves.denon4j.net.RequestCommand;
 import de.theves.denon4j.net.ConnectException;
+import de.theves.denon4j.net.Event;
 import de.theves.denon4j.net.Protocol;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
@@ -82,7 +76,6 @@ public class ControlsTest {
 
         Command cmd = cmd("SISAT/CBL");
         verify(protocol).send(cmd);
-        assertThat(cmd.getExecutedAt()).isAfter(LocalDateTime.MIN);
     }
 
     private Command cmd(String s) {
@@ -97,26 +90,18 @@ public class ControlsTest {
     public void testPowerControl() {
         Toggle power = avr1912.power();
 
-        when(protocol.request((RequestCommand) cmd("PW?")))
-                .thenReturn(event("PWSTANDBY"), event("PWON"));
+        when(protocol.request(cmd("PW?")))
+                .thenReturn(event("PWSTANDBY"));
 
         assertThat(power.state()).isEqualTo(SwitchState.STANDBY);
         power.toggle();
         verify(protocol).send(cmd("PWON"));
-        assertThat(power.state()).isEqualTo(SwitchState.ON);
-        power.toggle();
-        verify(protocol).send(cmd("PWSTANDBY"));
-    }
-
-    private Command[] commands(String... sig) {
-        List<Command> commandList = Stream.of(sig).map(this::cmd).collect(Collectors.toList());
-        return commandList.toArray(new Command[commandList.size()]);
     }
 
     @Test
     public void testMasterSlider() {
         Slider slider = avr1912.masterVolume();
-        when(protocol.request(cmd("MV?"))).thenReturn(event("MV45"));
+        when(protocol.request(cmd("MV?"))).thenReturn(event("MV45"), event("MV455"), event("MV45"), event("MV55"));
         assertThat(slider.getValue()).isEqualTo("45");
 
         slider.slideUp();
@@ -135,7 +120,7 @@ public class ControlsTest {
         slider.set("55");
         avr1912.getEventDispatcher().dispatch(Event.create("MV55"));
         avr1912.getEventDispatcher().dispatch(Event.create("MVMAX 72"));
-        verify(protocol).send(cmd("MV55"));
+        verify(protocol).send(Command.createSetCommand(protocol, "MV"));
         assertThat(slider.getValue()).isEqualTo("55");
     }
 

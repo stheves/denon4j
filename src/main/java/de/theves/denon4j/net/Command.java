@@ -28,11 +28,13 @@ import java.util.Objects;
  */
 public class Command extends Event {
     protected final Protocol protocol;
+    private final String signature;
     private LocalDateTime executedAt = LocalDateTime.MIN;
 
     public Command(Protocol protocol, String prefix, Parameter parameter) {
         super((prefix + parameter.getValue()).getBytes(StandardCharsets.US_ASCII), prefix, parameter);
         this.protocol = Objects.requireNonNull(protocol);
+        this.signature = getPrefix() + getParameter().getValue();
     }
 
     public static SetCommand createSetCommand(Protocol protocol, String prefix) {
@@ -48,6 +50,19 @@ public class Command extends Event {
 
     public static RequestCommand createRequestCommand(Protocol protocol, String prefix) {
         return new RequestCommand(protocol, prefix);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Command command = (Command) o;
+        return Objects.equals(signature, command.signature);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(signature);
     }
 
     public LocalDateTime getExecutedAt() {
@@ -69,6 +84,6 @@ public class Command extends Event {
     }
 
     public String signature() {
-        return getPrefix() + getParameter().getValue();
+        return signature;
     }
 }
