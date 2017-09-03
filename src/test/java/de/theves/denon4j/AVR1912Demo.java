@@ -44,43 +44,43 @@ public class AVR1912Demo {
             // power control
             Toggle power = avr.power();
             System.out.println("PWON: " + power.state().get());
-//            if (power.state() != SwitchState.ON) {
-//                // powering on
-//                power.toggle();
-//            }
-//
-//            Toggle mute = avr.mute();
-//            mute.toggle();
-//            System.out.println("MUTE ON: " + mute.state().get());
-//
-//            Thread.sleep(200);
-//            mute.switchOff();
-//            System.out.println("MUTE OFF: " + mute.state().get());
-//
-//            Slider masterVolume = avr.masterVolume();
-//            masterVolume.slideUp();
-//            System.out.println("MASTER VOL: " + masterVolume.getValue());
-//            masterVolume.set("25");
-//            System.out.println("MASTER VOL: " + masterVolume.getValue());
-//
-//            Thread.sleep(200);
-//            avr.video().source(VideoSource.SOURCE);
-//
-//            Thread.sleep(200);
-//            avr.input().source(InputSource.NET_UBS);
-//
+            if (power.state() != SwitchState.ON) {
+                // powering on
+                power.toggle();
+            }
+
+            Toggle mute = avr.mute();
+            mute.toggle();
+            System.out.println("MUTE ON: " + mute.state().get());
+
+            Thread.sleep(200);
+            mute.switchOff();
+            System.out.println("MUTE OFF: " + mute.state().get());
+
+            Slider masterVolume = avr.masterVolume();
+            masterVolume.slideUp();
+            System.out.println("MASTER VOL: " + masterVolume.getValue());
+            masterVolume.set("25");
+            System.out.println("MASTER VOL: " + masterVolume.getValue());
+
+            Thread.sleep(200);
+            avr.video().source(VideoSource.SOURCE);
+
+            Thread.sleep(200);
+            avr.input().source(InputSource.NET_UBS);
+
             Thread.sleep(200);
             avr.networkControl().control(NetworkControls.CURSOR_RIGHT);
             System.out.println("Display: " + avr.networkControl().getOnscreenInfo());
-//
-//            Thread.sleep(200);
-//            avr.menu().control(MenuControls.MENU_ON);
-//
-//            Thread.sleep(200);
-//            avr.menu().control(MenuControls.CURSOR_DOWN);
-//
-//            Thread.sleep(200);
-//            avr.menu().control(MenuControls.MENU_OFF);
+
+            Thread.sleep(200);
+            avr.menu().control(MenuControls.MENU_ON);
+
+            Thread.sleep(200);
+            avr.menu().control(MenuControls.CURSOR_DOWN);
+
+            Thread.sleep(200);
+            avr.menu().control(MenuControls.MENU_OFF);
         }
         System.out.println("------------DEMO END------------");
     }
