@@ -17,7 +17,9 @@
 
 package de.theves.denon4j.controls;
 
+import de.theves.denon4j.net.Command;
 import de.theves.denon4j.net.Event;
+import de.theves.denon4j.net.Protocol;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,10 +32,8 @@ import java.util.stream.Stream;
  * @author stheves
  */
 public class Menu extends AbstractControl {
-    private List<String> paramList;
-
-    public Menu(CommandRegistry registry) {
-        super("MN", registry);
+    public Menu(Protocol protocol) {
+        super("MN", protocol);
         setName("Main Menu");
     }
 
@@ -44,13 +44,10 @@ public class Menu extends AbstractControl {
 
     @Override
     protected void doInit() {
-        MenuControls[] params = MenuControls.values();
-        paramList = new ArrayList<>(params.length);
-        paramList.addAll(Stream.of(params).map(Enum::toString).collect(Collectors.toList()));
-        register(paramList.toArray(new String[paramList.size()]));
     }
 
     public void control(MenuControls controls) {
-        executeCommand(getCommands().get(paramList.indexOf(controls.toString())).getId());
+        Command command = CommandFactory.createCommand(protocol, prefix, controls.toString());
+        command.execute();
     }
 }

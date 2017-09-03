@@ -18,12 +18,10 @@
 package de.theves.denon4j.controls;
 
 import de.theves.denon4j.internal.net.ParameterImpl;
-import de.theves.denon4j.net.Command;
-import de.theves.denon4j.net.CommandId;
+import de.theves.denon4j.internal.net.SetCommandImpl;
 import de.theves.denon4j.net.Event;
+import de.theves.denon4j.net.Protocol;
 import de.theves.denon4j.net.RequestCommand;
-
-import java.util.List;
 
 
 /**
@@ -31,39 +29,50 @@ import java.util.List;
  *
  * @author stheves
  */
-public class SliderImpl extends StatefulControl implements Slider {
+public class SliderImpl extends AbstractControl implements Slider {
     private final String up;
     private final String down;
 
-    private CommandId upId;
-    private CommandId downId;
-    private CommandId setId;
-    private CommandId requestId;
-
-    public SliderImpl(CommandRegistry registry, String prefix, String up, String down) {
-        super(registry, prefix);
+    public SliderImpl(Protocol protocol, String prefix, String up, String down) {
+        super(prefix, protocol);
         this.up = up;
         this.down = down;
     }
 
     @Override
     public void slideUp() {
-        executeCommand(upId);
+        executeCommand(up);
+    }
+
+    private void executeCommand(String param) {
+        CommandFactory.createCommand(protocol, prefix, param).execute();
     }
 
     @Override
     public void slideDown() {
-        executeCommand(downId);
+        executeCommand(down);
     }
 
     @Override
     public String getValue() {
-        return getState().getValue();
+        RequestCommand command = (RequestCommand) CommandFactory.createCommand(protocol, prefix, ParameterImpl.REQUEST.getValue());
+        command.execute();
+        return command.getReceived().getParameter().getValue();
     }
 
     @Override
     public void set(String value) {
-        executeCommand(setId, value);
+        executeSetCommand(value);
+    }
+
+    private void executeSetCommand(String value) {
+        SetCommandImpl setCommand = (SetCommandImpl) CommandFactory.createCommand(protocol, prefix, "[*]");
+        setCommand.set(value);
+        setCommand.execute();
+    }
+
+    @Override
+    public void doHandle(Event event) {
     }
 
     @Override
@@ -73,25 +82,7 @@ public class SliderImpl extends StatefulControl implements Slider {
 
     @Override
     protected void doInit() {
-        List<Command> commands = register(up, down, "[*]", ParameterImpl.REQUEST.getValue());
-        upId = commands.get(0).getId();
-        downId = commands.get(1).getId();
-        setId = commands.get(2).getId();
-        requestId = commands.get(3).getId();
+
     }
 
-    @Override
-    public void doHandle(Event event) {
-        String value = event.getParameter().getValue();
-        if (value.startsWith("MAX")) {
-            // TODO handle MAX?
-        } else {
-            super.doHandle(event);
-        }
-    }
-
-    @Override
-    protected RequestCommand getRequestCommand() {
-        return (RequestCommand) getRegistry().getCommand(requestId);
-    }
 }

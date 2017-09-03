@@ -19,11 +19,9 @@ package de.theves.denon4j.controls;
 
 import de.theves.denon4j.net.Command;
 import de.theves.denon4j.net.Event;
+import de.theves.denon4j.net.Protocol;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Class description.
@@ -34,8 +32,8 @@ public class NetworkControlImpl extends AbstractControl implements de.theves.den
     private OnscreenInfo mostRecentOnscreenInfo;
     private List<String> paramList;
 
-    public NetworkControlImpl(CommandRegistry registry) {
-        super("NS", registry);
+    public NetworkControlImpl(Protocol protocol) {
+        super("NS", protocol);
         setName("Network USB/AUDIO/IPOD Extended Control");
     }
 
@@ -53,10 +51,6 @@ public class NetworkControlImpl extends AbstractControl implements de.theves.den
 
     @Override
     protected void doInit() {
-        NetworkControls[] params = NetworkControls.values();
-        paramList = new ArrayList<>(params.length);
-        paramList.addAll(Stream.of(params).map(Enum::toString).collect(Collectors.toList()));
-        register(paramList.toArray(new String[paramList.size()]));
     }
 
     private boolean isOnscreenInformation(Event event) {
@@ -70,7 +64,7 @@ public class NetworkControlImpl extends AbstractControl implements de.theves.den
     }
 
     private void readOnscreenInfo() {
-        Command nse = getCommands().stream().filter(cmd -> cmd.signature().equals("NSE")).findFirst().orElseThrow(() -> new CommandNotFoundException("NSE command not found"));
+        Command nse = CommandFactory.createCommand(protocol, prefix, "E");
         nse.execute();
         // wait until all events are received
         while (mostRecentOnscreenInfo == null || !mostRecentOnscreenInfo.isComplete()) {
@@ -84,6 +78,7 @@ public class NetworkControlImpl extends AbstractControl implements de.theves.den
 
     @Override
     public void control(NetworkControls controls) {
-        executeCommand(getCommands().get(paramList.indexOf(controls.toString())).getId());
+        Command command = CommandFactory.createCommand(protocol, prefix, controls.toString());
+        command.execute();
     }
 }

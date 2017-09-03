@@ -17,19 +17,12 @@
 
 package de.theves.denon4j.controls;
 
-import de.theves.denon4j.controls.CommandRegistry;
-import de.theves.denon4j.controls.Control;
-import de.theves.denon4j.controls.NotYetInitializedException;
 import de.theves.denon4j.internal.net.AlreadyInitException;
-import de.theves.denon4j.net.Command;
-import de.theves.denon4j.net.CommandId;
 import de.theves.denon4j.net.Event;
+import de.theves.denon4j.net.Protocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -41,14 +34,22 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public abstract class AbstractControl implements Control {
     protected final Logger logger = LoggerFactory.getLogger(getClass());
     protected final String prefix;
-    protected final CommandRegistry registry;
+    protected final Protocol protocol;
+
     private final AtomicBoolean initialized = new AtomicBoolean(false);
-    private final List<Command> commands = new ArrayList<>(10);
     private String name;
 
-    public AbstractControl(String prefix, CommandRegistry registry) {
+    public AbstractControl(String prefix, Protocol protocol) {
         this.prefix = Objects.requireNonNull(prefix);
-        this.registry = Objects.requireNonNull(registry);
+        this.protocol = protocol;
+    }
+
+
+    @Override
+    public final void handle(Event event) {
+        checkInitialized();
+        doHandle(event);
+        logger.debug("Handled event: {}", event);
     }
 
     protected void checkInitialized() {
@@ -58,31 +59,6 @@ public abstract class AbstractControl implements Control {
     }
 
     protected abstract void doHandle(Event event);
-
-    @Override
-    public final void handle(Event event) {
-        checkInitialized();
-        doHandle(event);
-        logger.debug("Handled event: {}", event);
-    }
-
-
-    protected Command executeCommand(CommandId commandId) {
-        return executeCommand(commandId, null);
-    }
-
-    protected Command executeCommand(CommandId downId, String value) {
-        return getRegistry().getCommandStack().execute(downId, value);
-    }
-
-    CommandRegistry getRegistry() {
-        return registry;
-    }
-
-    protected List<Command> register(String... parameters) {
-        commands.addAll(getRegistry().registerAll(getCommandPrefix(), parameters));
-        return commands;
-    }
 
     @Override
     public String getCommandPrefix() {
@@ -105,16 +81,7 @@ public abstract class AbstractControl implements Control {
     }
 
     @Override
-    public List<Command> getCommands() {
-        return Collections.unmodifiableList(commands);
-    }
-
-    @Override
     public void dispose() {
-        if (initialized.compareAndSet(true, false)) {
-            commands.forEach(command -> registry.deregisterCommand(command.getId()));
-        }
-        // ignore if we were not yet initialized
         logger.debug("Control disposed: {}", this);
     }
 

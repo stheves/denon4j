@@ -18,62 +18,52 @@
 package de.theves.denon4j.controls;
 
 import de.theves.denon4j.internal.net.ParameterImpl;
-import de.theves.denon4j.net.Command;
-import de.theves.denon4j.net.CommandId;
-import de.theves.denon4j.net.Parameter;
+import de.theves.denon4j.net.Event;
+import de.theves.denon4j.net.Protocol;
 import de.theves.denon4j.net.RequestCommand;
-
-import java.util.List;
 
 /**
  * Class description.
  *
  * @author stheves
  */
-public abstract class SwitchImpl extends StatefulControl implements Switch {
+public abstract class SwitchImpl extends AbstractControl implements Switch {
     protected final SwitchState onValue;
     protected final SwitchState offValue;
 
-    private CommandId onId;
-    private CommandId offId;
-    private CommandId requestId;
-
-    public SwitchImpl(CommandRegistry registry, String prefix, SwitchState onValue, SwitchState offValue) {
-        super(registry, prefix);
+    public SwitchImpl(Protocol protocol, String prefix, SwitchState onValue, SwitchState offValue) {
+        super(prefix, protocol);
         this.onValue = onValue;
         this.offValue = offValue;
     }
 
     @Override
     public void switchOff() {
-        executeCommand(offId);
+        executeCommand(offValue.get());
     }
 
     @Override
     public void switchOn() {
-        executeCommand(onId);
-    }
-
-    @Override
-    protected void doInit() {
-        registerCommands();
-    }
-
-    private void registerCommands() {
-        List<Command> commands = register(onValue.get(), offValue.get(), ParameterImpl.REQUEST.getValue());
-        onId = commands.get(0).getId();
-        offId = commands.get(1).getId();
-        requestId = commands.get(2).getId();
+        executeCommand(onValue.get());
     }
 
     @Override
     public SwitchState state() {
-        Parameter state = getState();
-        return SwitchState.valueOf((String) state.getValue());
+        RequestCommand command = (RequestCommand) CommandFactory.createCommand(protocol, prefix, ParameterImpl.REQUEST.getValue());
+        command.execute();
+        return SwitchState.valueOf(command.getReceived().getParameter().getValue());
+    }
+
+    private void executeCommand(String param) {
+        CommandFactory.createCommand(protocol, prefix, param).execute();
     }
 
     @Override
-    protected RequestCommand getRequestCommand() {
-        return (RequestCommand) getRegistry().getCommand(requestId);
+    protected void doInit() {
+    }
+
+    @Override
+    protected void doHandle(Event event) {
+
     }
 }

@@ -19,7 +19,6 @@ package de.theves.denon4j;
 
 import de.theves.denon4j.controls.*;
 import de.theves.denon4j.internal.EventDispatcher;
-import de.theves.denon4j.controls.CommandRegistryImpl;
 import de.theves.denon4j.internal.net.Tcp;
 import de.theves.denon4j.net.Protocol;
 
@@ -39,7 +38,6 @@ public class AVR1912 implements AVR {
     private final EventDispatcher eventDispatcher;
     private final Protocol protocol;
     private final Collection<Control> controls;
-    private final CommandRegistry registry;
 
     private String powerTogglePrefix;
     private String masterSliderPrefix;
@@ -56,7 +54,6 @@ public class AVR1912 implements AVR {
 
     AVR1912(Protocol protocol) {
         this.protocol = Objects.requireNonNull(protocol);
-        this.registry = new CommandRegistryImpl(protocol);
         this.eventDispatcher = new EventDispatcher();
         this.controls = new ArrayList<>();
 
@@ -69,53 +66,53 @@ public class AVR1912 implements AVR {
     private void addControls(Collection<? super Control> controls) {
         // power control
         powerTogglePrefix = "PW";
-        Toggle powerToggle = new ToggleImpl(registry, powerTogglePrefix, ON, STANDBY);
+        Toggle powerToggle = new ToggleImpl(protocol, powerTogglePrefix, ON, STANDBY);
         powerToggle.setName("Power Switch");
         powerToggle.init();
         controls.add(powerToggle);
 
         // master vol. control
         masterSliderPrefix = "MV";
-        Slider masterSlider = new SliderImpl(registry, masterSliderPrefix, "UP", "DOWN");
+        Slider masterSlider = new SliderImpl(protocol, masterSliderPrefix, "UP", "DOWN");
         masterSlider.setName("Master Volume");
         masterSlider.init();
         controls.add(masterSlider);
 
         // mute control
         muteTogglePrefix = "MU";
-        Toggle muteToggle = new ToggleImpl(registry, muteTogglePrefix, ON, OFF);
+        Toggle muteToggle = new ToggleImpl(protocol, muteTogglePrefix, ON, OFF);
         muteToggle.setName("Mute Toggle");
         muteToggle.init();
         controls.add(muteToggle);
 
         // source input
         selectInputPrefix = "SI";
-        Select<InputSource> selectInput = new SelectImpl<>(registry, selectInputPrefix, InputSource.values());
+        Select<InputSource> selectInput = new SelectImpl<>(protocol, selectInputPrefix, InputSource.values());
         selectInput.setName("Select INPUT Source");
         selectInput.init();
         controls.add(selectInput);
 
         // source video
         selectVideoPrefix = "SV";
-        Select<VideoSource> selectVideo = new SelectImpl<>(registry, selectVideoPrefix, VideoSource.values());
+        Select<VideoSource> selectVideo = new SelectImpl<>(protocol, selectVideoPrefix, VideoSource.values());
         selectVideo.setName("Select VIDEO Source");
         selectVideo.init();
         controls.add(selectVideo);
 
         // main zone toggle
         mainZoneTogglePrefix = "ZM";
-        Toggle mainZoneToggle = new ToggleImpl(registry, mainZoneTogglePrefix, ON, OFF);
+        Toggle mainZoneToggle = new ToggleImpl(protocol, mainZoneTogglePrefix, ON, OFF);
         mainZoneToggle.setName("Main Zone Toggle");
         mainZoneToggle.init();
         controls.add(mainZoneToggle);
 
         // network audio/usb/ipod DIRECT extended control
-        NetworkControlImpl selectNet = new NetworkControlImpl(registry);
+        NetworkControlImpl selectNet = new NetworkControlImpl(protocol);
         selectNetPrefix = selectNet.getCommandPrefix();
         selectNet.init();
         controls.add(selectNet);
 
-        Menu menu = new Menu(registry);
+        Menu menu = new Menu(protocol);
         menuPrefix = menu.getCommandPrefix();
         menu.init();
         controls.add(menu);
@@ -167,11 +164,9 @@ public class AVR1912 implements AVR {
         return findControl(menuPrefix, Menu.class);
     }
 
-    ;
-
     @Override
     public void printHelp(PrintStream writer) {
-        registry.printCommands(writer);
+
     }
 
     @Override
@@ -181,10 +176,6 @@ public class AVR1912 implements AVR {
 
     public void connect(int timeout) {
         protocol.establishConnection(timeout);
-    }
-
-    CommandRegistry getRegistry() {
-        return registry;
     }
 
     @Override

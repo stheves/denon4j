@@ -18,7 +18,9 @@
 package de.theves.denon4j;
 
 import de.theves.denon4j.controls.*;
+import de.theves.denon4j.internal.net.CommandImpl;
 import de.theves.denon4j.internal.net.EventFactory;
+import de.theves.denon4j.internal.net.ParameterImpl;
 import de.theves.denon4j.net.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,13 +41,11 @@ import static org.mockito.Mockito.*;
 public class ControlsTest {
     private AVR1912 avr1912;
     private Protocol protocol;
-    private CommandRegistry registry;
 
     @Before
     public void setup() {
         protocol = mock(Protocol.class);
         avr1912 = new AVR1912(protocol);
-        registry = avr1912.getRegistry();
     }
 
     @Test
@@ -71,14 +71,11 @@ public class ControlsTest {
     @Test
     public void testSelectControl() {
         Select<InputSource> si = avr1912.input();
-        List<Command> commands = si.getCommands();
-        assertThat(commands.size()).isEqualTo(InputSource.values().length + 1);
-        assertThat(registry.findByPrefix("SI")).hasSize(InputSource.values().length + 1);
 
         // execute control
         si.source(InputSource.SAT_CBL);
 
-        when(protocol.request((RequestCommand) cmd("SI?"))).thenReturn(event("SISAT/CBL"));
+        when(protocol.request(cmd("SI?"))).thenReturn(event("SISAT/CBL"));
         InputSource source = si.getSource();
         assertThat(source).isEqualTo(InputSource.SAT_CBL);
 
@@ -88,10 +85,7 @@ public class ControlsTest {
     }
 
     private Command cmd(String s) {
-        return registry.findBySignature(s)
-                .orElseThrow(() ->
-                        new CommandNotFoundException("Command with get '" + s + "' not found")
-                );
+        return new CommandImpl(protocol, CommandId.random(), s.substring(0, 2), new ParameterImpl(s.substring(2)));
     }
 
     private Event event(String e) {
@@ -101,9 +95,6 @@ public class ControlsTest {
     @Test
     public void testPowerControl() {
         Toggle power = avr1912.power();
-        assertThat(power.getCommands())
-                .hasSize(3)
-                .containsExactlyInAnyOrder(commands("PWON", "PWSTANDBY", "PW?"));
 
         when(protocol.request((RequestCommand) cmd("PW?")))
                 .thenReturn(event("PWSTANDBY"), event("PWON"));
@@ -122,21 +113,8 @@ public class ControlsTest {
     }
 
     @Test
-    public void testMuteControl() {
-        Toggle mute = avr1912.mute();
-        assertThat(mute.getCommands()).containsExactlyInAnyOrder(commands("MUON", "MUOFF", "MU?"));
-    }
-
-    @Test
-    public void testUnknownCommand() {
-        assertThatThrownBy(() ->
-                registry.getCommand(CommandId.random())).isInstanceOf(CommandNotFoundException.class);
-    }
-
-    @Test
     public void testMasterSlider() {
         Slider slider = avr1912.masterVolume();
-        assertThat(slider.getCommands()).hasSize(4).containsExactlyInAnyOrder(commands("MVUP", "MVDOWN", "MV", "MV?"));
         when(protocol.request((RequestCommand) cmd("MV?"))).thenReturn(event("MV45"));
         assertThat(slider.getValue()).isEqualTo("45");
 
@@ -161,17 +139,9 @@ public class ControlsTest {
     }
 
     @Test
-    public void testMainZoneToggle() {
-        Toggle toggle = avr1912.mainZone();
-        assertThat(toggle.getCommands()).hasSize(3).containsExactlyInAnyOrder(commands("ZMON", "ZMOFF", "ZM?"));
-    }
-
-    @Test
     public void testNetworkControl() {
         NetworkControl selectNetworkControl = avr1912.networkControl();
-        assertThat(selectNetworkControl.getCommands()).hasSize(NetworkControls.values().length);
         assertThat(selectNetworkControl.getCommandPrefix()).isEqualTo("NS");
-        assertThat(registry.findBySignature("NS?")).isEmpty();
 
         selectNetworkControl.control(NetworkControls.CURSOR_DOWN);
         verify(protocol).send(cmd("NS91"));

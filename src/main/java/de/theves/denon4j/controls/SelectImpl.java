@@ -18,12 +18,10 @@
 package de.theves.denon4j.controls;
 
 import de.theves.denon4j.internal.net.ParameterImpl;
-import de.theves.denon4j.net.Parameter;
+import de.theves.denon4j.net.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -31,33 +29,34 @@ import java.util.stream.Stream;
  *
  * @author stheves
  */
-public class SelectImpl<S extends Enum> extends StatefulControl implements Select<S> {
+public class SelectImpl<S extends Enum> extends AbstractControl implements Select<S> {
     private final S[] params;
 
-    private List<String> paramList;
-
-    public SelectImpl(CommandRegistry registry, String prefix, S[] params) {
-        super(registry, prefix);
+    public SelectImpl(Protocol protocol, String prefix, S[] params) {
+        super(prefix, protocol);
         this.params = Objects.requireNonNull(params);
     }
 
     @Override
     protected void doInit() {
-        paramList = new ArrayList<>(params.length + 1); // +1 for request parameter
-        paramList.addAll(Stream.of(params).map(Enum::toString).collect(Collectors.toList()));
-        paramList.add(ParameterImpl.REQUEST.getValue());
-        register(paramList.toArray(new String[paramList.size()]));
     }
 
     @Override
     public void source(S source) {
-        executeCommand(getCommands().get(paramList.indexOf(source.toString())).getId());
+        CommandFactory.createCommand(protocol, prefix, source.toString()).execute();
     }
 
     @Override
     public S getSource() {
-        Parameter state = getState();
-        return findSource(state);
+        RequestCommand command = (RequestCommand) CommandFactory.createCommand(protocol, prefix, ParameterImpl.REQUEST.getValue());
+        command.execute();
+        Event received = command.getReceived();
+        return findSource(received.getParameter());
+    }
+
+    @Override
+    protected void doHandle(Event event) {
+
     }
 
     private S findSource(Parameter state) {

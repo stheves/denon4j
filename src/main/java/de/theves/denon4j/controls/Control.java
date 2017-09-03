@@ -56,13 +56,6 @@ public interface Control {
     boolean isInitialized();
 
     /**
-     * Returns an unmodifiable list of the commands belonging to this control (the commands which made up this control).
-     *
-     * @return a list of all commands from this control.
-     */
-    List<Command> getCommands();
-
-    /**
      * Disposes this control and frees resources.
      */
     void dispose();
