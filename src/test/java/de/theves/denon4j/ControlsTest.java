@@ -68,10 +68,10 @@ public class ControlsTest {
         Select<InputSource> si = avr1912.input();
 
         // execute control
-        si.source(InputSource.SAT_CBL);
+        si.select(InputSource.SAT_CBL);
 
         when(protocol.request(cmd("SI?"))).thenReturn(event("SISAT/CBL"));
-        InputSource source = si.getSource();
+        InputSource source = si.get();
         assertThat(source).isEqualTo(InputSource.SAT_CBL);
 
         Command cmd = cmd("SISAT/CBL");

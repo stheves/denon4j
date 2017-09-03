@@ -46,6 +46,7 @@ public class AVR1912 implements AVR {
     private SelectImpl<VideoSource> selectVideo;
     private NetworkControlImpl selectNet;
     private Menu menu;
+    private SelectImpl<SurroundMode> selectSurround;
 
     public AVR1912(String host, int port) {
         this(new Tcp(host, port));
@@ -81,13 +82,13 @@ public class AVR1912 implements AVR {
         muteToggle.init();
         controls.add(muteToggle);
 
-        // source input
+        // select input
         selectInput = new SelectImpl<>(protocol, "SI", InputSource.values());
         selectInput.setName("Select INPUT Source");
         selectInput.init();
         controls.add(selectInput);
 
-        // source video
+        // select video
         selectVideo = new SelectImpl<>(protocol, "SV", VideoSource.values());
         selectVideo.setName("Select VIDEO Source");
         selectVideo.init();
@@ -107,10 +108,18 @@ public class AVR1912 implements AVR {
         menu = new Menu(protocol);
         menu.init();
         controls.add(menu);
+
+        selectSurround = new SelectImpl<>(protocol, "MS", SurroundMode.values());
+        selectSurround.init();
+        controls.add(selectSurround);
     }
 
     private void addToDispatcher(Collection<Control> controls) {
         controls.stream().forEach(eventDispatcher::addControl);
+    }
+
+    public Select<SurroundMode> surroundMode() {
+        return selectSurround;
     }
 
     EventDispatcher getEventDispatcher() {

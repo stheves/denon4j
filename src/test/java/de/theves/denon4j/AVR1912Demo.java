@@ -64,10 +64,10 @@ public class AVR1912Demo {
             System.out.println("MASTER VOL: " + masterVolume.getValue());
 
             Thread.sleep(200);
-            avr.video().source(VideoSource.SOURCE);
+            avr.video().select(VideoSource.SOURCE);
 
             Thread.sleep(200);
-            avr.input().source(InputSource.NET_UBS);
+            avr.input().select(InputSource.NET_UBS);
 
             Thread.sleep(200);
             avr.networkControl().control(NetworkControls.CURSOR_RIGHT);
@@ -81,6 +81,9 @@ public class AVR1912Demo {
 
             Thread.sleep(200);
             avr.menu().control(MenuControls.MENU_OFF);
+
+            Thread.sleep(200);
+            System.out.println("Surround Mode: " + avr.surroundMode().get().getMode());
         }
         System.out.println("------------DEMO END------------");
     }

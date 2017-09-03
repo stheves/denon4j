@@ -40,12 +40,12 @@ public class SelectImpl<S extends Enum> extends AbstractControl implements Selec
     }
 
     @Override
-    public void source(S source) {
+    public void select(S source) {
         Command.createCommand(protocol, prefix, source.toString()).execute();
     }
 
     @Override
-    public S getSource() {
+    public S get() {
         RequestCommand command = Command.createRequestCommand(protocol, prefix);
         command.execute();
         Event received = command.getReceived();

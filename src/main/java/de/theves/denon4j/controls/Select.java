@@ -7,16 +7,16 @@ package de.theves.denon4j.controls;
  */
 public interface Select<S extends Enum> extends Control {
     /**
-     * Selects the given <code>source</code>.
+     * Selects the given <code>select</code>.
      *
-     * @param source the source to source.
+     * @param source the select to select.
      */
-    void source(S source);
+    void select(S source);
 
     /**
-     * Returns the current active source.
+     * Returns the current active select.
      *
-     * @return the current source.
+     * @return the current select.
      */
-    S getSource();
+    S get();
 }
