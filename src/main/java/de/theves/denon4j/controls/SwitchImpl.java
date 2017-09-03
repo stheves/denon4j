@@ -18,9 +18,9 @@
 package de.theves.denon4j.controls;
 
 import de.theves.denon4j.internal.net.ParameterImpl;
+import de.theves.denon4j.internal.net.RequestCommand;
 import de.theves.denon4j.net.Event;
 import de.theves.denon4j.net.Protocol;
-import de.theves.denon4j.net.RequestCommand;
 
 /**
  * Class description.
@@ -59,11 +59,11 @@ public abstract class SwitchImpl extends AbstractControl implements Switch {
     }
 
     @Override
-    protected void doInit() {
+    protected void doHandle(Event event) {
+
     }
 
     @Override
-    protected void doHandle(Event event) {
-
+    protected void doInit() {
     }
 }

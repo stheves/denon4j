@@ -18,10 +18,12 @@
 package de.theves.denon4j;
 
 import de.theves.denon4j.controls.*;
-import de.theves.denon4j.internal.net.CommandImpl;
+import de.theves.denon4j.internal.net.Command;
 import de.theves.denon4j.internal.net.EventFactory;
-import de.theves.denon4j.internal.net.ParameterImpl;
-import de.theves.denon4j.net.*;
+import de.theves.denon4j.internal.net.RequestCommand;
+import de.theves.denon4j.net.ConnectException;
+import de.theves.denon4j.net.Event;
+import de.theves.denon4j.net.Protocol;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
@@ -85,7 +87,7 @@ public class ControlsTest {
     }
 
     private Command cmd(String s) {
-        return new CommandImpl(protocol, CommandId.random(), s.substring(0, 2), new ParameterImpl(s.substring(2)));
+        return CommandFactory.createCommand(protocol, s.substring(0, 2), s.substring(2));
     }
 
     private Event event(String e) {
@@ -115,7 +117,7 @@ public class ControlsTest {
     @Test
     public void testMasterSlider() {
         Slider slider = avr1912.masterVolume();
-        when(protocol.request((RequestCommand) cmd("MV?"))).thenReturn(event("MV45"));
+        when(protocol.request(cmd("MV?"))).thenReturn(event("MV45"));
         assertThat(slider.getValue()).isEqualTo("45");
 
         slider.slideUp();

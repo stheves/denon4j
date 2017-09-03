@@ -18,9 +18,9 @@
 package de.theves.denon4j.controls;
 
 import de.theves.denon4j.internal.net.ParameterImpl;
+import de.theves.denon4j.internal.net.RequestCommand;
 import de.theves.denon4j.net.*;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 

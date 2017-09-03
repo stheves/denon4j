@@ -24,15 +24,11 @@ import de.theves.denon4j.net.*;
  *
  * @author stheves
  */
-public class RequestCommandImpl extends CommandImpl implements RequestCommand {
+public class RequestCommand extends Command {
     private Event received;
 
-    public RequestCommandImpl(Protocol protocol, CommandId id, String prefix) {
-        super(protocol, id, prefix, ParameterImpl.REQUEST);
-    }
-
-    public RequestCommandImpl(Protocol protocol, CommandId id, String prefix, Parameter param) {
-        super(protocol, id, prefix, param);
+    public RequestCommand(Protocol protocol, String prefix) {
+        super(protocol, prefix, ParameterImpl.REQUEST);
     }
 
     @Override
@@ -40,7 +36,6 @@ public class RequestCommandImpl extends CommandImpl implements RequestCommand {
         received = protocol.request(this);
     }
 
-    @Override
     public Event getReceived() {
         return received;
     }

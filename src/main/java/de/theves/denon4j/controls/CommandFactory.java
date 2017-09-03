@@ -17,13 +17,11 @@
 
 package de.theves.denon4j.controls;
 
-import de.theves.denon4j.internal.net.*;
-import de.theves.denon4j.net.Command;
-import de.theves.denon4j.net.CommandId;
-import de.theves.denon4j.net.Parameter;
+import de.theves.denon4j.internal.net.Command;
+import de.theves.denon4j.internal.net.ParameterImpl;
+import de.theves.denon4j.internal.net.RequestCommand;
+import de.theves.denon4j.internal.net.SetCommand;
 import de.theves.denon4j.net.Protocol;
-
-import java.util.regex.Pattern;
 
 import static de.theves.denon4j.internal.net.ParameterImpl.createParameter;
 
@@ -32,20 +30,19 @@ import static de.theves.denon4j.internal.net.ParameterImpl.createParameter;
  *
  * @author stheves
  */
-class CommandFactory {
+public class CommandFactory {
 
     private CommandFactory() {
     }
 
-    static Command createCommand(Protocol protocol, String prefix, String param) {
+    public static Command createCommand(Protocol protocol, String prefix, String param) {
         if (null != prefix) {
-            CommandId commandId = CommandId.random();
             if (param.contains("[")) {
-                return new SetCommandImpl(protocol, commandId, prefix);
+                return new SetCommand(protocol, prefix);
             } else if (isRequest(prefix, param)) {
-                return new RequestCommandImpl(protocol, commandId, prefix);
+                return new RequestCommand(protocol, prefix);
             }
-            return new CommandImpl(protocol, commandId, prefix, createParameter(param));
+            return new Command(protocol, prefix, createParameter(param));
         }
         throw new IllegalArgumentException("Command may not be null");
     }

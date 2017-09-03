@@ -18,10 +18,10 @@
 package de.theves.denon4j.controls;
 
 import de.theves.denon4j.internal.net.ParameterImpl;
-import de.theves.denon4j.internal.net.SetCommandImpl;
+import de.theves.denon4j.internal.net.RequestCommand;
+import de.theves.denon4j.internal.net.SetCommand;
 import de.theves.denon4j.net.Event;
 import de.theves.denon4j.net.Protocol;
-import de.theves.denon4j.net.RequestCommand;
 
 
 /**
@@ -66,7 +66,7 @@ public class SliderImpl extends AbstractControl implements Slider {
     }
 
     private void executeSetCommand(String value) {
-        SetCommandImpl setCommand = (SetCommandImpl) CommandFactory.createCommand(protocol, prefix, "[*]");
+        SetCommand setCommand = (SetCommand) CommandFactory.createCommand(protocol, prefix, "[*]");
         setCommand.set(value);
         setCommand.execute();
     }

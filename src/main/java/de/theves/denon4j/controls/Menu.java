@@ -17,14 +17,9 @@
 
 package de.theves.denon4j.controls;
 
-import de.theves.denon4j.net.Command;
+import de.theves.denon4j.internal.net.Command;
 import de.theves.denon4j.net.Event;
 import de.theves.denon4j.net.Protocol;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Class description.

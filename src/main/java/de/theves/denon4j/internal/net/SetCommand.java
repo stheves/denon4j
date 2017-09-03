@@ -17,7 +17,6 @@
 
 package de.theves.denon4j.internal.net;
 
-import de.theves.denon4j.net.CommandId;
 import de.theves.denon4j.net.Protocol;
 
 /**
@@ -25,11 +24,11 @@ import de.theves.denon4j.net.Protocol;
  *
  * @author stheves
  */
-public class SetCommandImpl extends CommandImpl {
+public class SetCommand extends Command {
     private final MutableParameter mutableParameter;
 
-    public SetCommandImpl(Protocol protocol, CommandId id, String prefix) {
-        super(protocol, id, prefix, new MutableParameter());
+    public SetCommand(Protocol protocol, String prefix) {
+        super(protocol, prefix, new MutableParameter());
         this.mutableParameter = (MutableParameter) getParameter();
     }
 

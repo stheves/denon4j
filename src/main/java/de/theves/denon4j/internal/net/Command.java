@@ -17,8 +17,6 @@
 
 package de.theves.denon4j.internal.net;
 
-import de.theves.denon4j.net.Command;
-import de.theves.denon4j.net.CommandId;
 import de.theves.denon4j.net.Parameter;
 import de.theves.denon4j.net.Protocol;
 
@@ -31,41 +29,22 @@ import java.util.Objects;
  *
  * @author stheves
  */
-public class CommandImpl extends EventImpl implements Command {
+public class Command extends EventImpl {
     protected final Protocol protocol;
-    private final CommandId id;
     private LocalDateTime executedAt = LocalDateTime.MIN;
 
-    public CommandImpl(Protocol protocol, CommandId id, String prefix, Parameter parameter) {
+    public Command(Protocol protocol, String prefix, Parameter parameter) {
         super((prefix + parameter.getValue()).getBytes(StandardCharsets.US_ASCII), prefix, parameter);
-        this.id = Objects.requireNonNull(id);
         this.protocol = Objects.requireNonNull(protocol);
     }
 
-    @Override
-    public CommandId getId() {
-        return id;
-    }
-
-    @Override
     public LocalDateTime getExecutedAt() {
         return executedAt;
     }
 
-    @Override
     public void execute() {
         doSend();
         executedAt = LocalDateTime.now();
-    }
-
-    @Override
-    public boolean isDirtying() {
-        return true;
-    }
-
-    @Override
-    public String signature() {
-        return getPrefix() + getParameter().getValue();
     }
 
     protected void doSend() {
@@ -73,20 +52,11 @@ public class CommandImpl extends EventImpl implements Command {
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        CommandImpl command = (CommandImpl) o;
-        return Objects.equals(id, command.id);
-    }
-
-    @Override
     public String toString() {
         return "Command{" + signature() + '}';
+    }
+
+    public String signature() {
+        return getPrefix() + getParameter().getValue();
     }
 }
