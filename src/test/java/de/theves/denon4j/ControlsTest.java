@@ -86,7 +86,7 @@ public class ControlsTest {
     }
 
     private Command cmd(String s) {
-        return CommandFactory.createCommand(protocol, s.substring(0, 2), s.substring(2));
+        return Command.createCommand(protocol, s.substring(0, 2), s.substring(2));
     }
 
     private Event event(String e) {

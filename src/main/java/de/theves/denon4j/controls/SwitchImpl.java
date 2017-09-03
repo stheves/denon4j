@@ -17,6 +17,7 @@
 
 package de.theves.denon4j.controls;
 
+import de.theves.denon4j.internal.net.Command;
 import de.theves.denon4j.internal.net.Event;
 import de.theves.denon4j.internal.net.ParameterImpl;
 import de.theves.denon4j.internal.net.RequestCommand;
@@ -49,13 +50,13 @@ public abstract class SwitchImpl extends AbstractControl implements Switch {
 
     @Override
     public SwitchState state() {
-        RequestCommand command = (RequestCommand) CommandFactory.createCommand(protocol, prefix, ParameterImpl.REQUEST.getValue());
+        RequestCommand command = Command.createRequestCommand(protocol, prefix);
         command.execute();
         return SwitchState.valueOf(command.getReceived().getParameter().getValue());
     }
 
     private void executeCommand(String param) {
-        CommandFactory.createCommand(protocol, prefix, param).execute();
+        Command.createCommand(protocol, prefix, param).execute();
     }
 
     @Override

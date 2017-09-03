@@ -38,6 +38,21 @@ public class Command extends Event {
         this.protocol = Objects.requireNonNull(protocol);
     }
 
+    public static SetCommand createSetCommand(Protocol protocol, String prefix) {
+        return new SetCommand(protocol, prefix);
+    }
+
+    public static Command createCommand(Protocol protocol, String prefix, String param) {
+        if (ParameterImpl.REQUEST.getValue().equals(param)) {
+            return createRequestCommand(protocol, prefix);
+        }
+        return new Command(protocol, prefix, ParameterImpl.createParameter(param));
+    }
+
+    public static RequestCommand createRequestCommand(Protocol protocol, String prefix) {
+        return new RequestCommand(protocol, prefix);
+    }
+
     public LocalDateTime getExecutedAt() {
         return executedAt;
     }

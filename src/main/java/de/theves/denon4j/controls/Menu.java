@@ -42,7 +42,7 @@ public class Menu extends AbstractControl {
     }
 
     public void control(MenuControls controls) {
-        Command command = CommandFactory.createCommand(protocol, prefix, controls.toString());
+        Command command = Command.createCommand(protocol, prefix, controls.toString());
         command.execute();
     }
 }

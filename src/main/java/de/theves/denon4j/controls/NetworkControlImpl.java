@@ -64,7 +64,7 @@ public class NetworkControlImpl extends AbstractControl implements de.theves.den
     }
 
     private void readOnscreenInfo() {
-        Command nse = CommandFactory.createCommand(protocol, prefix, "E");
+        Command nse = Command.createCommand(protocol, prefix, "E");
         nse.execute();
         // wait until all events are received
         while (mostRecentOnscreenInfo == null || !mostRecentOnscreenInfo.isComplete()) {
@@ -78,7 +78,7 @@ public class NetworkControlImpl extends AbstractControl implements de.theves.den
 
     @Override
     public void control(NetworkControls controls) {
-        Command command = CommandFactory.createCommand(protocol, prefix, controls.toString());
+        Command command = Command.createCommand(protocol, prefix, controls.toString());
         command.execute();
     }
 }

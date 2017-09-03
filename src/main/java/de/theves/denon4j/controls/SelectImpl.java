@@ -17,10 +17,11 @@
 
 package de.theves.denon4j.controls;
 
+import de.theves.denon4j.internal.net.Command;
 import de.theves.denon4j.internal.net.Event;
-import de.theves.denon4j.internal.net.ParameterImpl;
 import de.theves.denon4j.internal.net.RequestCommand;
-import de.theves.denon4j.net.*;
+import de.theves.denon4j.net.Parameter;
+import de.theves.denon4j.net.Protocol;
 
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -39,25 +40,16 @@ public class SelectImpl<S extends Enum> extends AbstractControl implements Selec
     }
 
     @Override
-    protected void doInit() {
-    }
-
-    @Override
     public void source(S source) {
-        CommandFactory.createCommand(protocol, prefix, source.toString()).execute();
+        Command.createCommand(protocol, prefix, source.toString()).execute();
     }
 
     @Override
     public S getSource() {
-        RequestCommand command = (RequestCommand) CommandFactory.createCommand(protocol, prefix, ParameterImpl.REQUEST.getValue());
+        RequestCommand command = Command.createRequestCommand(protocol, prefix);
         command.execute();
         Event received = command.getReceived();
         return findSource(received.getParameter());
-    }
-
-    @Override
-    protected void doHandle(Event event) {
-
     }
 
     private S findSource(Parameter state) {
@@ -65,5 +57,14 @@ public class SelectImpl<S extends Enum> extends AbstractControl implements Selec
                 .filter(e -> state.getValue().equals(e.toString()))
                 .findFirst()
                 .orElseThrow(IllegalStateException::new);
+    }
+
+    @Override
+    protected void doHandle(Event event) {
+
+    }
+
+    @Override
+    protected void doInit() {
     }
 }
