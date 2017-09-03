@@ -17,7 +17,6 @@
 
 package de.theves.denon4j.net;
 
-import de.theves.denon4j.controls.ExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

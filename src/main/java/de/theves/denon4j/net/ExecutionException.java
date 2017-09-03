@@ -15,7 +15,7 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.controls;
+package de.theves.denon4j.net;
 
 /**
  * Thrown if a command execution failed.

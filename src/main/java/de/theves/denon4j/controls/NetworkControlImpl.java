@@ -30,7 +30,6 @@ import java.util.List;
  */
 public class NetworkControlImpl extends SelectImpl<NetworkControls> implements de.theves.denon4j.controls.NetworkControl {
     private DisplayInfo mostRecentDisplayInfo;
-    private List<String> paramList;
 
     public NetworkControlImpl(Protocol protocol) {
         super(protocol, "NS", NetworkControls.values());
