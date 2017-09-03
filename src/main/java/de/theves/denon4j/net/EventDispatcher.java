@@ -15,10 +15,10 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.internal;
+package de.theves.denon4j.net;
 
 import de.theves.denon4j.controls.Control;
-import de.theves.denon4j.internal.net.Event;
+import de.theves.denon4j.net.Event;
 
 import java.util.*;
 import java.util.stream.Collectors;

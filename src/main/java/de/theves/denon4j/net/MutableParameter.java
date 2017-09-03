@@ -15,28 +15,21 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.internal.net;
+package de.theves.denon4j.net;
 
-import de.theves.denon4j.net.*;
 
 /**
- * Request command implementation.
+ * Mutable implementation of an {@link Parameter}.
  *
  * @author stheves
  */
-public class RequestCommand extends Command {
-    private Event received;
-
-    public RequestCommand(Protocol protocol, String prefix) {
-        super(protocol, prefix, Parameter.REQUEST);
-    }
-
-    @Override
-    protected void doSend() {
-        received = protocol.request(this);
-    }
-
-    public Event getReceived() {
-        return received;
+public class MutableParameter extends Parameter {
+    /**
+     * Sets the value of this parameter.
+     *
+     * @param val the value to set.
+     */
+    public void setValue(String val) {
+        this.value = val;
     }
 }

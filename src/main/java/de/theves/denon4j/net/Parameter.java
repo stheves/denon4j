@@ -15,15 +15,41 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.internal.net;
+package de.theves.denon4j.net;
+
 
 /**
- * Thrown if control`s init-method was called multiple times.
+ * Class description.
  *
  * @author stheves
  */
-public class AlreadyInitException extends RuntimeException {
-    public AlreadyInitException(String message) {
-        super(message);
+public class Parameter {
+    public static final Parameter REQUEST = new Parameter("?");
+
+    protected String value;
+
+    public Parameter() {
+    }
+
+    public Parameter(String value) {
+        this.value = value;
+    }
+
+    public static Parameter createParameter(String val) {
+        if (REQUEST.getValue().equals(val)) {
+            return REQUEST;
+        }
+        return new Parameter(val);
+    }
+
+    public String getValue() {
+        return value == null ? "" : value;
+    }
+
+    @Override
+    public String toString() {
+        return "Parameter{" +
+                "value='" + value + '\'' +
+                '}';
     }
 }

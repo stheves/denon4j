@@ -15,9 +15,7 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.internal.net;
-
-import de.theves.denon4j.net.Protocol;
+package de.theves.denon4j.net;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;

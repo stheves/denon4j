@@ -15,7 +15,7 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.internal.net;
+package de.theves.denon4j.net;
 
 
 import java.nio.charset.StandardCharsets;

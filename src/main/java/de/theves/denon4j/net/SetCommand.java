@@ -15,24 +15,22 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.internal.net;
-
-import de.theves.denon4j.net.Event;
-import org.junit.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
+package de.theves.denon4j.net;
 
 /**
- * Class description.
+ * Command that sends a mutable value to the AVR.
  *
  * @author stheves
  */
-public class EventParsingTest {
-    @Test
-    public void testParseNSE() {
-        Event fromRawData = Event.create("NSE0 Hallo Welt_????".getBytes());
-        assertThat(fromRawData).isNotNull();
-        assertThat(fromRawData.getPrefix()).isEqualTo("NS");
-        assertThat(fromRawData.getParameter().getValue()).isEqualTo("E0 Hallo Welt_????");
+public class SetCommand extends Command {
+    private final MutableParameter mutableParameter;
+
+    public SetCommand(Protocol protocol, String prefix) {
+        super(protocol, prefix, new MutableParameter());
+        this.mutableParameter = (MutableParameter) getParameter();
+    }
+
+    public void set(String value) {
+        mutableParameter.setValue(value);
     }
 }

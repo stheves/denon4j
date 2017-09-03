@@ -15,10 +15,8 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.internal.net;
+package de.theves.denon4j.net;
 
-import de.theves.denon4j.net.ConnectionException;
-import de.theves.denon4j.net.Protocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

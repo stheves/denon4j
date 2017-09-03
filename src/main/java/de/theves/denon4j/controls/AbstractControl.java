@@ -17,8 +17,8 @@
 
 package de.theves.denon4j.controls;
 
-import de.theves.denon4j.internal.net.AlreadyInitException;
-import de.theves.denon4j.internal.net.Event;
+import de.theves.denon4j.net.AlreadyInitException;
+import de.theves.denon4j.net.Event;
 import de.theves.denon4j.net.Protocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

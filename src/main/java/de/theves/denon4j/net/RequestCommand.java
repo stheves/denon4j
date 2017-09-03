@@ -15,24 +15,26 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.internal.net;
-
-import de.theves.denon4j.net.Protocol;
+package de.theves.denon4j.net;
 
 /**
- * Command that sends a mutable value to the AVR.
+ * Request command implementation.
  *
  * @author stheves
  */
-public class SetCommand extends Command {
-    private final MutableParameter mutableParameter;
+public class RequestCommand extends Command {
+    private Event received;
 
-    public SetCommand(Protocol protocol, String prefix) {
-        super(protocol, prefix, new MutableParameter());
-        this.mutableParameter = (MutableParameter) getParameter();
+    public RequestCommand(Protocol protocol, String prefix) {
+        super(protocol, prefix, Parameter.REQUEST);
     }
 
-    public void set(String value) {
-        mutableParameter.setValue(value);
+    @Override
+    protected void doSend() {
+        received = protocol.request(this);
+    }
+
+    public Event getReceived() {
+        return received;
     }
 }

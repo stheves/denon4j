@@ -17,10 +17,6 @@
 
 package de.theves.denon4j.net;
 
-import de.theves.denon4j.internal.EventDispatcher;
-import de.theves.denon4j.internal.net.Command;
-import de.theves.denon4j.internal.net.Event;
-
 /**
  * Low-level network client for communication with AVR.
  *

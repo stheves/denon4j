@@ -18,8 +18,8 @@
 package de.theves.denon4j;
 
 import de.theves.denon4j.controls.*;
-import de.theves.denon4j.internal.EventDispatcher;
-import de.theves.denon4j.internal.net.Tcp;
+import de.theves.denon4j.net.EventDispatcher;
+import de.theves.denon4j.net.Tcp;
 import de.theves.denon4j.net.Protocol;
 
 import java.io.PrintStream;

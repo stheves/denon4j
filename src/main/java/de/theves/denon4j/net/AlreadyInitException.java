@@ -15,21 +15,15 @@
  *  limitations under the License.
  */
 
-package de.theves.denon4j.internal.net;
-
+package de.theves.denon4j.net;
 
 /**
- * Mutable implementation of an {@link Parameter}.
+ * Thrown if control`s init-method was called multiple times.
  *
  * @author stheves
  */
-public class MutableParameter extends Parameter {
-    /**
-     * Sets the value of this parameter.
-     *
-     * @param val the value to set.
-     */
-    public void setValue(String val) {
-        this.value = val;
+public class AlreadyInitException extends RuntimeException {
+    public AlreadyInitException(String message) {
+        super(message);
     }
 }
