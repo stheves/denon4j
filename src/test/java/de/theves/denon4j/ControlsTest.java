@@ -34,38 +34,38 @@ import static org.mockito.Mockito.*;
  * Test for basic controls.
  */
 public class ControlsTest {
-    private Avr1912 avr1912;
+    private DenonReceiver192 denonAvr192;
     private Protocol protocol;
 
     @Before
     public void setup() {
         protocol = mock(Protocol.class);
-        avr1912 = new Avr1912(protocol);
+        denonAvr192 = new DenonReceiver192(protocol);
     }
 
     @Test
     public void testConnectionHandling() {
-        avr1912.connect(100);
+        denonAvr192.connect(100);
         InOrder order = inOrder(protocol, protocol);
-        order.verify(protocol, times(1)).setDispatcher(avr1912.getEventDispatcher());
+        order.verify(protocol, times(1)).setDispatcher(denonAvr192.getEventDispatcher());
         order.verify(protocol, times(1)).establishConnection(100);
 
         when(protocol.isConnected()).thenReturn(Boolean.TRUE);
-        assertThat(avr1912.isConnected()).isTrue();
+        assertThat(denonAvr192.isConnected()).isTrue();
 
-        avr1912.disconnect();
+        denonAvr192.disconnect();
         verify(protocol).disconnect();
 
         when(protocol.isConnected()).thenReturn(Boolean.FALSE);
-        assertThat(avr1912.isConnected()).isFalse();
+        assertThat(denonAvr192.isConnected()).isFalse();
 
         doThrow(new ConnectException("Failure")).when(protocol).establishConnection(137);
-        assertThatThrownBy(() -> avr1912.connect(137)).isInstanceOf(ConnectException.class).withFailMessage("Failure");
+        assertThatThrownBy(() -> denonAvr192.connect(137)).isInstanceOf(ConnectException.class).withFailMessage("Failure");
     }
 
     @Test
     public void testSelectControl() {
-        Select<InputSource> si = avr1912.input();
+        Select<InputSource> si = denonAvr192.input();
 
         // execute control
         si.select(InputSource.SAT_CBL);
@@ -88,7 +88,7 @@ public class ControlsTest {
 
     @Test
     public void testPowerControl() {
-        Toggle power = avr1912.power();
+        Toggle power = denonAvr192.power();
 
         when(protocol.request(cmd("PW?")))
                 .thenReturn(event("PWSTANDBY"));
@@ -100,33 +100,33 @@ public class ControlsTest {
 
     @Test
     public void testMasterSlider() {
-        Slider slider = avr1912.masterVolume();
+        Slider slider = denonAvr192.masterVolume();
         when(protocol.request(cmd("MV?"))).thenReturn(event("MV45"), event("MV455"), event("MV45"), event("MV55"));
         assertThat(slider.getValue()).isEqualTo("45");
 
         slider.slideUp();
         // fake events
-        avr1912.getEventDispatcher().dispatch(Event.create("MV455"));
-        avr1912.getEventDispatcher().dispatch(Event.create("MVMAX 68"));
+        denonAvr192.getEventDispatcher().dispatch(Event.create("MV455"));
+        denonAvr192.getEventDispatcher().dispatch(Event.create("MVMAX 68"));
         verify(protocol).send(cmd("MVUP"));
         assertThat(slider.getValue()).isEqualTo("455");
 
         slider.slideDown();
-        avr1912.getEventDispatcher().dispatch(Event.create("MV45"));
-        avr1912.getEventDispatcher().dispatch(Event.create("MVMAX 675"));
+        denonAvr192.getEventDispatcher().dispatch(Event.create("MV45"));
+        denonAvr192.getEventDispatcher().dispatch(Event.create("MVMAX 675"));
         verify(protocol).send(cmd("MVDOWN"));
         assertThat(slider.getValue()).isEqualTo("45");
 
         slider.set("55");
-        avr1912.getEventDispatcher().dispatch(Event.create("MV55"));
-        avr1912.getEventDispatcher().dispatch(Event.create("MVMAX 72"));
+        denonAvr192.getEventDispatcher().dispatch(Event.create("MV55"));
+        denonAvr192.getEventDispatcher().dispatch(Event.create("MVMAX 72"));
         verify(protocol).send(Command.createSetCommand(protocol, "MV"));
         assertThat(slider.getValue()).isEqualTo("55");
     }
 
     @Test
     public void testNetworkControl() {
-        NetworkControl selectNetworkControl = avr1912.networkControl();
+        NetworkControl selectNetworkControl = denonAvr192.networkControl();
         assertThat(selectNetworkControl.getCommandPrefix()).isEqualTo("NS");
 
         selectNetworkControl.select(NetworkControls.CURSOR_DOWN);
@@ -143,18 +143,18 @@ public class ControlsTest {
     }
 
     private void assertControlsInitialized() {
-        assertThat(avr1912.getControls()
+        assertThat(denonAvr192.getControls()
                 .stream()
                 .filter(c -> !c.isInitialized())
                 .count()).isEqualTo(0);
     }
 
     private void assertDispatcherValid() {
-        assertThat(avr1912.getEventDispatcher().getControls())
+        assertThat(denonAvr192.getEventDispatcher().getControls())
                 .containsExactlyInAnyOrder(
-                        avr1912.getControls()
+                        denonAvr192.getControls()
                                 .stream()
-                                .toArray(value -> new Control[avr1912.getControls().size()])
+                                .toArray(value -> new Control[denonAvr192.getControls().size()])
                 );
     }
 }

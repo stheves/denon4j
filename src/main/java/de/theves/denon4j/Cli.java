@@ -53,7 +53,7 @@ public class Cli {
     }
 
     public void interactiveMode() {
-        try (Avr1912 avr = new Avr1912(args.get(0), Integer.parseInt(args.get(1)))) {
+        try (DenonReceiver192 avr = new DenonReceiver192(args.get(0), Integer.parseInt(args.get(1)))) {
             avr.connect(1000);
             System.out.println("Enter a command ('?' for help, 'q' for quit):");
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));

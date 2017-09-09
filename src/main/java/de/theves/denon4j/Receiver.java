@@ -26,7 +26,7 @@ import java.util.Collection;
  *
  * @author stheves
  */
-public interface Avr extends AutoCloseable {
+public interface Receiver extends AutoCloseable {
     /**
      * Sends the command to the receiver.
      *
