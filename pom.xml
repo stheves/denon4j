@@ -18,11 +18,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>de.theves</groupId>
+    <groupId>io.theves</groupId>
     <artifactId>denon4j</artifactId>
     <version>0.5-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <description>A higher-level Java API for communication with Denon Audio Video Receivers via TCP/IP</description>
+    <description>A high-level Java API for interaction with Denon Audio Video receivers via TCP/IP</description>
     <url>https://github.com/stheves/denon4j</url>
     <licenses>
         <license>
@@ -163,7 +163,7 @@
                             <transformers>
                                 <transformer
                                         implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>de.theves.denon4j.Cli</mainClass>
+                                    <mainClass>io.theves.denon4j.Cli</mainClass>
                                 </transformer>
                             </transformers>
                             <shadedArtifactAttached>true</shadedArtifactAttached>
