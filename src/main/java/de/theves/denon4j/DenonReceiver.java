@@ -31,7 +31,7 @@ import static de.theves.denon4j.controls.SwitchState.*;
  *
  * @author stheves
  */
-public class DenonReceiver192 implements Receiver {
+public class DenonReceiver implements Receiver {
     private final EventDispatcher eventDispatcher;
     private final Protocol protocol;
     private final Collection<Control> controls;
@@ -45,11 +45,11 @@ public class DenonReceiver192 implements Receiver {
     private Menu menu;
     private SelectImpl<SurroundMode> selectSurround;
 
-    public DenonReceiver192(String host, int port) {
+    public DenonReceiver(String host, int port) {
         this(new Tcp(host, port));
     }
 
-    DenonReceiver192(Protocol protocol) {
+    DenonReceiver(Protocol protocol) {
         this.protocol = Objects.requireNonNull(protocol);
         this.eventDispatcher = new EventDispatcher();
         this.controls = new ArrayList<>();

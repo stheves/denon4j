@@ -34,7 +34,7 @@ public class Demo {
 
     private void demo(String host, int port) throws Exception {
         System.out.println("------------DEMO START------------");
-        try (DenonReceiver192 avr = new DenonReceiver192(host, port)) {
+        try (DenonReceiver avr = new DenonReceiver(host, port)) {
             // establish connection
             avr.connect(1000);
 

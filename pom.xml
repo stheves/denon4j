@@ -21,6 +21,7 @@
     <groupId>de.theves</groupId>
     <artifactId>denon4j</artifactId>
     <version>0.5-SNAPSHOT</version>
+    <description>Java API </description>
 
     <scm>
         <connection>scm:git:https://github.com/sath1982/denon4j.git</connection>
@@ -35,6 +36,7 @@
         <developer>
             <name>Sascha Theves</name>
             <organizationUrl>http://www.theves.io</organizationUrl>
+            <email>sascha.theves@gmail.com</email>
         </developer>
     </developers>
 
