@@ -31,8 +31,10 @@ public interface Receiver extends AutoCloseable {
      * Sends the command to the receiver.
      *
      * @param command the command to send.
+     * @return the response or <code>null</code> for request commands ending with '?' e.g. 'PW?'.
      */
     String send(String command);
+
     /**
      * Returns a collection of all available controls.
      *
