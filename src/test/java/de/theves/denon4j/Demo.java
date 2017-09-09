@@ -19,7 +19,7 @@ package de.theves.denon4j;
 
 import de.theves.denon4j.controls.*;
 
-public class Avr1912Demo {
+public class Demo {
 
     public static void main(String[] args) throws Exception {
         if (null == args || args.length != 2) {
@@ -28,13 +28,13 @@ public class Avr1912Demo {
         }
         System.out.println(String.format("Starting demo... AVR1912: %s:%s",
                 args[0], args[1]));
-        Avr1912Demo test = new Avr1912Demo();
+        Demo test = new Demo();
         test.demo(args[0], Integer.parseInt(args[1]));
     }
 
     private void demo(String host, int port) throws Exception {
         System.out.println("------------DEMO START------------");
-        try (Avr1912 avr = new Avr1912(host, port)) {
+        try (DenonReceiver192 avr = new DenonReceiver192(host, port)) {
             // establish connection
             avr.connect(1000);
 
