@@ -5,7 +5,7 @@ sudo: false
 
 before_install:
 - "cp releng/maven_settings.xml ~/.m2/settings.xml"
-- "./releng/prepare_signing.sh"
+- "sh eleng/prepare_signing.sh"
 install: mvn install -Prelease -DskipTests=true -B -q -e
 
 before_script:
