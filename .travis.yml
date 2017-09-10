@@ -2,22 +2,56 @@ language: java
 jdk:
 - oraclejdk8
 sudo: false
+
+before_install:
+- "cp releng/maven_settings.xml ~/.m2/settings.xml"
+- "./releng/prepare_signing.sh"
+install: mvn install -Prelease -DskipTests=true -B -q -e
+
 before_script:
 - export MAVEN_OPTS="-Xmx512m -XX:MaxMetaspaceSize=512m"
-script: mvn -q -B -e clean package
-before_deploy:
-- export ARTIFACT=$(ls target/denon4j.jar)
+script: mvn -q -B -e test
+
 deploy:
+- provider: releases
   skip_cleanup: true
-  provider: releases
   api_key:
     secure: ovVGg8aFnpf/AyeMfc6KZ6xIwImi0n0Chxo5xjgTXymIDT1S8cNLB0xcyTFEmPqu7mzwW+cz/MIASfiZQkyzfJNl0UAQJRVHhymzqAqoDsRHximzl5+20JXtuMp72B9JgOMl1eL5gWFZw2AOJsv4UolEPZFyFDLN7riB4W6srWomdlqbnybBnA9HOIHU703NBOkQBXzZeyRv/mX819IpJ5nDneOLMteQLLUfc7pRpPyCqbv0ihvBTwsnheg/TzVgAyHZjb9c8iQcYZdgB8aXWS/NCSnRkJGYyUxuwauLV3t8qaiiU9mQnqXt6TtMo1WE7H8dqHjsAdoEc/vkKCGkHY4xtlJcP9DVbB+DuPoOO+DFgz5dSmRiHzZuLyc1f4lOTfgUqn4lmlNo7razZxpO1kB/FYY+NU+A6BsqrD+GBsE/7Mn3260z6T2LQV+Xt8sXzFxLdGlTWSf1i3CXSNPw1vBr4RTl8c2TeS1A/wI7dSMjHU/HUoUxWVHCXSvh7dvb3CArh7TtycW6vmZjGWWbmmBpyN50xgD9eC88JtehqMNh9hBmgdczb/CkrYQpFDQzsXc2J1hpKW7vInbqg1/22uaqH1O1522MzhVK2M3f3pCKbKUBhocIYGIJTwiSUvsfrXtP+8TNXlutCDSvy5BN4XVv//jrJntKh2YqJSMBrRU=
-  file: "${ARTIFACT}"
+  file_glob: true
+  file:
+    - "target/*.jar"
+    - "target/*.jar.asc"
+    - "target/*.pom"
+    - "target/*.pom.asc"
   on:
     repo: stheves/denon4j
     tags: true
     all_branches: true
+- provider: script
+  script: "mvn deploy -Prelease"
+  skip_cleanup: true
+  file_glob: true
+  file:
+    - "target/*.jar"
+    - "target/*.jar.asc"
+    - "target/*.pom"
+    - "target/*.pom.asc"
+  on:
+    repo: stheves/denon4j
+    branch: master
+
+
+cache:
+  directories:
+    - ~/.m2/repository
 
 notifications:
   email:
   - sascha.theves@gmail.com
+
+env:
+  global:
+  - secure: U/7NBQdIbyVPixH+kKrgESKz23KKy14mqOAphFnkzwpX+1knejCC3Wv4NNyFb0RASMPSTO8M6IHhOPdaA2iI7C8c4BTEohwurqxTTmvzZoTCvnAlSMbeaIkxMThoZE2YLMZXi7EDb7njUTSsC/Ix1utaAEHnKaDS7Pl6eDyc0jR6zXGxMiziSd5i9iTixq2+7R8ozThg5nA2n9KzpUtcD8e9YHMPk0gDpgdhShmPXQ1orDWUxcte1t7q6+RY3T9MmnPgifTrVHEkTO8769rbJS3+ltPIowOQCiTwAXQ4Llh4veAqZC0xo/2RSheFUMrIleOf+xULPji0yoUFjOR//Qrikmbq3GsinLeBHGerTPyTX+KDKICW7pVS/L9ePnQ4VXbcwtZ/2Cfroez4u6REatH/tJTweXZLj+h/Cmzt58lVya0fPMZo83R6OIFOOX2pPl5TdkZe9MaFQjNAJq+I9Baw93RrcAOLIzFj6ARBu4n+KCQOJCchFexyohkH8IfPOfuQZqSH4jXcrxubP8ExWz9tpTjMc1XsWsk+Fic0fy1WPi7HT8z6bri+JZ5SQTC4lZU2ATijwAOd9A8oc2kyKfLGJj3O8gMaa6Y5s4p866V2xwR83vd7CUNQfS6hYjGjfrfnnWKbkM/RSKEQfhOOtJJSs6aIkyQfl38ewpytHng=
+  - secure: DtSvCyfxiWFKzHRC9eicdo2iV/VBVbZUuWc5NIS+XpHNGOEmCD3Z6Lc71FUP2a9Uwo+GITx+e0mR+lmr2fpgSlbDCwZ8T8D4dY5WGlD06GIURgozQjcxjkqiJr5Q6nucCwtKTqiwhz8eBYaJRev1UImEdGKDGlOAEMOHXnuN64o3JPm9z2pP1ZIrCuWpvPlV54KYUafrc1nd0AWLS7P8QskOAF1JB7qT6bWYN7dHFk8s5ZIuZM5JjitPYW7zV1SRcyUJ04O9TUVkWQcvSmnKDTpgYzKraY4pgKpv0OaSrgIKvSZE69z4NPiZ56j6aGWLfRbrbgrTABb7NxPsN+lgUNKNeKqmGp6fCt4V38iIl4lkGgVTqA5xInm3Qq2YlRoU9kWZzwKPTXapxh8enty6hOKFTk9yO2Gp+DB7+z/oVBmmuRgFIFsnN0R3nNcKsfQeq4STXp97RRXp9boHv+dASysn3cineT1zhrnf1Jn0nOGrCMcBcpi2lvd7dX3Mp5VMREbOBFJdRTkOVIBuob572FRN+57SABcrUwPhSrlm16hsNthokMMBvc8VxRTUBeky4Xuh9zSFfqm5KZaQecv9zZwtFT+hPcita7NX/VXPXGqHxnhpuWBEU9sKNTCfdGDtgVHCkPt26ixRtvA9HxSlDmlhEHbWzFbO+VDyoa/AmyA=
+  - secure: JdI1nnAb9X9AWcQoq68e/cIPGZzTCeXcFJ59/73zawGQI/eQ699BY9NmBIfnEInSCpBShXlBLLUnOQjrNqj0znnl6UNQWMUH3BsbbZKOzUkkEnokMmPIJTTK9Q7YCN36wKg750M7LFYJt5NpjNhTVSTNi7U8+Ts59TOSs7Z0K5psmoidrUWAaWEIn7QhVqq5OXfeJIa1ogHs7joMxD3IRtJRYR8P0uVSgQFm0ZfX8qWoZZfNiCYx8He8J5C8gGNcdeTOujuRPzoRwdFTA2N/mQ7rtv8kBeaG8erjGdPCeyuRgAhapuizsRS19eM6sG6LK7nP2b6QujWmuhBVvxDnF4+qhtNEfZi7fZ5876nx5L1e352PwfclpL6e+HSbXxumbaiJ7CHH36C1TDgDaEFSDlbBHPRC0Uz6BdGYE4Nad9bJXvGtlHHQD+31GtHmZyC+xihjE5G/2aTUKTf/zuD3E1SeNYBYSGisDrpg6Jm5TwY5UJtya2npP1g1NLVQyQLkbkEM2mw6wXHsM4Op3O35FqDj7r0uPsKZfRc/m4+lUF+O98al2+/DxdM0sDSg35O5a8dE6xAdiOEtZ8lWGYiiK2hEXdrDeC57KhWuwAHbTyA24T7uaGiQborpX82EfF5+g75ZwQuQp4XYwQd5aYUJUBUaZ78UsW0gr1nCSgmfp3c=
+  - secure: bYoGyqiD9KHyX8VtLQEYkbkPuRjgfVwqE2g/kpwBBFg2z92FTZrkBzhQHh4VFeGNFJefAUTQ6k6wE253R4/GlHqoznNRcJrmoc5B+Qv6axHlzzwAno0JvcLgIW/mBUbTkg2TRoWscVddfK63aDrg25GuwtjD9lFwOQuqTEKPPXKVxQdlz9GC/xfsJ+pZ0mt67MS78YkaxhUtkyuVqiZQYZl6Xz+n6nDcvzg8tL5dRF6RuP4fybauw0RvcqoM9v193qNXTYDkKpeBKTtAnE4gzZdvQEuYEOlUDjjhmIQzzG+J0dR2/WTj+Opiq54l/oVCqoJr4ktTdXRknKb8weZKb7Qs95EV7e4Z5qYrsicDdCpD3XnTowldHpvvHDrEj+clfqpN5vqtztk02k9G3HA1XiWtYDzErXnXg9dI+phdB4pntEHqgBok7j11/GGJ6SdF3LG4xH9ooEDQwMcswz4gIdWXflvdvozop6Z6igXJMkSz8/1kzSFiqGWW43tXCKzscw1WvvVbf4n61rGEqJG5PI81b0r+n7eM8an852RXVHS8HFT9nFtkkb11yaoinQFHXZZ4T+gPO8nLGTk7HlWBimvX97TyLjbWXqg2ExUgt5GwhCSs/4/8OyiaHUDCZ0K1PiYIR8u1a62RnVLubtVnaUUpduM/XxiQeT51mOvmA/A=
