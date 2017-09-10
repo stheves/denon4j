@@ -1,0 +1,12 @@
+= denon4j - A high-level Java API for interaction with Denon Audio Video receivers via TCP/IP
+//:author: Sascha Theves
+//:email: sascha.theves@gmail.com
+:revnumber: ${project.version}
+:revdate: 2017-09-10
+:toc: left
+:numbered:
+:toclevels: 2
+:toc-title: Overview
+:source-highlighter: coderay
+:icons: font
+//:imagesdir: images
