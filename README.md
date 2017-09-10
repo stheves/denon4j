@@ -26,7 +26,7 @@ masterVolume.slideUp();
 avr.disconnect();
 ```
 
-Take a look at the class Avr1912Demo.java in the test directory to view a complete example.
+Take a look at the class Demo.java in the test directory to view a complete example.
 
 # Command line usage
 
