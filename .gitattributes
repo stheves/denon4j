@@ -83,6 +83,7 @@ TODO            text
 *.class         binary
 *.jar           binary
 *.war           binary
+*.enc           binary
 
 ## LINTERS
 .csslintrc      text
