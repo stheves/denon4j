@@ -28,6 +28,7 @@ deploy:
   script: mvn -q -B -e deploy -Prelease -DskipTests=true
   skip_cleanup: true
   on:
+    repo: stheves/denon4j
     tags: true
     all_branches: true
 cache:
