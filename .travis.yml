@@ -27,15 +27,9 @@ deploy:
 - provider: script
   script: mvn -q -B -e deploy -Prelease -DskipTests=true
   skip_cleanup: true
-  file_glob: true
-  file:
-  - target/*.jar
-  - target/*.jar.asc
-  - target/*.pom
-  - target/*.pom.asc
   on:
-    repo: stheves/denon4j
-    branch: master
+    tags: true
+    all_branches: true
 cache:
   directories:
   - ~/.m2/repository
