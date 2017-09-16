@@ -25,7 +25,7 @@ deploy:
     tags: true
     all_branches: true
 - provider: script
-  script: mvn deploy -Prelease -DskipTests=true
+  script: mvn deploy -Prelease -DskipTests=true -s releng/maven_settings.xml
   skip_cleanup: true
   file_glob: true
   file:
