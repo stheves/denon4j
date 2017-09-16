@@ -60,10 +60,6 @@
         </developer>
     </developers>
 
-    <prerequisites>
-        <maven>3.2.1</maven>
-    </prerequisites>
-
     <properties>
         <encoding>UTF-8</encoding>
         <java-target-version>1.8</java-target-version>
