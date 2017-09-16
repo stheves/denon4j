@@ -28,7 +28,7 @@ deploy:
     tags: true
     all_branches: true
 - provider: script
-  script: "mvn deploy -Prelease"
+  script: "mvn deploy -Prelease -DskipTests=true"
   skip_cleanup: true
   file_glob: true
   file:
