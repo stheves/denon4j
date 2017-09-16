@@ -20,7 +20,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.theves</groupId>
     <artifactId>denon4j</artifactId>
-    <version>0.8-SNAPSHOT</version>
+    <version>0.8</version>
     <packaging>jar</packaging>
     <name>Denon4j</name>
     <description>A high-level Java API for interaction with Denon Audio Video receivers via TCP/IP</description>
