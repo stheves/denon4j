@@ -2,6 +2,8 @@
 
 [![Build Status](https://travis-ci.org/stheves/denon4j.svg?branch=master)](https://travis-ci.org/stheves/denon4j)
 
+[![Maven Central](https://img.shields.io/badge/maven--central-0.8-blue.svg)](https://search.maven.org/#artifactdetails%7Cio.theves%7Cdenon4j%7C0.8%7Cjar)
+
 The denon4j project provides a higher level Java API for communicating with a Denon audio video receiver (currently only AVR1912 is tested)
 via TCP/IP. It hides the complexity of the network protocol and provides generic controls that can be used with every Denon receiver.
  
