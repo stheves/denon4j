@@ -29,7 +29,7 @@ public class AutoDiscovery {
     private int step = 1;
     private String subnet = "127.0.0";
     private int port = 23;
-    private int timeout = 200;
+    private int timeout = 55;
 
     public int getStart() {
         return start;

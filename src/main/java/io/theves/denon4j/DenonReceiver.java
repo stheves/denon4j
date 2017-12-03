@@ -45,7 +45,8 @@ public class DenonReceiver implements Receiver {
     private SelectImpl<SurroundMode> selectSurround;
 
     /**
-     * Starts auto discovery and chooses first receiver found;
+     * Starts auto discovery and chooses first receiver found.
+     * Takes some time from time to time, so pls be patient.
      */
     public DenonReceiver(String subnet) {
         this(autoDiscover(subnet).getHostAddress(), 23);
