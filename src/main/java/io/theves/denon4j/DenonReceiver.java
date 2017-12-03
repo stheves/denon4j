@@ -20,6 +20,7 @@ package io.theves.denon4j;
 import io.theves.denon4j.controls.*;
 import io.theves.denon4j.net.*;
 
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
@@ -30,9 +31,9 @@ import java.util.Objects;
  * @author stheves
  */
 public class DenonReceiver implements Receiver {
-    private final EventDispatcher eventDispatcher;
-    private final Protocol protocol;
-    private final Collection<Control> controls;
+    private EventDispatcher eventDispatcher;
+    private Protocol protocol;
+    private Collection<Control> controls;
     private ToggleImpl powerToggle;
     private SliderImpl masterSlider;
     private ToggleImpl mainZoneToggle;
@@ -43,22 +44,39 @@ public class DenonReceiver implements Receiver {
     private Menu menu;
     private SelectImpl<SurroundMode> selectSurround;
 
+    /**
+     * Starts auto discovery and chooses first receiver found;
+     */
+    public DenonReceiver(String subnet) {
+        this(autoDiscover(subnet).getHostAddress(), 23);
+    }
+
+    private static InetAddress autoDiscover(String subnet) {
+        AutoDiscovery autoDiscovery = new AutoDiscovery();
+        autoDiscovery.setSubnet(subnet);
+        Collection<InetAddress> discovered = autoDiscovery.discover(1);
+        if (discovered.isEmpty()) {
+            throw new ConnectionException("No receivers found");
+        }
+        return discovered.iterator().next();
+    }
+
     public DenonReceiver(String host, int port) {
         this(new Tcp(host, port));
     }
 
-    DenonReceiver(Protocol protocol) {
+    public DenonReceiver(Protocol protocol) {
         this.protocol = Objects.requireNonNull(protocol);
         this.eventDispatcher = new EventDispatcher();
         this.controls = new ArrayList<>();
 
         this.protocol.setDispatcher(eventDispatcher);
 
-        addControls(this.controls);
+        createControls(this.controls);
         addToDispatcher(this.controls);
     }
 
-    private void addControls(Collection<? super Control> controls) {
+    private void createControls(Collection<? super Control> controls) {
         // power control
         powerToggle = new ToggleImpl(protocol, "PW", SwitchState.ON, SwitchState.STANDBY);
         powerToggle.setName("Power Switch");
@@ -110,7 +128,7 @@ public class DenonReceiver implements Receiver {
     }
 
     private void addToDispatcher(Collection<Control> controls) {
-        controls.stream().forEach(eventDispatcher::addControl);
+        controls.forEach(eventDispatcher::addControl);
     }
 
     public Select<SurroundMode> surroundMode() {
@@ -155,12 +173,19 @@ public class DenonReceiver implements Receiver {
 
     @Override
     public String send(String command) {
+        checkConnected();
         Command cmd = Command.createCommand(protocol, command);
         cmd.execute();
         if (cmd instanceof RequestCommand) {
             return ((RequestCommand) cmd).getReceived().getParameter().getValue();
         }
         return null;
+    }
+
+    private void checkConnected() {
+        if (!isConnected()) {
+            throw new ConnectionException("Not connected");
+        }
     }
 
     @Override

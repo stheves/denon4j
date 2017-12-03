@@ -46,7 +46,7 @@ public class AutoDiscovery {
     }
 
     public void setEnd(int end) {
-        if (end > 0 && end < 255){
+        if (end > 0 && end < 255) {
             this.end = end;
         }
     }
@@ -72,6 +72,10 @@ public class AutoDiscovery {
     }
 
     public Collection<InetAddress> discover() {
+        return discover(255);
+    }
+
+    public Collection<InetAddress> discover(int max) {
         if (start < 0 || end < 0 || start > 255) {
             throw new IllegalArgumentException("from/to must be in range 0-254");
         }
@@ -85,6 +89,10 @@ public class AutoDiscovery {
                     try (Socket s = new Socket(host, port)) {
                         s.close();
                         discoveredServers.add(address);
+                        if (discoveredServers.size() == max) {
+                            // stop immediate
+                            break;
+                        }
                     }
                 }
             } catch (IOException e) {
