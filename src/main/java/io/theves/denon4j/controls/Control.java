@@ -17,11 +17,10 @@
 
 package io.theves.denon4j.controls;
 
-import io.theves.denon4j.Receiver;
 import io.theves.denon4j.net.Event;
 
 /**
- * A control represents a feature of an {@link Receiver}.
+ * A control represents a feature of an {@link io.theves.denon4j.DenonReceiver}.
  *
  * @author stheves
  */

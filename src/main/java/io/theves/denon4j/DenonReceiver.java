@@ -30,7 +30,7 @@ import java.util.Objects;
  *
  * @author stheves
  */
-public class DenonReceiver implements Receiver {
+public class DenonReceiver implements AutoCloseable {
     private EventDispatcher eventDispatcher;
     private Protocol protocol;
     private Collection<Control> controls;
@@ -172,7 +172,6 @@ public class DenonReceiver implements Receiver {
         return menu;
     }
 
-    @Override
     public String send(String command) {
         checkConnected();
         Command cmd = Command.createCommand(protocol, command);
@@ -189,7 +188,6 @@ public class DenonReceiver implements Receiver {
         }
     }
 
-    @Override
     public Collection<Control> getControls() {
         return controls;
     }
