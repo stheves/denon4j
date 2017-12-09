@@ -67,8 +67,8 @@ public class Demo {
             avr.input().select(InputSource.NET_UBS);
 
             Thread.sleep(200);
-            avr.networkControl().select(NetworkControls.CURSOR_RIGHT);
-            System.out.println("Display: " + avr.networkControl().getDisplay());
+            avr.netUsb().play();
+            System.out.println("Display: " + avr.netUsb().getDisplay());
 
             Thread.sleep(200);
             avr.menu().control(MenuControls.MENU_ON);

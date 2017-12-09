@@ -53,7 +53,7 @@ public class SliderImpl extends AbstractControl implements Slider {
     public String getValue() {
         RequestCommand command = Command.createRequestCommand(protocol, prefix);
         command.execute();
-        return command.getReceived().getParameter().getValue();
+        return command.getResponse().getParameter().getValue();
     }
 
     @Override

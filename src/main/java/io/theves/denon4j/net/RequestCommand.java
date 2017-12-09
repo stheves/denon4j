@@ -23,7 +23,7 @@ package io.theves.denon4j.net;
  * @author stheves
  */
 public class RequestCommand extends Command {
-    private Event received;
+    private Event response;
 
     public RequestCommand(Protocol protocol, String prefix) {
         super(protocol, prefix, Parameter.REQUEST);
@@ -31,10 +31,10 @@ public class RequestCommand extends Command {
 
     @Override
     protected void doSend() {
-        received = protocol.request(this);
+        response = protocol.request(this);
     }
 
-    public Event getReceived() {
-        return received;
+    public Event getResponse() {
+        return response;
     }
 }

@@ -48,7 +48,7 @@ public class DisplayInfo {
     }
 
     public Line getCursor() {
-        return lines.values().stream().filter(line -> line.isCursorSelect()).findFirst().orElse(null);
+        return lines.values().stream().filter(Line::isCursorSelect).findFirst().orElse(null);
     }
 
     @Override

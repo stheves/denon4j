@@ -34,13 +34,13 @@ public class DenonReceiver implements AutoCloseable {
     private EventDispatcher eventDispatcher;
     private Protocol protocol;
     private Collection<Control> controls;
-    private ToggleImpl powerToggle;
-    private SliderImpl masterSlider;
-    private ToggleImpl mainZoneToggle;
-    private ToggleImpl muteToggle;
-    private SelectImpl<InputSource> selectInput;
-    private SelectImpl<VideoSource> selectVideo;
-    private NetworkControlImpl selectNet;
+    private Toggle powerToggle;
+    private Slider masterSlider;
+    private Toggle mainZoneToggle;
+    private Toggle muteToggle;
+    private Select<InputSource> selectInput;
+    private Select<VideoSource> selectVideo;
+    private NetUsb netUsb;
     private Menu menu;
     private SelectImpl<SurroundMode> selectSurround;
 
@@ -115,9 +115,9 @@ public class DenonReceiver implements AutoCloseable {
         controls.add(mainZoneToggle);
 
         // network audio/usb/ipod DIRECT extended control
-        selectNet = new NetworkControlImpl(protocol);
-        selectNet.init();
-        controls.add(selectNet);
+        netUsb = new NetUsbImpl(protocol);
+        netUsb.init();
+        controls.add(netUsb);
 
         menu = new Menu(protocol);
         menu.init();
@@ -160,8 +160,8 @@ public class DenonReceiver implements AutoCloseable {
         return selectInput;
     }
 
-    public NetworkControl networkControl() {
-        return selectNet;
+    public NetUsb netUsb() {
+        return netUsb;
     }
 
     public Select<VideoSource> video() {
@@ -177,7 +177,7 @@ public class DenonReceiver implements AutoCloseable {
         Command cmd = Command.createCommand(protocol, command);
         cmd.execute();
         if (cmd instanceof RequestCommand) {
-            return ((RequestCommand) cmd).getReceived().getParameter().getValue();
+            return ((RequestCommand) cmd).getResponse().getParameter().getValue();
         }
         return null;
     }

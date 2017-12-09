@@ -22,6 +22,25 @@ package io.theves.denon4j.controls;
  *
  * @author stheves
  */
-public interface NetworkControl extends Select<NetworkControls> {
+public interface NetUsb extends Control {
     DisplayInfo getDisplay();
+    void cursorUp();
+    void cursorDown();
+    void cursorLeft();
+    void cursorRight();
+    void play();
+    void pause();
+    void stop();
+    void enter();
+    void previousPage();
+    void nextPage();
+    void shuffleOn();
+    void shuffleOff();
+    void mode();
+    void repeatOne();
+    void repeatAll();
+    void repeatOff();
+    void partyMode();
+    void skipPlus();
+    void skipMinus();
 }

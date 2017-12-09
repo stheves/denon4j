@@ -51,7 +51,7 @@ public abstract class SwitchImpl extends AbstractControl implements Switch {
     public SwitchState state() {
         RequestCommand command = Command.createRequestCommand(protocol, prefix);
         command.execute();
-        return SwitchState.valueOf(command.getReceived().getParameter().getValue());
+        return SwitchState.valueOf(command.getResponse().getParameter().getValue());
     }
 
     private void executeCommand(String param) {

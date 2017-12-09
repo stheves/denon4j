@@ -126,10 +126,10 @@ public class ControlsTest {
 
     @Test
     public void testNetworkControl() {
-        NetworkControl selectNetworkControl = denonAvr192.networkControl();
-        assertThat(selectNetworkControl.getCommandPrefix()).isEqualTo("NS");
+        NetUsb selectNetUsb = denonAvr192.netUsb();
+        assertThat(selectNetUsb.getCommandPrefix()).isEqualTo("NS");
 
-        selectNetworkControl.select(NetworkControls.CURSOR_DOWN);
+        selectNetUsb.cursorDown();
         verify(protocol).send(cmd("NS91"));
     }
 

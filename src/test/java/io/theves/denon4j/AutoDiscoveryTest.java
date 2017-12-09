@@ -31,11 +31,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class AutoDiscoveryTest {
     @Test
     public void discoverReceivers() throws Exception {
-        AutoDiscovery autoDiscovery = new AutoDiscovery();
-        autoDiscovery.setStart(0);
-        autoDiscovery.setEnd(10);
-        autoDiscovery.setPort(2323);
-        try (ServerSocket mockServer = new ServerSocket(2323)) {
+        try (ServerSocket mockServer = new ServerSocket(0)) {
+            AutoDiscovery autoDiscovery = new AutoDiscovery();
+            autoDiscovery.setStart(0);
+            autoDiscovery.setEnd(10);
+            autoDiscovery.setPort(mockServer.getLocalPort());
             Instant now = Instant.now();
             Collection<InetAddress> discover = autoDiscovery.discover();
             System.out.println("Duration: " + Duration.between(now, Instant.now()));
