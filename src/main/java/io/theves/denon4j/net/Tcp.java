@@ -79,6 +79,7 @@ public final class Tcp implements Protocol {
         }
         try {
             socket.setSoTimeout(0); // set infinite poll timeout
+            socket.setKeepAlive(true);
             socket.connect(new InetSocketAddress(host, port), timeout);
 
             writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.US_ASCII));
