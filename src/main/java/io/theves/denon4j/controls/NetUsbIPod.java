@@ -17,20 +17,22 @@
 
 package io.theves.denon4j.controls;
 
-import io.theves.denon4j.net.Command;
+import io.theves.denon4j.DenonReceiver;
 import io.theves.denon4j.net.Event;
 import io.theves.denon4j.net.Protocol;
+
+import static io.theves.denon4j.controls.NetUsbControls.*;
 
 /**
  * Class description.
  *
  * @author stheves
  */
-public class NetUsbImpl extends AbstractControl implements NetUsb {
+public class NetUsbIPod extends AbstractControl {
     private DisplayInfo mostRecentDisplayInfo;
 
-    public NetUsbImpl(Protocol protocol) {
-        super("NS", protocol);
+    public NetUsbIPod(DenonReceiver receiver) {
+        super("NS", receiver);
         setName("Network USB/AUDIO/IPOD Extended Control");
     }
 
@@ -45,118 +47,111 @@ public class NetUsbImpl extends AbstractControl implements NetUsb {
         }
     }
 
-    @Override
-    protected void doInit() {
-    }
-
     private boolean isDisplayInfoEvent(Event event) {
         return event.getPrefix().startsWith("NS");
     }
 
-    @Override
     public DisplayInfo getDisplay() {
         readOnscreenInfo();
         return mostRecentDisplayInfo;
     }
 
-    @Override
+
     public void cursorUp() {
-        Command.createCommand(protocol, prefix, NetUsbControls.CURSOR_UP.getControl()).execute();
+        send(CURSOR_UP.getControl());
     }
 
-    @Override
+
     public void cursorDown() {
-        Command.createCommand(protocol, prefix, NetUsbControls.CURSOR_DOWN.getControl()).execute();
+        send(CURSOR_DOWN.getControl());
     }
 
-    @Override
+
     public void cursorLeft() {
-        Command.createCommand(protocol, prefix, NetUsbControls.CURSOR_LEFT.getControl()).execute();
+        send(CURSOR_LEFT.getControl());
     }
 
-    @Override
+
     public void cursorRight() {
-        Command.createCommand(protocol, prefix, NetUsbControls.CURSOR_RIGHT.getControl()).execute();
+        send(CURSOR_RIGHT.getControl());
     }
 
-    @Override
+
     public void play() {
-        Command.createCommand(protocol, prefix, NetUsbControls.PLAY.getControl()).execute();
+        send(PLAY.getControl());
     }
 
-    @Override
+
     public void pause() {
-        Command.createCommand(protocol, prefix, NetUsbControls.PAUSE.getControl()).execute();
+        send(PAUSE.getControl());
     }
 
-    @Override
+
     public void stop() {
-        Command.createCommand(protocol, prefix, NetUsbControls.STOP.getControl()).execute();
+        send(STOP.getControl());
     }
 
-    @Override
+
     public void enter() {
-        Command.createCommand(protocol, prefix, NetUsbControls.ENTER.getControl()).execute();
+        send(ENTER.getControl());
     }
 
-    @Override
+
     public void previousPage() {
-        Command.createCommand(protocol, prefix, NetUsbControls.PAGE_PREV.getControl()).execute();
+        send(PAGE_PREV.getControl());
     }
 
-    @Override
+
     public void nextPage() {
-        Command.createCommand(protocol, prefix, NetUsbControls.PAGE_NEXT.getControl()).execute();
+        send(PAGE_NEXT.getControl());
     }
 
-    @Override
+
     public void shuffleOn() {
-        Command.createCommand(protocol, prefix, NetUsbControls.SHUFFLE_ON.getControl()).execute();
+        send(SHUFFLE_ON.getControl());
     }
 
-    @Override
+
     public void shuffleOff() {
-        Command.createCommand(protocol, prefix, NetUsbControls.SHUFFLE_OFF.getControl()).execute();
+        send(SHUFFLE_OFF.getControl());
     }
 
-    @Override
+
     public void mode() {
-        Command.createCommand(protocol, prefix, NetUsbControls.MODE.getControl()).execute();
+        send(MODE.getControl());
     }
 
-    @Override
+
     public void repeatOne() {
-        Command.createCommand(protocol, prefix, NetUsbControls.REPEAT_ONE.getControl()).execute();
+        send(REPEAT_ONE.getControl());
     }
 
-    @Override
     public void repeatAll() {
-        Command.createCommand(protocol, prefix, NetUsbControls.REPEAT_ALL.getControl()).execute();
+        send(REPEAT_ALL.getControl());
     }
 
-    @Override
+
     public void repeatOff() {
-        Command.createCommand(protocol, prefix, NetUsbControls.REPEAT_OFF.getControl()).execute();
+        send(REPEAT_OFF.getControl());
     }
 
-    @Override
+
     public void partyMode() {
-        Command.createCommand(protocol, prefix, NetUsbControls.PARTY_MODE.getControl()).execute();
+        send(PARTY_MODE.getControl());
     }
 
-    @Override
+
     public void skipPlus() {
-        Command.createCommand(protocol, prefix, NetUsbControls.SKIP_PLUS.getControl()).execute();
+        send(SKIP_PLUS.getControl());
     }
 
-    @Override
+
     public void skipMinus() {
-        Command.createCommand(protocol, prefix, NetUsbControls.SKIP_MINUS.getControl()).execute();
+        send(SKIP_MINUS.getControl());
     }
 
     private void readOnscreenInfo() {
-        Command nse = Command.createCommand(protocol, prefix, "E");
-        nse.execute();
+        send("E");
         // wait until all events are received
         while (mostRecentDisplayInfo == null || !mostRecentDisplayInfo.isComplete()) {
             try {

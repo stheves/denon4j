@@ -5,7 +5,7 @@
 [![Maven Central](https://img.shields.io/badge/maven--central-0.8-blue.svg)](https://search.maven.org/#artifactdetails%7Cio.theves%7Cdenon4j%7C0.8%7Cjar)
 
 The denon4j project provides a higher level Java API for communicating with a Denon audio video receiver (currently only AVR1912 is tested)
-via TCP/IP. It hides the complexity of the network protocol and provides generic controls that can be used with every Denon receiver.
+via TCP/IP. It hides the complexity of the network receiver and provides generic controls that can be used with every Denon receiver.
  
 The project is intended to be easily extended for those who want to write an API for their own AVR model.
 
@@ -45,7 +45,7 @@ q			Quits the program
 PW?			Returns the power state
 PWON		Turns power on
 
-See the Denon AVR protocol for a full list of commands.
+See the Denon AVR receiver for a full list of commands.
 > MU?
 OFF
 ```

@@ -17,7 +17,7 @@
 
 package io.theves.denon4j.controls;
 
-import io.theves.denon4j.net.Protocol;
+import io.theves.denon4j.DenonReceiver;
 
 /**
  * Toggle control implementation.
@@ -26,8 +26,8 @@ import io.theves.denon4j.net.Protocol;
  */
 public class ToggleImpl extends SwitchImpl implements Toggle {
 
-    public ToggleImpl(Protocol protocol, String prefix, SwitchState on, SwitchState off) {
-        super(protocol, prefix, on, off);
+    public ToggleImpl(DenonReceiver receiver, String prefix, SwitchState on, SwitchState off) {
+        super(receiver, prefix, on, off);
     }
 
     public void toggle() {

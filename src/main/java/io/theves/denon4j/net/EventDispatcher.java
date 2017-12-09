@@ -17,56 +17,53 @@
 
 package io.theves.denon4j.net;
 
-import io.theves.denon4j.controls.Control;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Receives events from an AVR and dispatches them to the controls.
+ * Receives events from an AVR and dispatches them to the eventListeners.
  *
  * @author stheves
  */
 public class EventDispatcher {
 
-    private final Collection<Control> controls;
-    private final Set<Event> unhandledEvents;
+    private final Collection<EventListener> eventListeners;
+    private final Logger log = LoggerFactory.getLogger(EventDispatcher.class);
 
-    /**
-     */
     public EventDispatcher() {
-        this.controls = new HashSet<>();
-        unhandledEvents = new HashSet<>();
+        this.eventListeners = new HashSet<>();
     }
 
-    public Set<Event> getUnhandledEvents() {
-        return Collections.unmodifiableSet(unhandledEvents);
-    }
-
-    public void addControl(Control ctrl) {
-        if (null != ctrl) {
-            controls.add(ctrl);
+    public void addListener(EventListener listener) {
+        if (null != listener) {
+            eventListeners.add(listener);
         }
     }
 
-    public void removeControl(Control ctrl) {
-        if (null != ctrl) {
-            controls.remove(ctrl);
+    public void removeListener(EventListener eventListener) {
+        if (null != eventListener) {
+            eventListeners.remove(eventListener);
         }
     }
 
-    public Collection<Control> getControls() {
-        return controls;
+    public Collection<EventListener> getEventListeners() {
+        return eventListeners;
     }
 
     public void dispatch(Event event) {
-        List<Control> supporters = controls.stream().filter(ctrl ->
-                ctrl.supports(event)).collect(Collectors.toList());
-        if (supporters.size() == 0) {
-            // nobody cares...
-            unhandledEvents.add(event);
-        } else {
-            supporters.forEach(ctrl -> ctrl.handle(event));
-        }
+        List<EventListener> supporters = eventListeners.stream().filter(ctrl ->
+            ctrl.supports(event)).collect(Collectors.toList());
+        supporters.forEach(ctrl -> {
+            try {
+                ctrl.handle(event);
+            } catch (Exception e) {
+                log.error("Caught exception from listener: " + ctrl, e);
+            }
+        });
     }
 }

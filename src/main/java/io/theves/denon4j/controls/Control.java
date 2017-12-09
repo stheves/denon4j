@@ -17,20 +17,14 @@
 
 package io.theves.denon4j.controls;
 
-import io.theves.denon4j.net.Event;
+import io.theves.denon4j.net.EventListener;
 
 /**
  * A control represents a feature of an {@link io.theves.denon4j.DenonReceiver}.
  *
  * @author stheves
  */
-public interface Control {
-    /**
-     * Invoked when an event belonging to this control`s prefix was received on the event bus.
-     *
-     * @param event the event that was received.
-     */
-    void handle(Event event);
+public interface Control extends EventListener {
 
     /**
      * Returns the command prefix which this control handles.
@@ -38,23 +32,6 @@ public interface Control {
      * @return the command prefix of this control
      */
     String getCommandPrefix();
-
-    /**
-     * Initialized this control.
-     */
-    void init();
-
-    /**
-     * Returns <code>true</code> if this control is initialized.
-     *
-     * @return <code>true</code> if initialized.
-     */
-    boolean isInitialized();
-
-    /**
-     * Disposes this control and frees resources.
-     */
-    void dispose();
 
     /**
      * Returns the name of the control.
@@ -70,11 +47,4 @@ public interface Control {
      */
     void setName(String name);
 
-    /**
-     * Returns <code>true</code> if this control can handle the <code>event</code>.
-     *
-     * @param event the event to check.
-     * @return <code>true</code> if this control can handle the event.
-     */
-    boolean supports(Event event);
 }

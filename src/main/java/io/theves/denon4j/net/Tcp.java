@@ -36,6 +36,7 @@ import java.util.Optional;
  * @author stheves
  */
 public final class Tcp implements Protocol {
+    private static final long READ_TIMEOUT = 1000;
     private final Logger logger = LoggerFactory.getLogger(Tcp.class);
     private final Integer port;
     private final String host;
@@ -131,12 +132,15 @@ public final class Tcp implements Protocol {
             send(requestCommand);
             // wait until response is received
             try {
-                eventReader.wait();
+                eventReader.wait(READ_TIMEOUT);
             } catch (InterruptedException e) {
                 logger.warn("Receive interrupted", e);
             }
             // we expecting the last event as result of the request command
-            return Optional.ofNullable(mostRecent).orElseThrow(() -> new ExecutionException("Could not get response"));
+            return Optional.ofNullable(mostRecent)
+                .orElseThrow(
+                () -> new ExecutionException("Could not get response within timeout " + READ_TIMEOUT)
+            );
         }
     }
 

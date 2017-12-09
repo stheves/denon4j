@@ -17,24 +17,19 @@
 
 package io.theves.denon4j.net;
 
-/**
- * Request command implementation.
- *
- * @author stheves
- */
-public class RequestCommand extends Command {
-    private Event response;
+public interface EventListener {
+    /**
+     * Invoked when an event belonging to this control`s prefix was received on the event bus.
+     *
+     * @param event the event that was received.
+     */
+    void handle(Event event);
 
-    public RequestCommand(Protocol protocol, String prefix) {
-        super(protocol, prefix, Parameter.REQUEST);
-    }
-
-    @Override
-    protected void doSend() {
-        response = protocol.request(this);
-    }
-
-    public Event getResponse() {
-        return response;
-    }
+    /**
+     * Returns <code>true</code> if this control can handle the <code>event</code>.
+     *
+     * @param event the event to check.
+     * @return <code>true</code> if this control can handle the event.
+     */
+    boolean supports(Event event);
 }

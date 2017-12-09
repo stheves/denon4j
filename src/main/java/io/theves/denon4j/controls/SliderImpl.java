@@ -17,6 +17,7 @@
 
 package io.theves.denon4j.controls;
 
+import io.theves.denon4j.DenonReceiver;
 import io.theves.denon4j.net.*;
 
 
@@ -29,8 +30,8 @@ public class SliderImpl extends AbstractControl implements Slider {
     private final String up;
     private final String down;
 
-    public SliderImpl(Protocol protocol, String prefix, String up, String down) {
-        super(prefix, protocol);
+    public SliderImpl(DenonReceiver receiver, String prefix, String up, String down) {
+        super(prefix, receiver);
         this.up = up;
         this.down = down;
     }
@@ -41,7 +42,7 @@ public class SliderImpl extends AbstractControl implements Slider {
     }
 
     private void executeCommand(String param) {
-        Command.createCommand(protocol, prefix, param).execute();
+        send(param);
     }
 
     @Override
@@ -51,20 +52,12 @@ public class SliderImpl extends AbstractControl implements Slider {
 
     @Override
     public String getValue() {
-        RequestCommand command = Command.createRequestCommand(protocol, prefix);
-        command.execute();
-        return command.getResponse().getParameter().getValue();
+        return sendRequest().getParameter();
     }
 
     @Override
     public void set(String value) {
-        executeSetCommand(value);
-    }
-
-    private void executeSetCommand(String value) {
-        SetCommand setCommand = Command.createSetCommand(protocol, prefix);
-        setCommand.set(value);
-        setCommand.execute();
+        executeCommand(value);
     }
 
     public void doHandle(Event event) {
@@ -72,11 +65,6 @@ public class SliderImpl extends AbstractControl implements Slider {
 
     public boolean supports(Event event) {
         return getCommandPrefix().equals(event.getPrefix());
-    }
-
-    @Override
-    protected void doInit() {
-
     }
 
 }

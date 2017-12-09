@@ -79,7 +79,7 @@ public class ControlsTest {
     }
 
     private Command cmd(String s) {
-        return Command.createCommand(protocol, s.substring(0, 2), s.substring(2));
+        return Command.createCommand(s.substring(0, 2), s.substring(2));
     }
 
     private Event event(String e) {
@@ -91,7 +91,7 @@ public class ControlsTest {
         Toggle power = denonAvr192.power();
 
         when(protocol.request(cmd("PW?")))
-                .thenReturn(event("PWSTANDBY"));
+            .thenReturn(event("PWSTANDBY"));
 
         assertThat(power.state()).isEqualTo(SwitchState.STANDBY);
         power.toggle();
@@ -120,13 +120,13 @@ public class ControlsTest {
         slider.set("55");
         denonAvr192.getEventDispatcher().dispatch(Event.create("MV55"));
         denonAvr192.getEventDispatcher().dispatch(Event.create("MVMAX 72"));
-        verify(protocol).send(Command.createSetCommand(protocol, "MV"));
+        verify(protocol).send(Command.createCommand("MV55"));
         assertThat(slider.getValue()).isEqualTo("55");
     }
 
     @Test
     public void testNetworkControl() {
-        NetUsb selectNetUsb = denonAvr192.netUsb();
+        NetUsbIPod selectNetUsb = denonAvr192.netUsb();
         assertThat(selectNetUsb.getCommandPrefix()).isEqualTo("NS");
 
         selectNetUsb.cursorDown();
@@ -135,26 +135,16 @@ public class ControlsTest {
 
     @Test
     public void testCorrectInit() {
-        // check all controls initialized
-        assertControlsInitialized();
-
         // and added to dispatcher
         assertDispatcherValid();
     }
 
-    private void assertControlsInitialized() {
-        assertThat(denonAvr192.getControls()
-                .stream()
-                .filter(c -> !c.isInitialized())
-                .count()).isEqualTo(0);
-    }
-
     private void assertDispatcherValid() {
-        assertThat(denonAvr192.getEventDispatcher().getControls())
-                .containsExactlyInAnyOrder(
-                        denonAvr192.getControls()
-                                .stream()
-                                .toArray(value -> new Control[denonAvr192.getControls().size()])
-                );
+        assertThat(denonAvr192.getEventDispatcher().getEventListeners())
+            .containsExactlyInAnyOrder(
+                denonAvr192.getControls()
+                    .stream()
+                    .toArray(value -> new Control[denonAvr192.getControls().size()])
+            );
     }
 }

@@ -40,7 +40,7 @@ public class DenonReceiver implements AutoCloseable {
     private Toggle muteToggle;
     private Select<InputSource> selectInput;
     private Select<VideoSource> selectVideo;
-    private NetUsb netUsb;
+    private NetUsbIPod netUsb;
     private Menu menu;
     private SelectImpl<SurroundMode> selectSurround;
 
@@ -79,57 +79,48 @@ public class DenonReceiver implements AutoCloseable {
 
     private void createControls(Collection<? super Control> controls) {
         // power control
-        powerToggle = new ToggleImpl(protocol, "PW", SwitchState.ON, SwitchState.STANDBY);
+        powerToggle = new ToggleImpl(this, "PW", SwitchState.ON, SwitchState.STANDBY);
         powerToggle.setName("Power Switch");
-        powerToggle.init();
         controls.add(powerToggle);
 
         // master vol. control
-        masterSlider = new SliderImpl(protocol, "MV", "UP", "DOWN");
+        masterSlider = new SliderImpl(this, "MV", "UP", "DOWN");
         masterSlider.setName("Master Volume");
-        masterSlider.init();
         controls.add(masterSlider);
 
         // mute control
-        muteToggle = new ToggleImpl(protocol, "MU", SwitchState.ON, SwitchState.OFF);
+        muteToggle = new ToggleImpl(this, "MU", SwitchState.ON, SwitchState.OFF);
         muteToggle.setName("Mute Toggle");
-        muteToggle.init();
         controls.add(muteToggle);
 
         // select input
-        selectInput = new SelectImpl<>(protocol, "SI", InputSource.values());
+        selectInput = new SelectImpl<>(this, "SI", InputSource.values());
         selectInput.setName("Select INPUT Source");
-        selectInput.init();
         controls.add(selectInput);
 
         // select video
-        selectVideo = new SelectImpl<>(protocol, "SV", VideoSource.values());
+        selectVideo = new SelectImpl<>(this, "SV", VideoSource.values());
         selectVideo.setName("Select VIDEO Source");
-        selectVideo.init();
         controls.add(selectVideo);
 
         // main zone toggle
-        mainZoneToggle = new ToggleImpl(protocol, "ZM", SwitchState.ON, SwitchState.OFF);
+        mainZoneToggle = new ToggleImpl(this, "ZM", SwitchState.ON, SwitchState.OFF);
         mainZoneToggle.setName("Main Zone Toggle");
-        mainZoneToggle.init();
         controls.add(mainZoneToggle);
 
         // network audio/usb/ipod DIRECT extended control
-        netUsb = new NetUsbImpl(protocol);
-        netUsb.init();
+        netUsb = new NetUsbIPod(this);
         controls.add(netUsb);
 
-        menu = new Menu(protocol);
-        menu.init();
+        menu = new Menu(this);
         controls.add(menu);
 
-        selectSurround = new SelectImpl<>(protocol, "MS", SurroundMode.values());
-        selectSurround.init();
+        selectSurround = new SelectImpl<>(this, "MS", SurroundMode.values());
         controls.add(selectSurround);
     }
 
     private void addToDispatcher(Collection<Control> controls) {
-        controls.forEach(eventDispatcher::addControl);
+        controls.forEach(eventDispatcher::addListener);
     }
 
     public Select<SurroundMode> surroundMode() {
@@ -160,7 +151,7 @@ public class DenonReceiver implements AutoCloseable {
         return selectInput;
     }
 
-    public NetUsb netUsb() {
+    public NetUsbIPod netUsb() {
         return netUsb;
     }
 
@@ -172,20 +163,13 @@ public class DenonReceiver implements AutoCloseable {
         return menu;
     }
 
-    public String send(String command) {
-        checkConnected();
-        Command cmd = Command.createCommand(protocol, command);
-        cmd.execute();
-        if (cmd instanceof RequestCommand) {
-            return ((RequestCommand) cmd).getResponse().getParameter().getValue();
+    public Event send(String command) {
+        if (command != null && command.endsWith("?")) {
+            return protocol.request(Command.createCommand(command));
+        } else {
+            protocol.send(Command.createCommand(command));
         }
         return null;
-    }
-
-    private void checkConnected() {
-        if (!isConnected()) {
-            throw new ConnectionException("Not connected");
-        }
     }
 
     public Collection<Control> getControls() {
@@ -198,8 +182,7 @@ public class DenonReceiver implements AutoCloseable {
     }
 
     public void disconnect() {
-        getControls().forEach(eventDispatcher::removeControl);
-        getControls().forEach(Control::dispose);
+        getControls().forEach(eventDispatcher::removeListener);
         protocol.disconnect();
     }
 

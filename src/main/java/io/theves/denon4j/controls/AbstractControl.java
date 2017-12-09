@@ -17,45 +17,38 @@
 
 package io.theves.denon4j.controls;
 
-import io.theves.denon4j.net.AlreadyInitException;
+import io.theves.denon4j.DenonReceiver;
 import io.theves.denon4j.net.Event;
-import io.theves.denon4j.net.Protocol;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Class description.
+ * Base class for controls that handles requests/responses.
  *
  * @author stheves
  */
 public abstract class AbstractControl implements Control {
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
     protected final String prefix;
-    protected final Protocol protocol;
+    private final DenonReceiver receiver;
 
-    private final AtomicBoolean initialized = new AtomicBoolean(false);
     private String name;
 
-    public AbstractControl(String prefix, Protocol protocol) {
+    public AbstractControl(String prefix, DenonReceiver receiver) {
         this.prefix = Objects.requireNonNull(prefix);
-        this.protocol = protocol;
+        this.receiver = receiver;
     }
 
+    protected void send(String param) {
+        receiver.send(prefix + param);
+    }
+
+    protected Event sendRequest() {
+        return receiver.send(prefix + "?");
+    }
 
     @Override
     public final void handle(Event event) {
-        checkInitialized();
         doHandle(event);
-        logger.debug("Handled event: {}", event);
-    }
-
-    protected void checkInitialized() {
-        if (!initialized.get()) {
-            throw new NotYetInitializedException(this);
-        }
     }
 
     protected abstract void doHandle(Event event);
@@ -63,26 +56,6 @@ public abstract class AbstractControl implements Control {
     @Override
     public String getCommandPrefix() {
         return prefix;
-    }
-
-    @Override
-    public final void init() {
-        if (initialized.compareAndSet(false, true)) {
-            doInit();
-        } else {
-            throw new AlreadyInitException("This control has already been initialized");
-        }
-        logger.debug("Control initialized: {}", this);
-    }
-
-    @Override
-    public boolean isInitialized() {
-        return initialized.get();
-    }
-
-    @Override
-    public void dispose() {
-        logger.debug("Control disposed: {}", this);
     }
 
     @Override
@@ -99,14 +72,12 @@ public abstract class AbstractControl implements Control {
         return getCommandPrefix().equals(event.getPrefix());
     }
 
-    protected abstract void doInit();
-
     @Override
     public String toString() {
         return "Control{" +
-                "prefix='" + prefix + '\'' +
-                ", name='" + name + '\'' +
-                '}';
+            "prefix='" + prefix + '\'' +
+            ", name='" + name + '\'' +
+            '}';
     }
 
 

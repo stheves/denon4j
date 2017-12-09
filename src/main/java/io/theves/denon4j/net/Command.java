@@ -17,8 +17,6 @@
 
 package io.theves.denon4j.net;
 
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
 import java.util.Objects;
 
 /**
@@ -27,36 +25,22 @@ import java.util.Objects;
  * @author stheves
  */
 public class Command extends Event {
-    protected final Protocol protocol;
     private final String signature;
-    private LocalDateTime executedAt = LocalDateTime.MIN;
 
-    public Command(Protocol protocol, String prefix, Parameter parameter) {
-        super((prefix + parameter.getValue()).getBytes(StandardCharsets.US_ASCII), prefix, parameter);
-        this.protocol = Objects.requireNonNull(protocol);
-        this.signature = getPrefix() + getParameter().getValue();
+    public Command(String prefix, String parameter) {
+        super(prefix, parameter);
+        this.signature = getPrefix() + getParameter();
     }
 
-    public static SetCommand createSetCommand(Protocol protocol, String prefix) {
-        return new SetCommand(protocol, prefix);
-    }
-
-    public static Command createCommand(Protocol protocol, String command) {
+    public static Command createCommand(String command) {
         if (command == null || command.length() < 2) {
             throw new IllegalArgumentException("Command length must be > 2");
         }
-        return createCommand(protocol, command.substring(0, 2), command.substring(2));
+        return createCommand(command.substring(0, 2), command.substring(2));
     }
 
-    public static Command createCommand(Protocol protocol, String prefix, String param) {
-        if (Parameter.REQUEST.getValue().equals(param)) {
-            return createRequestCommand(protocol, prefix);
-        }
-        return new Command(protocol, prefix, Parameter.createParameter(param));
-    }
-
-    public static RequestCommand createRequestCommand(Protocol protocol, String prefix) {
-        return new RequestCommand(protocol, prefix);
+    public static Command createCommand(String prefix, String param) {
+        return new Command(prefix, param);
     }
 
     @Override
@@ -70,19 +54,6 @@ public class Command extends Event {
         if (o == null || getClass() != o.getClass()) return false;
         Command command = (Command) o;
         return Objects.equals(signature, command.signature);
-    }
-
-    public LocalDateTime getExecutedAt() {
-        return executedAt;
-    }
-
-    public void execute() {
-        doSend();
-        executedAt = LocalDateTime.now();
-    }
-
-    protected void doSend() {
-        protocol.send(this);
     }
 
     @Override

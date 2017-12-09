@@ -49,8 +49,8 @@ public class Line implements Comparable<Line> {
             cursorSelect = isSet(data, 3);
             picture = isSet(data, 6);
         }
-        this.displayLine = event.getParameter().getValue().substring(2);
-        this.index = Integer.valueOf(event.getParameter().getValue().substring(1, 2));
+        this.displayLine = event.getParameter().substring(2);
+        this.index = Integer.valueOf(event.getParameter().substring(1, 2));
     }
 
     private boolean isDataByte(byte data) {

@@ -23,43 +23,30 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 /**
- * Class description.
+ * Event is the representation of a receiver`s response.
  *
  * @author stheves
  */
 public class Event {
     private final String prefix;
-    private final Parameter parameter;
+    private final String parameter;
     private final LocalDateTime createdAt;
-    private final byte[] raw;
 
-    protected Event(byte[] raw, String prefix, Parameter parameter) {
-        this.raw = Objects.requireNonNull(raw);
+    protected Event(String prefix, String parameter) {
         this.prefix = Objects.requireNonNull(prefix);
         this.parameter = Objects.requireNonNull(parameter);
         this.createdAt = LocalDateTime.now();
     }
 
     public static Event create(String event) {
-        return create(event.getBytes(StandardCharsets.UTF_8));
-    }
-
-    public static Event create(byte[] raw) {
-        // TODO this does not work for NS commands
-        String prefix = new String(raw, 0, 2, StandardCharsets.US_ASCII);
-        String parameter = new String(raw, 2, raw.length - 2, StandardCharsets.UTF_8);
-        return new Event(raw, prefix, Parameter.createParameter(parameter));
+        return new Event(event.substring(0, 2), event.substring(2));
     }
 
     public String getPrefix() {
         return prefix;
     }
 
-    public byte[] getRaw() {
-        return raw;
-    }
-
-    public Parameter getParameter() {
+    public String getParameter() {
         return parameter;
     }
 
@@ -70,10 +57,17 @@ public class Event {
     @Override
     public String toString() {
         return "Event{" +
-                "prefix='" + prefix + '\'' +
-                ", parameter=" + parameter +
-                ", createdAt=" + createdAt +
-                '}';
+            "prefix='" + prefix + '\'' +
+            ", parameter=" + parameter +
+            ", createdAt=" + createdAt +
+            '}';
     }
 
+    public byte[] getRaw() {
+        return new StringBuilder()
+            .append(getPrefix())
+            .append(getParameter())
+            .toString()
+            .getBytes(StandardCharsets.UTF_8);
+    }
 }
