@@ -24,12 +24,4 @@ public interface EventListener {
      * @param event the event that was received.
      */
     void handle(Event event);
-
-    /**
-     * Returns <code>true</code> if this control can handle the <code>event</code>.
-     *
-     * @param event the event to check.
-     * @return <code>true</code> if this control can handle the event.
-     */
-    boolean supports(Event event);
 }

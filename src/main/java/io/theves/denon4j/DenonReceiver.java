@@ -127,10 +127,6 @@ public class DenonReceiver implements AutoCloseable {
         return selectSurround;
     }
 
-    EventDispatcher getEventDispatcher() {
-        return eventDispatcher;
-    }
-
     public Toggle power() {
         return powerToggle;
     }
@@ -163,13 +159,8 @@ public class DenonReceiver implements AutoCloseable {
         return menu;
     }
 
-    public Event send(String command) {
-        if (command != null && command.endsWith("?")) {
-            return protocol.request(Command.createCommand(command));
-        } else {
-            protocol.send(Command.createCommand(command));
-        }
-        return null;
+    public void send(String command) {
+        protocol.send(Command.createCommand(command));
     }
 
     public Collection<Control> getControls() {
@@ -192,5 +183,13 @@ public class DenonReceiver implements AutoCloseable {
 
     public boolean isConnected() {
         return protocol.isConnected();
+    }
+
+    public Collection<EventListener> getEventListeners() {
+        return eventDispatcher.getEventListeners();
+    }
+
+    EventDispatcher getEventDispatcher() {
+        return eventDispatcher;
     }
 }

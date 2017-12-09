@@ -69,10 +69,7 @@ public class Cli {
                             break;
                         }
                         if (input.length() > 2) {
-                            String response = avr.send(input).getParameter();
-                            if (response != null) {
-                                System.out.println(response);
-                            }
+                            avr.send(input);
                         }
                     }
                 } catch (IOException e) {

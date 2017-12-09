@@ -24,11 +24,14 @@ import java.util.Objects;
  *
  * @author stheves
  */
-public class Command extends Event {
+public class Command {
     private final String signature;
+    private final String prefix;
+    private final String parameter;
 
     public Command(String prefix, String parameter) {
-        super(prefix, parameter);
+        this.prefix = prefix;
+        this.parameter = parameter;
         this.signature = getPrefix() + getParameter();
     }
 
@@ -63,5 +66,13 @@ public class Command extends Event {
 
     public String signature() {
         return signature;
+    }
+
+    public String getPrefix() {
+        return prefix;
+    }
+
+    public String getParameter() {
+        return parameter;
     }
 }

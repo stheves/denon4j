@@ -18,9 +18,7 @@
 package io.theves.denon4j.controls;
 
 import io.theves.denon4j.DenonReceiver;
-import io.theves.denon4j.net.Command;
 import io.theves.denon4j.net.Event;
-import io.theves.denon4j.net.Protocol;
 
 /**
  * Class description.
@@ -29,7 +27,7 @@ import io.theves.denon4j.net.Protocol;
  */
 public class Menu extends AbstractControl {
     public Menu(DenonReceiver receiver) {
-        super("MN", receiver);
+        super(receiver, "MN");
         setName("Main Menu");
     }
 

@@ -20,6 +20,7 @@ package io.theves.denon4j.controls;
 
 import io.theves.denon4j.net.Event;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -38,7 +39,7 @@ public class DisplayInfo {
     }
 
     public void addEvent(Event event) {
-        Line line = new Line(event);
+        Line line = new Line(event, StandardCharsets.UTF_8);
         lines.put(line.getIndex(), line);
 
     }

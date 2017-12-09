@@ -19,7 +19,6 @@ package io.theves.denon4j.controls;
 
 import io.theves.denon4j.DenonReceiver;
 import io.theves.denon4j.net.Event;
-import io.theves.denon4j.net.Protocol;
 
 import static io.theves.denon4j.controls.NetUsbControls.*;
 
@@ -32,7 +31,7 @@ public class NetUsbIPod extends AbstractControl {
     private DisplayInfo mostRecentDisplayInfo;
 
     public NetUsbIPod(DenonReceiver receiver) {
-        super("NS", receiver);
+        super(receiver, "NS");
         setName("Network USB/AUDIO/IPOD Extended Control");
     }
 
@@ -48,7 +47,7 @@ public class NetUsbIPod extends AbstractControl {
     }
 
     private boolean isDisplayInfoEvent(Event event) {
-        return event.getPrefix().startsWith("NS");
+        return asciiString(event).startsWith("NS");
     }
 
     public DisplayInfo getDisplay() {

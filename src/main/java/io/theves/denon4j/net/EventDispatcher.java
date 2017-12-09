@@ -22,11 +22,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
- * Receives events from an AVR and dispatches them to the eventListeners.
+ * Receives events from an AVR and dispatches them to the event listeners.
  *
  * @author stheves
  */
@@ -56,9 +54,7 @@ public class EventDispatcher {
     }
 
     public void dispatch(Event event) {
-        List<EventListener> supporters = eventListeners.stream().filter(ctrl ->
-            ctrl.supports(event)).collect(Collectors.toList());
-        supporters.forEach(ctrl -> {
+        eventListeners.forEach(ctrl -> {
             try {
                 ctrl.handle(event);
             } catch (Exception e) {

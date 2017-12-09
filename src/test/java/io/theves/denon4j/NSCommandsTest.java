@@ -21,6 +21,9 @@ import io.theves.denon4j.controls.Line;
 import io.theves.denon4j.net.Event;
 import org.junit.Test;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 /**
@@ -32,8 +35,8 @@ public class NSCommandsTest {
     @Test
     public void testParseDataByte() {
         byte dataByte = 0b00001001; // playable music + cursor select bit set
-        Event event = Event.create("NSE1" + (char) dataByte + "Come Away With Mö");
-        Line aLine = new Line(event);
+        Event event = Event.create(new String("NSE1" + (char) dataByte + "Come Away With Mö").getBytes());
+        Line aLine = new Line(event, StandardCharsets.UTF_8);
         assertThat(aLine.getDisplayLine()).contains("Come Away With Mö");
         assertThat(aLine.getIndex()).isEqualTo(1);
         assertThat(aLine.isCursorSelect()).isTrue();
@@ -44,8 +47,8 @@ public class NSCommandsTest {
 
     @Test
     public void testParseWithoutDataByte() {
-        Event event = Event.create("NSE0Now Playing Usb");
-        Line aLine = new Line(event);
+        Event event = Event.create("NSE0Now Playing Usb".getBytes(StandardCharsets.UTF_8));
+        Line aLine = new Line(event, StandardCharsets.UTF_8);
         assertThat(aLine.getDisplayLine()).isEqualTo("Now Playing Usb");
         assertThat(aLine.getIndex()).isEqualTo(0);
         assertThat(aLine.isCursorSelect()).isFalse();

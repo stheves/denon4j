@@ -47,7 +47,6 @@ public class ControlsTest {
     public void testConnectionHandling() {
         denonAvr192.connect(100);
         InOrder order = inOrder(protocol, protocol);
-        order.verify(protocol, times(1)).setDispatcher(denonAvr192.getEventDispatcher());
         order.verify(protocol, times(1)).establishConnection(100);
 
         when(protocol.isConnected()).thenReturn(Boolean.TRUE);
@@ -70,7 +69,7 @@ public class ControlsTest {
         // execute control
         si.select(InputSource.SAT_CBL);
 
-        when(protocol.request(cmd("SI?"))).thenReturn(event("SISAT/CBL"));
+        denonAvr192.getEventDispatcher().dispatch(Event.create("SISAT/CBL".getBytes()));
         InputSource source = si.get();
         assertThat(source).isEqualTo(InputSource.SAT_CBL);
 
@@ -82,44 +81,38 @@ public class ControlsTest {
         return Command.createCommand(s.substring(0, 2), s.substring(2));
     }
 
-    private Event event(String e) {
-        return Event.create(e);
-    }
-
     @Test
     public void testPowerControl() {
         Toggle power = denonAvr192.power();
-
-        when(protocol.request(cmd("PW?")))
-            .thenReturn(event("PWSTANDBY"));
-
+        denonAvr192.getEventDispatcher().dispatch(Event.create("PWSTANDBY".getBytes()));
         assertThat(power.state()).isEqualTo(SwitchState.STANDBY);
         power.toggle();
+        denonAvr192.getEventDispatcher().dispatch(Event.create("PWON".getBytes()));
         verify(protocol).send(cmd("PWON"));
     }
 
     @Test
     public void testMasterSlider() {
         Slider slider = denonAvr192.masterVolume();
-        when(protocol.request(cmd("MV?"))).thenReturn(event("MV45"), event("MV455"), event("MV45"), event("MV55"));
+        denonAvr192.getEventDispatcher().dispatch(Event.create("MV45".getBytes()));
         assertThat(slider.getValue()).isEqualTo("45");
 
         slider.slideUp();
         // fake events
-        denonAvr192.getEventDispatcher().dispatch(Event.create("MV455"));
-        denonAvr192.getEventDispatcher().dispatch(Event.create("MVMAX 68"));
+        denonAvr192.getEventDispatcher().dispatch(Event.create("MV455".getBytes()));
+        denonAvr192.getEventDispatcher().dispatch(Event.create("MVMAX 68".getBytes()));
         verify(protocol).send(cmd("MVUP"));
         assertThat(slider.getValue()).isEqualTo("455");
 
         slider.slideDown();
-        denonAvr192.getEventDispatcher().dispatch(Event.create("MV45"));
-        denonAvr192.getEventDispatcher().dispatch(Event.create("MVMAX 675"));
+        denonAvr192.getEventDispatcher().dispatch(Event.create("MV45".getBytes()));
+        denonAvr192.getEventDispatcher().dispatch(Event.create("MVMAX 675".getBytes()));
         verify(protocol).send(cmd("MVDOWN"));
         assertThat(slider.getValue()).isEqualTo("45");
 
         slider.set("55");
-        denonAvr192.getEventDispatcher().dispatch(Event.create("MV55"));
-        denonAvr192.getEventDispatcher().dispatch(Event.create("MVMAX 72"));
+        denonAvr192.getEventDispatcher().dispatch(Event.create("MV55".getBytes()));
+        denonAvr192.getEventDispatcher().dispatch(Event.create("MVMAX 72".getBytes()));
         verify(protocol).send(Command.createCommand("MV55"));
         assertThat(slider.getValue()).isEqualTo("55");
     }
@@ -135,12 +128,11 @@ public class ControlsTest {
 
     @Test
     public void testCorrectInit() {
-        // and added to dispatcher
         assertDispatcherValid();
     }
 
     private void assertDispatcherValid() {
-        assertThat(denonAvr192.getEventDispatcher().getEventListeners())
+        assertThat(denonAvr192.getEventListeners())
             .containsExactlyInAnyOrder(
                 denonAvr192.getControls()
                     .stream()

@@ -18,56 +18,23 @@
 package io.theves.denon4j.net;
 
 
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
-import java.util.Objects;
-
 /**
  * Event is the representation of a receiver`s response.
  *
  * @author stheves
  */
 public class Event {
-    private final String prefix;
-    private final String parameter;
-    private final LocalDateTime createdAt;
+    private final byte[] raw;
 
-    protected Event(String prefix, String parameter) {
-        this.prefix = Objects.requireNonNull(prefix);
-        this.parameter = Objects.requireNonNull(parameter);
-        this.createdAt = LocalDateTime.now();
+    private Event(byte[] raw) {
+        this.raw = raw;
     }
 
-    public static Event create(String event) {
-        return new Event(event.substring(0, 2), event.substring(2));
-    }
-
-    public String getPrefix() {
-        return prefix;
-    }
-
-    public String getParameter() {
-        return parameter;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    @Override
-    public String toString() {
-        return "Event{" +
-            "prefix='" + prefix + '\'' +
-            ", parameter=" + parameter +
-            ", createdAt=" + createdAt +
-            '}';
+    public static Event create(byte[] event) {
+        return new Event(event);
     }
 
     public byte[] getRaw() {
-        return new StringBuilder()
-            .append(getPrefix())
-            .append(getParameter())
-            .toString()
-            .getBytes(StandardCharsets.UTF_8);
+        return raw;
     }
 }

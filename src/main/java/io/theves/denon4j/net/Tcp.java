@@ -36,7 +36,6 @@ import java.util.Optional;
  * @author stheves
  */
 public final class Tcp implements Protocol {
-    private static final long READ_TIMEOUT = 1000;
     private final Logger logger = LoggerFactory.getLogger(Tcp.class);
     private final Integer port;
     private final String host;
@@ -45,7 +44,6 @@ public final class Tcp implements Protocol {
     private EventDispatcher eventDispatcher;
     private Socket socket;
     private Writer writer;
-    private Event mostRecent;
 
     public Tcp(String host, Integer port) {
         this.host = Optional.ofNullable(host).orElse("127.0.0.1");
@@ -58,9 +56,7 @@ public final class Tcp implements Protocol {
         if (logger.isDebugEnabled()) {
             logger.debug("Event received: {}", event);
         }
-
         notify(event);
-        mostRecent = event;
     }
 
     private void notify(Event event) {
@@ -68,7 +64,7 @@ public final class Tcp implements Protocol {
             try {
                 eventDispatcher.dispatch(event);
             } catch (Exception e) {
-                logger.warn("Error invoking event listener", e);
+                logger.warn("Error invoking callback", e);
             }
         }
     }
@@ -122,26 +118,6 @@ public final class Tcp implements Protocol {
     @Override
     public void setDispatcher(EventDispatcher eventDispatcher) {
         this.eventDispatcher = eventDispatcher;
-    }
-
-
-    @Override
-    public Event request(Command requestCommand) {
-        synchronized (eventReader) {
-            mostRecent = null;
-            send(requestCommand);
-            // wait until response is received
-            try {
-                eventReader.wait(READ_TIMEOUT);
-            } catch (InterruptedException e) {
-                logger.warn("Receive interrupted", e);
-            }
-            // we expecting the last event as result of the request command
-            return Optional.ofNullable(mostRecent)
-                .orElseThrow(
-                () -> new ExecutionException("Could not get response within timeout " + READ_TIMEOUT)
-            );
-        }
     }
 
 

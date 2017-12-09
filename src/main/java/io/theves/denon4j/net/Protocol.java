@@ -44,15 +44,6 @@ public interface Protocol {
     void setDispatcher(EventDispatcher eventDispatcher);
 
     /**
-     * Sends a request command.
-     * A request command is a special command that has a immediate response in form of an {@link Event}.
-     *
-     * @param requestCommand the command to send.
-     * @return the response of the command.
-     */
-    Event request(Command requestCommand);
-
-    /**
      * Connect to the receiver.
      *
      * @param timeout the timeout in seconds to wait for connection establishment.

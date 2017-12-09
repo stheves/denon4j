@@ -18,7 +18,7 @@
 package io.theves.denon4j.controls;
 
 import io.theves.denon4j.DenonReceiver;
-import io.theves.denon4j.net.*;
+import io.theves.denon4j.net.Event;
 
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -32,7 +32,7 @@ public class SelectImpl<S extends Enum> extends AbstractControl implements Selec
     private final S[] params;
 
     public SelectImpl(DenonReceiver receiver, String prefix, S[] params) {
-        super(prefix, receiver);
+        super(receiver, prefix);
         this.params = Objects.requireNonNull(params);
     }
 
@@ -43,15 +43,15 @@ public class SelectImpl<S extends Enum> extends AbstractControl implements Selec
 
     @Override
     public S get() {
-        Event received = sendRequest();
-        return findSource(received.getParameter());
+        String received = sendRequest();
+        return findSource(received);
     }
 
     private S findSource(String state) {
         return Stream.of(params)
-                .filter(e -> state.equals(e.toString()))
-                .findFirst()
-                .orElseThrow(IllegalStateException::new);
+            .filter(e -> state.substring(2).equals(e.toString()))
+            .findFirst()
+            .orElseThrow(IllegalStateException::new);
     }
 
     @Override

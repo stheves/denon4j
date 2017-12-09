@@ -20,13 +20,15 @@ package io.theves.denon4j.controls;
 
 import io.theves.denon4j.net.Event;
 
+import java.nio.charset.Charset;
+
 /**
  * Class description.
  *
  * @author stheves
  */
 public class Line implements Comparable<Line> {
-    private Event event;
+    private String event;
     private String displayLine;
     private boolean playable;
     private boolean directory;
@@ -34,9 +36,11 @@ public class Line implements Comparable<Line> {
     private boolean picture;
     private Integer index;
 
-    public Line(Event event) {
-        this.event = event;
-        parseDataByte(this.event);
+    public Line(Event raw, Charset charset) {
+        this.event = new String(raw.getRaw(), charset);
+        this.displayLine = event.substring(4);
+        this.index = Integer.valueOf(event.substring(3, 4));
+        parseDataByte(raw);
     }
 
     private void parseDataByte(Event event) {
@@ -49,8 +53,7 @@ public class Line implements Comparable<Line> {
             cursorSelect = isSet(data, 3);
             picture = isSet(data, 6);
         }
-        this.displayLine = event.getParameter().substring(2);
-        this.index = Integer.valueOf(event.getParameter().substring(1, 2));
+
     }
 
     private boolean isDataByte(byte data) {
@@ -63,10 +66,6 @@ public class Line implements Comparable<Line> {
 
     public String getDisplayLine() {
         return displayLine;
-    }
-
-    public Event getEvent() {
-        return event;
     }
 
     public boolean isPlayable() {

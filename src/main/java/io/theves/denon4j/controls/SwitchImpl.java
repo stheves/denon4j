@@ -19,7 +19,6 @@ package io.theves.denon4j.controls;
 
 import io.theves.denon4j.DenonReceiver;
 import io.theves.denon4j.net.Event;
-import io.theves.denon4j.net.Protocol;
 
 /**
  * Class description.
@@ -31,7 +30,7 @@ public abstract class SwitchImpl extends AbstractControl implements Switch {
     protected final SwitchState offValue;
 
     public SwitchImpl(DenonReceiver receiver, String prefix, SwitchState onValue, SwitchState offValue) {
-        super(prefix, receiver);
+        super(receiver, prefix);
         this.onValue = onValue;
         this.offValue = offValue;
     }
@@ -48,7 +47,7 @@ public abstract class SwitchImpl extends AbstractControl implements Switch {
 
     @Override
     public SwitchState state() {
-        return SwitchState.valueOf(sendRequest().getParameter());
+        return SwitchState.valueOf(sendRequest().substring(2));
     }
 
     private void executeCommand(String param) {

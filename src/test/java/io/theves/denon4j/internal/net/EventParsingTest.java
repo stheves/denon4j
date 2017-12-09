@@ -30,9 +30,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class EventParsingTest {
     @Test
     public void testParseNSE() {
-        Event fromRawData = Event.create("NSE0 Hallo Welt_????");
+        String msg = "NSE0 Hallo Welt_????";
+        Event fromRawData = Event.create(msg.getBytes());
         assertThat(fromRawData).isNotNull();
-        assertThat(fromRawData.getPrefix()).isEqualTo("NS");
-        assertThat(fromRawData.getParameter()).isEqualTo("E0 Hallo Welt_????");
+        assertThat(fromRawData.getRaw()).isEqualTo(msg.getBytes());
     }
 }

@@ -20,6 +20,7 @@ package io.theves.denon4j.controls;
 import io.theves.denon4j.DenonReceiver;
 import io.theves.denon4j.net.Event;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 /**
@@ -28,26 +29,45 @@ import java.util.Objects;
  * @author stheves
  */
 public abstract class AbstractControl implements Control {
-    protected final String prefix;
+    private static final long READ_TIMEOUT = 1000;
+    private final String commandPrefix;
     private final DenonReceiver receiver;
+    private final Object receiveLock = new Object();
 
+    private Event mostRecent;
     private String name;
 
-    public AbstractControl(String prefix, DenonReceiver receiver) {
-        this.prefix = Objects.requireNonNull(prefix);
+    public AbstractControl(DenonReceiver receiver, String commandPrefix) {
+        this.commandPrefix = Objects.requireNonNull(commandPrefix);
         this.receiver = receiver;
     }
 
     protected void send(String param) {
-        receiver.send(prefix + param);
+        receiver.send(commandPrefix + param);
     }
 
-    protected Event sendRequest() {
-        return receiver.send(prefix + "?");
+    protected String sendRequest() {
+        synchronized (receiveLock) {
+            receiver.send(commandPrefix + "?");
+            try {
+                receiveLock.wait(READ_TIMEOUT);
+            } catch (InterruptedException e) {
+                // ignore
+            }
+            return asciiString(mostRecent);
+        }
+    }
+
+    protected String asciiString(Event mostRecent) {
+        return new String(mostRecent.getRaw(), StandardCharsets.US_ASCII);
     }
 
     @Override
     public final void handle(Event event) {
+        mostRecent = event;
+        synchronized (receiveLock) {
+            receiveLock.notify();
+        }
         doHandle(event);
     }
 
@@ -55,7 +75,7 @@ public abstract class AbstractControl implements Control {
 
     @Override
     public String getCommandPrefix() {
-        return prefix;
+        return commandPrefix;
     }
 
     @Override
@@ -68,14 +88,9 @@ public abstract class AbstractControl implements Control {
     }
 
     @Override
-    public boolean supports(Event event) {
-        return getCommandPrefix().equals(event.getPrefix());
-    }
-
-    @Override
     public String toString() {
         return "Control{" +
-            "prefix='" + prefix + '\'' +
+            "commandPrefix='" + commandPrefix + '\'' +
             ", name='" + name + '\'' +
             '}';
     }
