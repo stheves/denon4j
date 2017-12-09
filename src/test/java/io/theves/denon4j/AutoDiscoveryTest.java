@@ -33,11 +33,11 @@ public class AutoDiscoveryTest {
     public void discoverReceivers() throws Exception {
         try (ServerSocket mockServer = new ServerSocket(0)) {
             AutoDiscovery autoDiscovery = new AutoDiscovery();
-            autoDiscovery.setStart(0);
-            autoDiscovery.setEnd(10);
+            autoDiscovery.setStart(1);
+            autoDiscovery.setEnd(1);
             autoDiscovery.setPort(mockServer.getLocalPort());
             Instant now = Instant.now();
-            Collection<InetAddress> discover = autoDiscovery.discover();
+            Collection<InetAddress> discover = autoDiscovery.discover(1);
             System.out.println("Duration: " + Duration.between(now, Instant.now()));
             assertThat(discover.size()).isEqualTo(1);
             assertThat(discover.iterator().next().getHostAddress()).isEqualTo("127.0.0.1");

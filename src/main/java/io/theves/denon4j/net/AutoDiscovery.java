@@ -80,7 +80,7 @@ public class AutoDiscovery {
             throw new IllegalArgumentException("from/to must be in range 0-254");
         }
         Collection<InetAddress> discoveredServers = new ArrayList<>();
-        for (int i = start; i < end; i = i + step) {
+        for (int i = start; i <= end; i = i + step) {
             String host = subnet + "." + i;
             try {
                 InetAddress address = InetAddress.getByName(host);
