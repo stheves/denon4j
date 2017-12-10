@@ -21,6 +21,7 @@ package io.theves.denon4j.controls;
 import io.theves.denon4j.net.Event;
 
 import java.nio.charset.Charset;
+import java.util.Arrays;
 
 /**
  * Class description.
@@ -28,18 +29,16 @@ import java.nio.charset.Charset;
  * @author stheves
  */
 public class Line implements Comparable<Line> {
-    private String event;
     private String displayLine;
     private boolean playable;
     private boolean directory;
     private boolean cursorSelect;
     private boolean picture;
-    private Integer index;
+    private int index;
 
     public Line(Event raw, Charset charset) {
-        this.event = new String(raw.getRaw(), charset);
-        this.displayLine = event.substring(4);
-        this.index = Integer.valueOf(event.substring(3, 4));
+        this.displayLine = new String(Arrays.copyOfRange(raw.getRaw(), 4, raw.getRaw().length), charset);
+        this.index = Integer.parseInt(Character.toString((char) raw.getRaw()[3]));
         parseDataByte(raw);
     }
 

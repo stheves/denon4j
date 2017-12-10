@@ -52,7 +52,7 @@ public class SliderImpl extends AbstractControl implements Slider {
 
     @Override
     public String getValue() {
-        return sendRequest().substring(2);
+        return sendRequest().asciiValue().substring(2);
     }
 
     @Override

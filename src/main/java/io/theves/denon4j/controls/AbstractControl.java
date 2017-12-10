@@ -19,8 +19,8 @@ package io.theves.denon4j.controls;
 
 import io.theves.denon4j.DenonReceiver;
 import io.theves.denon4j.net.Event;
+import io.theves.denon4j.net.TimeoutException;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 /**
@@ -29,13 +29,15 @@ import java.util.Objects;
  * @author stheves
  */
 public abstract class AbstractControl implements Control {
-    private static final long READ_TIMEOUT = 1000;
+    public static final long READ_TIMEOUT = 1000;
+
     private final String commandPrefix;
     private final DenonReceiver receiver;
     private final Object receiveLock = new Object();
 
     private Event mostRecent;
     private String name;
+    private boolean receiving = false;
 
     public AbstractControl(DenonReceiver receiver, String commandPrefix) {
         this.commandPrefix = Objects.requireNonNull(commandPrefix);
@@ -46,27 +48,33 @@ public abstract class AbstractControl implements Control {
         receiver.send(commandPrefix + param);
     }
 
-    protected String sendRequest() {
+    protected Event sendRequest() {
         synchronized (receiveLock) {
-            receiver.send(commandPrefix + "?");
             try {
-                receiveLock.wait(READ_TIMEOUT);
-            } catch (InterruptedException e) {
-                // ignore
+                receiving = true;
+                receiver.send(commandPrefix + "?");
+                try {
+                    receiveLock.wait(READ_TIMEOUT);
+                } catch (InterruptedException e) {
+                    // ignore
+                }
+                if (mostRecent == null) {
+                    throw new TimeoutException("No response received within " + READ_TIMEOUT);
+                }
+                return mostRecent;
+            } finally {
+                receiving = false;
             }
-            return asciiString(mostRecent);
         }
-    }
-
-    protected String asciiString(Event mostRecent) {
-        return new String(mostRecent.getRaw(), StandardCharsets.US_ASCII);
     }
 
     @Override
     public final void handle(Event event) {
-        mostRecent = event;
-        synchronized (receiveLock) {
-            receiveLock.notify();
+        if (receiving) {
+            synchronized (receiveLock) {
+                mostRecent = event;
+                receiveLock.notify();
+            }
         }
         doHandle(event);
     }

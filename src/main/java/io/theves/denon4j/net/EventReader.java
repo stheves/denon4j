@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.net.Socket;
 import java.net.SocketException;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 /**
  * @author stheves
@@ -73,7 +74,7 @@ public class EventReader extends Thread {
                 rawBuffer.put((byte) read);
             }
             if (rawBuffer.position() > 0) {
-                Event e = Event.create(rawBuffer.array());
+                Event e = Event.create(Arrays.copyOfRange(rawBuffer.array(), 0, rawBuffer.position()));
                 synchronized (this) {
                     client.received(e);
                     notify();

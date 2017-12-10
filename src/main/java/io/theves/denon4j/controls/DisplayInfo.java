@@ -20,11 +20,8 @@ package io.theves.denon4j.controls;
 
 import io.theves.denon4j.net.Event;
 
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.nio.charset.Charset;
+import java.util.*;
 
 /**
  * Class description.
@@ -32,14 +29,16 @@ import java.util.List;
  * @author stheves
  */
 public class DisplayInfo {
-    private final LinkedHashMap<Integer, Line> lines;
+    private final Map<Integer, Line> lines;
+    private final Charset charset;
 
-    public DisplayInfo() {
-        lines = new LinkedHashMap<>();
+    public DisplayInfo(Charset charset) {
+        this.lines = new LinkedHashMap<>();
+        this.charset = charset;
     }
 
     public void addEvent(Event event) {
-        Line line = new Line(event, StandardCharsets.UTF_8);
+        Line line = new Line(event, charset);
         lines.put(line.getIndex(), line);
 
     }

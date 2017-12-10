@@ -23,6 +23,10 @@ package io.theves.denon4j.net;
  * @author stheves
  */
 public class TimeoutException extends ConnectionException {
+    public TimeoutException(String message) {
+        super(message);
+    }
+
     public TimeoutException(String message, Throwable cause) {
         super(message, cause);
     }

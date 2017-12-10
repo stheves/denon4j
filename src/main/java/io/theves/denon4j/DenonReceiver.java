@@ -116,6 +116,7 @@ public class DenonReceiver implements AutoCloseable {
         controls.add(menu);
 
         selectSurround = new SelectImpl<>(this, "MS", SurroundMode.values());
+        selectSurround.setName("Select Surround Mode");
         controls.add(selectSurround);
     }
 

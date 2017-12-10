@@ -43,13 +43,14 @@ public class SelectImpl<S extends Enum> extends AbstractControl implements Selec
 
     @Override
     public S get() {
-        String received = sendRequest();
+        Event received = sendRequest();
         return findSource(received);
     }
 
-    private S findSource(String state) {
+    private S findSource(Event state) {
+        String value = state.asciiValue().substring(2);
         return Stream.of(params)
-            .filter(e -> state.substring(2).equals(e.toString()))
+            .filter(param -> value.equals(param.toString()))
             .findFirst()
             .orElseThrow(IllegalStateException::new);
     }

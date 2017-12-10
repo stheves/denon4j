@@ -19,8 +19,10 @@ package io.theves.denon4j.controls;
 
 import io.theves.denon4j.DenonReceiver;
 import io.theves.denon4j.net.Event;
+import io.theves.denon4j.net.TimeoutException;
 
-import static io.theves.denon4j.controls.NetUsbControls.*;
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 
 /**
  * Class description.
@@ -28,26 +30,49 @@ import static io.theves.denon4j.controls.NetUsbControls.*;
  * @author stheves
  */
 public class NetUsbIPod extends AbstractControl {
+    private static final String CURSOR_UP = "90";
+    private static final String CURSOR_DOWN = "91";
+    private static final String CURSOR_LEFT = "92";
+    private static final String CURSOR_RIGHT = "93";
+    private static final String PLAY = "9A";
+    private static final String PAUSE = "9B";
+    private static final String STOP = "9C";
+    private static final String ENTER = "94";
+    private static final String PAGE_PREV = "9Y";
+    private static final String PAGE_NEXT = "9X";
+    private static final String SHUFFLE_ON = "9K";
+    private static final String SHUFFLE_OFF = "9M";
+    private static final String MODE = "9W";
+    private static final String REPEAT_ONE = "9H";
+    private static final String REPEAT_ALL = "9I";
+    private static final String REPEAT_OFF = "9J";
+    private static final String PARTY_MODE = "PT";
+    private static final String SKIP_PLUS = "9D";
+    private static final String SKIP_MINUS = "9E";
+
+    private final Object readLock = new Object();
+
     private DisplayInfo mostRecentDisplayInfo;
 
     public NetUsbIPod(DenonReceiver receiver) {
         super(receiver, "NS");
-        setName("Network USB/AUDIO/IPOD Extended Control");
+        setName("Network Audio/USB /iPod DIRECT Extended Control");
     }
 
     @Override
     public void doHandle(Event event) {
         if (isDisplayInfoEvent(event)) {
-            if (mostRecentDisplayInfo == null || mostRecentDisplayInfo.isComplete()) {
-                // init a new info message
-                mostRecentDisplayInfo = new DisplayInfo();
+            synchronized (readLock) {
+                mostRecentDisplayInfo.addEvent(event);
+                if (mostRecentDisplayInfo.isComplete()) {
+                    readLock.notify();
+                }
             }
-            mostRecentDisplayInfo.addEvent(event);
         }
     }
 
     private boolean isDisplayInfoEvent(Event event) {
-        return asciiString(event).startsWith("NS");
+        return event.startsWith(getCommandPrefix());
     }
 
     public DisplayInfo getDisplay() {
@@ -57,107 +82,109 @@ public class NetUsbIPod extends AbstractControl {
 
 
     public void cursorUp() {
-        send(CURSOR_UP.getControl());
+        send(CURSOR_UP);
     }
 
 
     public void cursorDown() {
-        send(CURSOR_DOWN.getControl());
+        send(CURSOR_DOWN);
     }
 
 
     public void cursorLeft() {
-        send(CURSOR_LEFT.getControl());
+        send(CURSOR_LEFT);
     }
 
 
     public void cursorRight() {
-        send(CURSOR_RIGHT.getControl());
+        send(CURSOR_RIGHT);
     }
 
 
     public void play() {
-        send(PLAY.getControl());
+        send(PLAY);
     }
 
 
     public void pause() {
-        send(PAUSE.getControl());
+        send(PAUSE);
     }
 
 
     public void stop() {
-        send(STOP.getControl());
+        send(STOP);
     }
 
 
     public void enter() {
-        send(ENTER.getControl());
+        send(ENTER);
     }
 
 
     public void previousPage() {
-        send(PAGE_PREV.getControl());
+        send(PAGE_PREV);
     }
 
 
     public void nextPage() {
-        send(PAGE_NEXT.getControl());
+        send(PAGE_NEXT);
     }
 
 
     public void shuffleOn() {
-        send(SHUFFLE_ON.getControl());
+        send(SHUFFLE_ON);
     }
 
 
     public void shuffleOff() {
-        send(SHUFFLE_OFF.getControl());
+        send(SHUFFLE_OFF);
     }
 
 
     public void mode() {
-        send(MODE.getControl());
+        send(MODE);
     }
 
 
     public void repeatOne() {
-        send(REPEAT_ONE.getControl());
+        send(REPEAT_ONE);
     }
 
     public void repeatAll() {
-        send(REPEAT_ALL.getControl());
+        send(REPEAT_ALL);
     }
 
 
     public void repeatOff() {
-        send(REPEAT_OFF.getControl());
+        send(REPEAT_OFF);
     }
 
 
     public void partyMode() {
-        send(PARTY_MODE.getControl());
+        send(PARTY_MODE);
     }
 
 
     public void skipPlus() {
-        send(SKIP_PLUS.getControl());
+        send(SKIP_PLUS);
     }
 
 
     public void skipMinus() {
-        send(SKIP_MINUS.getControl());
+        send(SKIP_MINUS);
     }
 
     private void readOnscreenInfo() {
-        send("E");
-        // wait until all events are received
-        while (mostRecentDisplayInfo == null || !mostRecentDisplayInfo.isComplete()) {
+        synchronized (readLock) {
+            mostRecentDisplayInfo = new DisplayInfo(UTF_8);
+            send("E");
+            // wait until all events are received
             try {
-                Thread.sleep(100);
+                readLock.wait(READ_TIMEOUT);
             } catch (InterruptedException e) {
-                // ignore
+                throw new TimeoutException("Could not get Onscreen Display Information List");
             }
+
         }
     }
 }

@@ -18,6 +18,10 @@
 package io.theves.denon4j.net;
 
 
+import java.util.Arrays;
+
+import static java.nio.charset.StandardCharsets.US_ASCII;
+
 /**
  * Event is the representation of a receiver`s response.
  *
@@ -25,9 +29,11 @@ package io.theves.denon4j.net;
  */
 public class Event {
     private final byte[] raw;
+    private final String prefix;
 
     private Event(byte[] raw) {
         this.raw = raw;
+        this.prefix = new String(Arrays.copyOfRange(raw, 0, 2), US_ASCII);
     }
 
     public static Event create(byte[] event) {
@@ -36,5 +42,13 @@ public class Event {
 
     public byte[] getRaw() {
         return raw;
+    }
+
+    public boolean startsWith(String prefix) {
+        return this.prefix.equals(prefix);
+    }
+
+    public String asciiValue() {
+        return new String(raw, US_ASCII);
     }
 }
