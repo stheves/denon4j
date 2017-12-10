@@ -25,14 +25,20 @@ import io.theves.denon4j.net.*;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
+
+import static java.lang.String.format;
 
 /**
  * Implementation of the Denon AVR 1912 protocol spec.
  *
  * @author stheves
  */
-public class DenonReceiver implements AutoCloseable {
+public class DenonReceiver implements AutoCloseable, EventListener {
+    private static final long READ_TIMEOUT = 220;
+    private final Object sendReceiveLock = new Object();
+
     private EventDispatcher eventDispatcher;
     private Protocol protocol;
     private Collection<Control> controls;
@@ -46,6 +52,9 @@ public class DenonReceiver implements AutoCloseable {
     private Menu menu;
     private SelectImpl<SurroundMode> selectSurround;
     private Session session;
+    private boolean receiving = false;
+    private CompletionCallback callback = null;
+    private List<Event> response = new ArrayList<>();
 
     /**
      * Starts auto discovery and chooses first receiver found.
@@ -53,6 +62,21 @@ public class DenonReceiver implements AutoCloseable {
      */
     public DenonReceiver(String subnet) {
         this(autoDiscover(subnet).getHostAddress(), 23);
+    }
+
+    public DenonReceiver(String host, int port) {
+        this(new Tcp(host, port));
+    }
+
+    public DenonReceiver(Protocol protocol) {
+        this.protocol = Objects.requireNonNull(protocol);
+        this.eventDispatcher = new EventDispatcher();
+        this.eventDispatcher.addListener(this);
+        this.controls = new ArrayList<>();
+        this.protocol.setDispatcher(eventDispatcher);
+
+        createControls(this.controls);
+        addToDispatcher(this.controls);
     }
 
     private static InetAddress autoDiscover(String subnet) {
@@ -63,20 +87,6 @@ public class DenonReceiver implements AutoCloseable {
             throw new ConnectionException("No receivers found");
         }
         return discovered.iterator().next();
-    }
-
-    public DenonReceiver(String host, int port) {
-        this(new Tcp(host, port));
-    }
-
-    public DenonReceiver(Protocol protocol) {
-        this.protocol = Objects.requireNonNull(protocol);
-        this.eventDispatcher = new EventDispatcher();
-        this.controls = new ArrayList<>();
-        this.protocol.setDispatcher(eventDispatcher);
-
-        createControls(this.controls);
-        addToDispatcher(this.controls);
     }
 
     private void createControls(Collection<? super Control> controls) {
@@ -164,6 +174,71 @@ public class DenonReceiver implements AutoCloseable {
 
     public void send(String command) {
         protocol.send(Command.createCommand(command));
+    }
+
+    public final Event sendRequest(String command, String regex) {
+        List<Event> response;
+        int retries = 0;
+        do {
+            // do retry - receiver is maybe too busy to answer
+            response = doSendRequest(command, regex);
+            retries++;
+        } while (!isComplete() && retries < 3);
+
+        if (response.isEmpty()) {
+            throw new TimeoutException(
+                format("No response received after %d retries. Maybe receiver is too busy answer.", retries)
+            );
+        }
+        return response.get(0);
+    }
+
+    private List<Event> doSendRequest(String command, String regex) {
+        return sendAndReceive(command,
+            res -> res.stream().anyMatch(e -> e.asciiValue().matches(regex))
+        );
+    }
+
+    public final List<Event> sendAndReceive(String command, CompletionCallback completionCallback) {
+        // obtain lock to safe state
+        synchronized (sendReceiveLock) {
+            try {
+                receiving = true;
+                callback = completionCallback;
+                response.clear();
+                send(command);
+                waitForResponse();
+                return new ArrayList<>(this.response);
+            } finally {
+                receiving = false;
+                response.clear();
+                callback = null;
+            }
+        }
+    }
+
+    private void waitForResponse() {
+        try {
+            sendReceiveLock.wait(READ_TIMEOUT);
+        } catch (InterruptedException e) {
+            // ignore
+        }
+    }
+
+    @Override
+    public final void handle(Event event) {
+        synchronized (sendReceiveLock) {
+            if (receiving) {
+                response.add(event);
+            }
+            if (isComplete()) {
+                sendReceiveLock.notify();
+            }
+        }
+    }
+
+    private boolean isComplete() {
+        return callback != null && callback.isComplete(this.response);
     }
 
     public Collection<Control> getControls() {

@@ -21,13 +21,9 @@ package io.theves.denon4j.controls;
 
 import io.theves.denon4j.DenonReceiver;
 import io.theves.denon4j.net.Event;
-import io.theves.denon4j.net.TimeoutException;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
-import static java.lang.String.format;
 
 /**
  * Base class for controls that handles requests/responses.
@@ -35,16 +31,10 @@ import static java.lang.String.format;
  * @author stheves
  */
 public abstract class AbstractControl implements Control {
-    private static final long READ_TIMEOUT = 220; // as of spec 200ms + 20ms delay
-
     private final String commandPrefix;
     private final DenonReceiver receiver;
-    private final Object sendReceiveLock = new Object();
 
-    private List<Event> response = new ArrayList<>();
     private String name;
-    private boolean receiving = false;
-    private CompletionCallback callback;
 
     public AbstractControl(DenonReceiver receiver, String commandPrefix) {
         this.commandPrefix = Objects.requireNonNull(commandPrefix);
@@ -55,80 +45,27 @@ public abstract class AbstractControl implements Control {
         receiver.send(commandPrefix + param);
     }
 
-    final Event sendRequest() {
+    protected final Event sendRequest(String regex) {
+        return receiver.sendRequest(getCommandPrefix() + "?", regex);
+    }
+
+    protected final Event sendRequest() {
         return sendRequest(getCommandPrefix() + ".*");
     }
 
-    final Event sendRequest(String regex) {
-        List<Event> response;
-        int retries = 0;
-        do {
-            // do retry - receiver is maybe too busy to answer
-            response = doSendRequest(regex);
-            retries++;
-        } while (!isComplete() && retries < 3);
-
-        if (response.isEmpty()) {
-            throw new TimeoutException(
-                format("No response received after %d retries. Maybe receiver is too busy answer.", retries)
-            );
-        }
-        return response.get(0);
-    }
-
-    private List<Event> doSendRequest(String regex) {
-        return sendAndReceive("?",
-            response -> !response.isEmpty() && response.get(0).asciiValue().matches(regex)
-        );
-    }
-
     final List<Event> sendAndReceive(String param, CompletionCallback completionCallback) {
-        // obtain lock to safe state
-        synchronized (sendReceiveLock) {
-            try {
-                receiving = true;
-                callback = completionCallback;
-                response.clear();
-                send(param);
-                waitForResponse();
-                return new ArrayList<>(this.response);
-            } finally {
-                receiving = false;
-                response.clear();
-                callback = null;
-            }
-        }
-    }
-
-    private void waitForResponse() {
-        try {
-            sendReceiveLock.wait(READ_TIMEOUT);
-        } catch (InterruptedException e) {
-            // ignore
-        }
+        return receiver.sendAndReceive(getCommandPrefix() + param, completionCallback);
     }
 
     @Override
     public final void handle(Event event) {
         if (shouldHandle(event)) {
-            synchronized (sendReceiveLock) {
-                if (receiving) {
-                    response.add(event);
-                }
-                doHandle(event);
-                if (isComplete()) {
-                    sendReceiveLock.notify();
-                }
-            }
+            doHandle(event);
         }
     }
 
     private boolean shouldHandle(Event event) {
         return event.startsWith(getCommandPrefix());
-    }
-
-    private boolean isComplete() {
-        return callback != null && callback.isComplete(this.response);
     }
 
     protected void doHandle(Event event) {
@@ -156,6 +93,4 @@ public abstract class AbstractControl implements Control {
             ", name='" + name + '\'' +
             '}';
     }
-
-
 }
