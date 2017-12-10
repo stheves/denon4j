@@ -75,10 +75,7 @@ public class EventReader extends Thread {
             }
             if (rawBuffer.position() > 0) {
                 Event e = Event.create(Arrays.copyOfRange(rawBuffer.array(), 0, rawBuffer.position()));
-                synchronized (this) {
-                    client.received(e);
-                    notify();
-                }
+                client.received(e);
             }
         } catch (SocketException se) {
             if (!socket.isClosed() && !socket.isInputShutdown()) {

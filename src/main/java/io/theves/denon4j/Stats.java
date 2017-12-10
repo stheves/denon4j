@@ -15,25 +15,26 @@
  *  limitations under the License.
  */
 
-package io.theves.denon4j.controls;
+package io.theves.denon4j;
 
-/**
- * Control to switch between sources.
- *
- * @author stheves
- */
-public interface Select<S extends Enum> extends Control {
-    /**
-     * Selects the given <code>selection</code>.
-     *
-     * @param selection the selection to select.
-     */
-    void select(S selection);
+import java.io.PrintStream;
+import java.io.PrintWriter;
 
-    /**
-     * Returns the current active selection.
-     *
-     * @return the current selection.
-     */
-    String get();
+public class Stats {
+    private int eventCounter;
+
+    public int eventCounter() {
+        return eventCounter;
+    }
+
+    public void incrementEvents() {
+        eventCounter++;
+    }
+
+    public void print(PrintStream out) {
+        PrintWriter writer = new PrintWriter(out);
+        writer.printf("Session Stats:%n");
+        writer.printf(" Events: %d%n", eventCounter);
+        writer.flush();
+    }
 }

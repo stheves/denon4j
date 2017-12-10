@@ -49,7 +49,7 @@ public class NetUsbIPod extends AbstractControl {
     private static final String SKIP_PLUS = "9D";
     private static final String SKIP_MINUS = "9E";
 
-    private DisplayInfo mostRecentDisplayInfo;
+    private OsdInfoList mostRecentOsdInfoList;
 
     public NetUsbIPod(DenonReceiver receiver) {
         super(receiver, "NS");
@@ -59,7 +59,7 @@ public class NetUsbIPod extends AbstractControl {
     @Override
     public void doHandle(Event event) {
         if (isDisplayInfoEvent(event)) {
-            mostRecentDisplayInfo.addEvent(event);
+            mostRecentOsdInfoList.addEvent(event);
         }
     }
 
@@ -68,9 +68,9 @@ public class NetUsbIPod extends AbstractControl {
         return event.startsWith(getCommandPrefix());
     }
 
-    public DisplayInfo getDisplay() {
+    public OsdInfoList getDisplay() {
         readOnscreenInfo();
-        return mostRecentDisplayInfo;
+        return mostRecentOsdInfoList;
     }
 
 
@@ -168,7 +168,7 @@ public class NetUsbIPod extends AbstractControl {
     }
 
     private void readOnscreenInfo() {
-        mostRecentDisplayInfo = new DisplayInfo(UTF_8);
-        sendAndReceive("E", () -> mostRecentDisplayInfo.isComplete());
+        mostRecentOsdInfoList = new OsdInfoList(UTF_8);
+        sendAndReceive("E", () -> mostRecentOsdInfoList.isComplete());
     }
 }

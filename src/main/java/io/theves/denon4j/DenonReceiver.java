@@ -35,7 +35,7 @@ public class DenonReceiver implements AutoCloseable {
     private Protocol protocol;
     private Collection<Control> controls;
     private Toggle powerToggle;
-    private Slider masterSlider;
+    private Volume masterSlider;
     private Toggle mainZoneToggle;
     private Toggle muteToggle;
     private Select<InputSource> selectInput;
@@ -43,6 +43,7 @@ public class DenonReceiver implements AutoCloseable {
     private NetUsbIPod netUsb;
     private Menu menu;
     private SelectImpl<SurroundMode> selectSurround;
+    private Session session;
 
     /**
      * Starts auto discovery and chooses first receiver found.
@@ -70,7 +71,6 @@ public class DenonReceiver implements AutoCloseable {
         this.protocol = Objects.requireNonNull(protocol);
         this.eventDispatcher = new EventDispatcher();
         this.controls = new ArrayList<>();
-
         this.protocol.setDispatcher(eventDispatcher);
 
         createControls(this.controls);
@@ -84,7 +84,7 @@ public class DenonReceiver implements AutoCloseable {
         controls.add(powerToggle);
 
         // master vol. control
-        masterSlider = new SliderImpl(this, "MV", "UP", "DOWN");
+        masterSlider = new Volume(this, "MV", "UP", "DOWN");
         masterSlider.setName("Master Volume");
         controls.add(masterSlider);
 
@@ -94,12 +94,12 @@ public class DenonReceiver implements AutoCloseable {
         controls.add(muteToggle);
 
         // select input
-        selectInput = new SelectImpl<>(this, "SI", InputSource.values());
+        selectInput = new SelectImpl<>(this, "SI");
         selectInput.setName("Select INPUT Source");
         controls.add(selectInput);
 
         // select video
-        selectVideo = new SelectImpl<>(this, "SV", VideoSource.values());
+        selectVideo = new SelectImpl<>(this, "SV");
         selectVideo.setName("Select VIDEO Source");
         controls.add(selectVideo);
 
@@ -115,7 +115,7 @@ public class DenonReceiver implements AutoCloseable {
         menu = new Menu(this);
         controls.add(menu);
 
-        selectSurround = new SelectImpl<>(this, "MS", SurroundMode.values());
+        selectSurround = new SelectImpl<>(this, "MS");
         selectSurround.setName("Select Surround Mode");
         controls.add(selectSurround);
     }
@@ -176,10 +176,16 @@ public class DenonReceiver implements AutoCloseable {
     public void disconnect() {
         getControls().forEach(eventDispatcher::removeListener);
         protocol.disconnect();
+        session = null;
     }
 
     public void connect(int timeout) {
+        session = new Session(eventDispatcher);
         protocol.establishConnection(timeout);
+    }
+
+    public Session getSession() {
+        return session;
     }
 
     public boolean isConnected() {

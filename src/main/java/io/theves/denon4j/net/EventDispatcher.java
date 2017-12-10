@@ -18,11 +18,9 @@
 package io.theves.denon4j.net;
 
 
-
-
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,7 +35,7 @@ public class EventDispatcher {
     private final Logger log = Logger.getLogger(EventDispatcher.class.getName());
 
     public EventDispatcher() {
-        this.eventListeners = new HashSet<>();
+        this.eventListeners = Collections.synchronizedList(new ArrayList<>());
     }
 
     public void addListener(EventListener listener) {
@@ -57,12 +55,14 @@ public class EventDispatcher {
     }
 
     public void dispatch(Event event) {
-        eventListeners.forEach(listener -> {
-            try {
-                listener.handle(event);
-            } catch (Exception e) {
-                log.log(Level.SEVERE, "Caught exception from listener: " + listener, e);
-            }
-        });
+        synchronized (eventListeners) {
+            eventListeners.forEach(listener -> {
+                try {
+                    listener.handle(event);
+                } catch (Exception e) {
+                    log.log(Level.SEVERE, "Caught exception from listener: " + listener, e);
+                }
+            });
+        }
     }
 }

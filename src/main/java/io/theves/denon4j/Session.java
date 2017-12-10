@@ -15,25 +15,26 @@
  *  limitations under the License.
  */
 
-package io.theves.denon4j.controls;
+package io.theves.denon4j;
 
-/**
- * Control to switch between sources.
- *
- * @author stheves
- */
-public interface Select<S extends Enum> extends Control {
-    /**
-     * Selects the given <code>selection</code>.
-     *
-     * @param selection the selection to select.
-     */
-    void select(S selection);
+import io.theves.denon4j.net.Event;
+import io.theves.denon4j.net.EventDispatcher;
+import io.theves.denon4j.net.EventListener;
 
-    /**
-     * Returns the current active selection.
-     *
-     * @return the current selection.
-     */
-    String get();
+public class Session implements EventListener {
+    private Stats stats = new Stats();
+
+    public Session(EventDispatcher dispatcher) {
+        dispatcher.addListener(this);
+    }
+
+    @Override
+    public void handle(Event event) {
+        stats.incrementEvents();
+    }
+
+    public Stats stats() {
+        return stats;
+    }
+
 }

@@ -70,8 +70,8 @@ public class ControlsTest {
         si.select(InputSource.SAT_CBL);
 
         denonAvr192.getEventDispatcher().dispatch(Event.create("SISAT/CBL".getBytes()));
-        InputSource source = si.get();
-        assertThat(source).isEqualTo(InputSource.SAT_CBL);
+        String source = si.get();
+        assertThat(source).isEqualTo(InputSource.SAT_CBL.getInputSource());
 
         Command cmd = cmd("SISAT/CBL");
         verify(protocol).send(cmd);

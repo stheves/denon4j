@@ -46,42 +46,27 @@ public class Demo {
                 power.toggle();
             }
 
-            Toggle mute = avr.mute();
-            mute.toggle();
-            System.out.println("MUTE ON: " + mute.state().get());
+//            Slider masterVolume = avr.masterVolume();
+//            masterVolume.slideUp();
+//            System.out.println("MASTER VOL: " + masterVolume.getValue());
+//            masterVolume.set("25");
+//            System.out.println("MASTER VOL: " + masterVolume.getValue());
+//
+//            avr.video().select(VideoSource.SOURCE);
+//            avr.input().select(InputSource.NET_UBS);
+//            avr.netUsb().play();
 
-            Thread.sleep(200);
-            mute.switchOff();
-            System.out.println("MUTE OFF: " + mute.state().get());
-
-            Slider masterVolume = avr.masterVolume();
-            masterVolume.slideUp();
-            System.out.println("MASTER VOL: " + masterVolume.getValue());
-            masterVolume.set("25");
-            System.out.println("MASTER VOL: " + masterVolume.getValue());
-
-            Thread.sleep(200);
-            avr.video().select(VideoSource.SOURCE);
-
-            Thread.sleep(200);
-            avr.input().select(InputSource.NET_UBS);
-
-            Thread.sleep(200);
-            avr.netUsb().play();
             System.out.println("Display: ");
             System.out.println(avr.netUsb().getDisplay());
 
-            Thread.sleep(200);
-            avr.menu().control(MenuControls.MENU_ON);
 
-            Thread.sleep(200);
-            avr.menu().control(MenuControls.CURSOR_DOWN);
+//            avr.menu().control(MenuControls.MENU_ON);
+//            avr.menu().control(MenuControls.CURSOR_DOWN);
+//            avr.menu().control(MenuControls.MENU_OFF);
 
-            Thread.sleep(200);
-            avr.menu().control(MenuControls.MENU_OFF);
+            System.out.println("Surround Mode: " + avr.surroundMode().get());
 
-            Thread.sleep(200);
-            System.out.println("Surround Mode: " + avr.surroundMode().get().getMode());
+            avr.getSession().stats().print(System.out);
         }
         System.out.println("------------DEMO END------------");
     }

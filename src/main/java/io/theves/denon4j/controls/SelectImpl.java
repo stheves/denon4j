@@ -29,11 +29,9 @@ import java.util.stream.Stream;
  * @author stheves
  */
 public class SelectImpl<S extends Enum> extends AbstractControl implements Select<S> {
-    private final S[] params;
 
-    public SelectImpl(DenonReceiver receiver, String prefix, S[] params) {
+    public SelectImpl(DenonReceiver receiver, String prefix) {
         super(receiver, prefix);
-        this.params = Objects.requireNonNull(params);
     }
 
     @Override
@@ -42,22 +40,8 @@ public class SelectImpl<S extends Enum> extends AbstractControl implements Selec
     }
 
     @Override
-    public S get() {
+    public String get() {
         Event received = sendRequest();
-        return findSource(received);
+        return received.asciiValue().substring(2);
     }
-
-    private S findSource(Event state) {
-        String value = state.asciiValue().substring(2);
-        return Stream.of(params)
-            .filter(param -> value.equals(param.toString()))
-            .findFirst()
-            .orElseThrow(IllegalStateException::new);
-    }
-
-    @Override
-    protected void doHandle(Event event) {
-
-    }
-
 }

@@ -24,15 +24,15 @@ import java.nio.charset.Charset;
 import java.util.*;
 
 /**
- * Class description.
+ * Represents the Onscreen Display Information List that is sent back for 'NSE' and 'NSA' commands.
  *
  * @author stheves
  */
-public class DisplayInfo {
+public class OsdInfoList {
     private final Map<Integer, Line> lines;
     private final Charset charset;
 
-    public DisplayInfo(Charset charset) {
+    public OsdInfoList(Charset charset) {
         this.lines = new LinkedHashMap<>();
         this.charset = charset;
     }
@@ -53,11 +53,8 @@ public class DisplayInfo {
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder("=======DISPLAY INFO=======" + System.lineSeparator());
-        builder.append(System.lineSeparator());
-        getLines().stream().forEach(line -> builder.append(line.getDisplayLine()).append(System.lineSeparator()));
-        builder.append(System.lineSeparator());
-        builder.append("=======END=======" + System.lineSeparator());
+        StringBuilder builder = new StringBuilder();
+        getLines().forEach(line -> builder.append(line.getDisplayLine()).append(System.lineSeparator()));
         return builder.toString();
     }
 

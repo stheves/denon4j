@@ -17,23 +17,20 @@
 
 package io.theves.denon4j.controls;
 
-/**
- * Control to switch between sources.
- *
- * @author stheves
- */
-public interface Select<S extends Enum> extends Control {
-    /**
-     * Selects the given <code>selection</code>.
-     *
-     * @param selection the selection to select.
-     */
-    void select(S selection);
+import io.theves.denon4j.DenonReceiver;
+import io.theves.denon4j.net.Event;
 
-    /**
-     * Returns the current active selection.
-     *
-     * @return the current selection.
-     */
-    String get();
+public class Volume extends SliderImpl {
+    private String max;
+
+    public Volume(DenonReceiver receiver, String prefix, String up, String down) {
+        super(receiver, prefix, up, down);
+    }
+
+    @Override
+    public void doHandle(Event event) {
+        if (event.startsWith(getCommandPrefix()) && event.asciiValue().contains("MAX")) {
+            max = event.asciiValue().substring(5);
+        }
+    }
 }

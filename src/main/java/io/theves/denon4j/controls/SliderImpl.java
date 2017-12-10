@@ -59,8 +59,4 @@ public class SliderImpl extends AbstractControl implements Slider {
     public void set(String value) {
         executeCommand(value);
     }
-
-    @Override
-    public void doHandle(Event event) {
-    }
 }

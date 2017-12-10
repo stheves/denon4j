@@ -22,7 +22,7 @@ import io.theves.denon4j.net.Event;
 import io.theves.denon4j.net.TimeoutException;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -31,13 +31,13 @@ import java.util.Objects;
  * @author stheves
  */
 public abstract class AbstractControl implements Control {
-    public static final long READ_TIMEOUT = 1000;
+    public static final long READ_TIMEOUT = 5 * 1000;
 
     private final String commandPrefix;
     private final DenonReceiver receiver;
-    private final Object receiveLock = new Object();
+    private final Object sendReceiveLock = new Object();
 
-    private Collection<Event> response;
+    private List<Event> response = new ArrayList<>();
     private String name;
     private boolean receiving = false;
     private CompletionCallback callback;
@@ -52,49 +52,62 @@ public abstract class AbstractControl implements Control {
     }
 
     protected Event sendRequest() {
-        sendAndReceive("?", () -> response.size() == 1);
+        sendAndReceive("?", () -> response.size() == 1 && response.get(0).startsWith(getCommandPrefix()));
         if (response.isEmpty()) {
             throw new TimeoutException("No response received");
         }
-        return response.iterator().next();
+        return response.get(0);
     }
 
     protected void sendAndReceive(String param, CompletionCallback completionCallback) {
-        synchronized (receiveLock) {
+        synchronized (sendReceiveLock) {
             try {
                 receiving = true;
                 callback = completionCallback;
-                response = new ArrayList<>();
+                response.clear();
                 send(param);
-                try {
-                    receiveLock.wait(READ_TIMEOUT);
-                } catch (InterruptedException e) {
-                    // ignore
-                }
+                waitForResponse();
             } finally {
                 receiving = false;
+                callback = null;
             }
+        }
+    }
+
+    private void waitForResponse() {
+        try {
+            sendReceiveLock.wait(READ_TIMEOUT);
+        } catch (InterruptedException e) {
+            // ignore
         }
     }
 
     @Override
     public final void handle(Event event) {
-        synchronized (receiveLock) {
-            if (receiving) {
-                response.add(event);
+        if (shouldHandle(event)) {
+            synchronized (sendReceiveLock) {
+                if (receiving) {
+                    response.add(event);
+                }
+                doHandle(event);
                 if (isComplete()) {
-                    receiveLock.notify();
+                    sendReceiveLock.notify();
                 }
             }
         }
-        doHandle(event);
+    }
+
+    protected boolean shouldHandle(Event event) {
+        return event.startsWith(getCommandPrefix());
     }
 
     private boolean isComplete() {
         return callback != null && callback.isComplete();
     }
 
-    protected abstract void doHandle(Event event);
+    protected void doHandle(Event event) {
+        // subclasses may override
+    }
 
     @Override
     public String getCommandPrefix() {
