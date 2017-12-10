@@ -27,6 +27,7 @@ import io.theves.denon4j.net.Protocol;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
+import org.mockito.Mockito;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
@@ -71,7 +72,11 @@ public class ControlsTest {
         // execute control
         si.select(InputSource.SAT_CBL);
 
-        denonAvr192.getEventDispatcher().dispatch(Event.create("SISAT/CBL".getBytes()));
+        doAnswer(invocationOnMock -> {
+            denonAvr192.getEventDispatcher().dispatch(Event.create("SISAT/CBL".getBytes()));
+            return null;
+        }).when(protocol).send(cmd("SI?"));
+
         String source = si.get();
         assertThat(source).isEqualTo(InputSource.SAT_CBL.getInputSource());
 
@@ -86,37 +91,56 @@ public class ControlsTest {
     @Test
     public void testPowerControl() {
         Toggle power = denonAvr192.power();
-        denonAvr192.getEventDispatcher().dispatch(Event.create("PWSTANDBY".getBytes()));
+        doAnswer(invocationOnMock -> {
+            denonAvr192.getEventDispatcher().dispatch(Event.create("PWSTANDBY".getBytes()));
+            return null;
+        }).when(protocol).send(cmd("PW?"));
         assertThat(power.state()).isEqualTo(SwitchState.STANDBY);
+
+        doAnswer(invocationOnMock -> {
+            denonAvr192.getEventDispatcher().dispatch(Event.create("PWON".getBytes()));
+            return null;
+        }).when(protocol).send(cmd("PWON"));
+        doAnswer(invocationOnMock -> {
+            denonAvr192.getEventDispatcher().dispatch(Event.create("PWON".getBytes()));
+            return null;
+        }).when(protocol).send(cmd("PW?"));
         power.toggle();
-        denonAvr192.getEventDispatcher().dispatch(Event.create("PWON".getBytes()));
-        verify(protocol).send(cmd("PWON"));
+        assertThat(power.state()).isEqualTo(SwitchState.ON);
     }
 
     @Test
     public void testMasterSlider() {
         Slider slider = denonAvr192.masterVolume();
-        denonAvr192.getEventDispatcher().dispatch(Event.create("MV45".getBytes()));
+        doAnswer(invocationOnMock -> {
+            denonAvr192.getEventDispatcher().dispatch(Event.create("MV45".getBytes()));
+            return null;
+        }).when(protocol).send(cmd("MV?"));
         assertThat(slider.getValue()).isEqualTo("45");
 
+        doAnswer(invocationOnMock -> {
+            denonAvr192.getEventDispatcher().dispatch(Event.create("MV455".getBytes()));
+            denonAvr192.getEventDispatcher().dispatch(Event.create("MVMAX 68".getBytes()));
+            return null;
+        }).when(protocol).send(cmd("MVUP"));
+        doAnswer(invocationOnMock -> {
+            denonAvr192.getEventDispatcher().dispatch(Event.create("MV455".getBytes()));
+            return null;
+        }).when(protocol).send(cmd("MV?"));
         slider.slideUp();
-        // fake events
-        denonAvr192.getEventDispatcher().dispatch(Event.create("MV455".getBytes()));
-        denonAvr192.getEventDispatcher().dispatch(Event.create("MVMAX 68".getBytes()));
-        verify(protocol).send(cmd("MVUP"));
         assertThat(slider.getValue()).isEqualTo("455");
 
+        doAnswer(invocationOnMock -> {
+            denonAvr192.getEventDispatcher().dispatch(Event.create("MV45".getBytes()));
+            denonAvr192.getEventDispatcher().dispatch(Event.create("MVMAX 675".getBytes()));
+            return null;
+        }).when(protocol).send(cmd("MVDOWN"));
+        doAnswer(invocationOnMock -> {
+            denonAvr192.getEventDispatcher().dispatch(Event.create("MV45".getBytes()));
+            return null;
+        }).when(protocol).send(cmd("MV?"));
         slider.slideDown();
-        denonAvr192.getEventDispatcher().dispatch(Event.create("MV45".getBytes()));
-        denonAvr192.getEventDispatcher().dispatch(Event.create("MVMAX 675".getBytes()));
-        verify(protocol).send(cmd("MVDOWN"));
         assertThat(slider.getValue()).isEqualTo("45");
-
-        slider.set("55");
-        denonAvr192.getEventDispatcher().dispatch(Event.create("MV55".getBytes()));
-        denonAvr192.getEventDispatcher().dispatch(Event.create("MVMAX 72".getBytes()));
-        verify(protocol).send(Command.createCommand("MV55"));
-        assertThat(slider.getValue()).isEqualTo("55");
     }
 
     @Test
