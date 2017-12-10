@@ -25,10 +25,6 @@ package io.theves.denon4j.net;
  * @author stheves
  */
 public class NetException extends RuntimeException {
-    public NetException() {
-        super();
-    }
-
     public NetException(String message, Throwable cause) {
         super(message, cause);
     }
