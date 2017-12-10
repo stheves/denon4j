@@ -19,8 +19,10 @@
 
 package io.theves.denon4j.controls;
 
+import io.theves.denon4j.CompletionCallback;
 import io.theves.denon4j.DenonReceiver;
 import io.theves.denon4j.net.Event;
+import io.theves.denon4j.net.EventListener;
 
 import java.util.List;
 import java.util.Objects;
@@ -30,7 +32,7 @@ import java.util.Objects;
  *
  * @author stheves
  */
-public abstract class AbstractControl implements Control {
+public abstract class AbstractControl implements EventListener {
     private final String commandPrefix;
     private final DenonReceiver receiver;
 
@@ -72,12 +74,10 @@ public abstract class AbstractControl implements Control {
         // subclasses may override
     }
 
-    @Override
     public String getCommandPrefix() {
         return commandPrefix;
     }
 
-    @Override
     public String getName() {
         return name;
     }

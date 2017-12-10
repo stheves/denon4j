@@ -19,15 +19,36 @@
 
 package io.theves.denon4j.controls;
 
+import io.theves.denon4j.DenonReceiver;
+
 /**
- * Switch control.
+ * Switch control like on/off.
  *
  * @author stheves
  */
-public interface Switch extends Control {
-    void switchOff();
+public abstract class Switch extends AbstractControl {
+    protected final SwitchState onValue;
+    protected final SwitchState offValue;
 
-    void switchOn();
+    public Switch(DenonReceiver receiver, String prefix, SwitchState onValue, SwitchState offValue) {
+        super(receiver, prefix);
+        this.onValue = onValue;
+        this.offValue = offValue;
+    }
 
-    SwitchState state();
+    public void switchOff() {
+        executeCommand(offValue.get());
+    }
+
+    public void switchOn() {
+        executeCommand(onValue.get());
+    }
+
+    public SwitchState state() {
+        return SwitchState.valueOf(sendRequest().asciiValue().substring(2));
+    }
+
+    private void executeCommand(String param) {
+        send(param);
+    }
 }

@@ -38,7 +38,7 @@ public class Menu extends AbstractControl {
         // not needed
     }
 
-    public void control(MenuControls controls) {
+    public void control(MenuNavigation controls) {
         send(controls.toString());
     }
 }

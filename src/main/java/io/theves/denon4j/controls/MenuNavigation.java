@@ -19,24 +19,36 @@
 
 package io.theves.denon4j.controls;
 
-import io.theves.denon4j.DenonReceiver;
-
 /**
- * Toggle control implementation.
+ * Class description.
  *
  * @author stheves
  */
-public class ToggleImpl extends SwitchImpl implements Toggle {
+public enum MenuNavigation {
+    CURSOR_UP("CUP"),
+    CURSOR_DOWN("CDN"),
+    CURSOR_LEFT("CLT"),
+    CURSOR_RIGHT("CRT"),
+    ENTER("ENT"),
+    RETURN("RTN"),
+    MENU_ON("MEN ON"),
+    MENU_OFF("MEN OFF"),
+    SOURCE_ON("SRC ON"),
+    SOURCE_OFF("SRC OFF");
 
-    public ToggleImpl(DenonReceiver receiver, String prefix, SwitchState on, SwitchState off) {
-        super(receiver, prefix, on, off);
+
+    private final String control;
+
+    MenuNavigation(String control) {
+        this.control = control;
     }
 
-    public void toggle() {
-        if (onValue.equals(state())) {
-            switchOff();
-        } else {
-            switchOn();
-        }
+    @Override
+    public String toString() {
+        return getControl();
+    }
+
+    public String getControl() {
+        return control;
     }
 }

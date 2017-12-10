@@ -28,6 +28,10 @@ public interface Protocol {
     char PAUSE = 0x0d; // \r character
     char NULL = 0x00;
 
+    static Protocol tcp(String host, int port) {
+        return new Tcp(host, port);
+    }
+
     /**
      * Sends the command to the receiver (socket) and waits for a response
      * (blocking).

@@ -55,16 +55,16 @@ public class Demo {
             System.out.println("MASTER VOL: " + masterVolume.getValue());
             System.out.println("MASTER VOL MAX: " + masterVolume.getMax());
 
-            avr.video().select(VideoSource.SOURCE);
-            avr.input().select(InputSource.NET_UBS);
+            avr.video().set(VideoSource.SOURCE);
+            avr.input().set(InputSource.NET_UBS);
             avr.netUsb().cursorRight();
 
             System.out.println("Display: ");
             System.out.println(avr.netUsb().getDisplay());
 
-            avr.menu().control(MenuControls.MENU_ON);
-            avr.menu().control(MenuControls.CURSOR_DOWN);
-            avr.menu().control(MenuControls.MENU_OFF);
+            avr.menu().control(MenuNavigation.MENU_ON);
+            avr.menu().control(MenuNavigation.CURSOR_DOWN);
+            avr.menu().control(MenuNavigation.MENU_OFF);
 
             System.out.println("Surround Mode: " + avr.surroundMode().get());
 

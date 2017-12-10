@@ -37,7 +37,7 @@ import java.util.logging.Logger;
  *
  * @author stheves
  */
-public final class Tcp implements Protocol {
+final class Tcp implements Protocol {
     private final Logger logger = Logger.getLogger(Tcp.class.getName());
     private final Integer port;
     private final String host;

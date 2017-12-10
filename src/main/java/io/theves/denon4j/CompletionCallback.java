@@ -17,38 +17,18 @@
  *  limitations under the License.
  */
 
-package io.theves.denon4j.controls;
+package io.theves.denon4j;
+
+import io.theves.denon4j.net.Event;
+
+import java.util.List;
 
 /**
- * Class description.
+ * Used to check if a response is completely received.
  *
  * @author stheves
  */
-public enum MenuControls {
-    CURSOR_UP("CUP"),
-    CURSOR_DOWN("CDN"),
-    CURSOR_LEFT("CLT"),
-    CURSOR_RIGHT("CRT"),
-    ENTER("ENT"),
-    RETURN("RTN"),
-    MENU_ON("MEN ON"),
-    MENU_OFF("MEN OFF"),
-    SOURCE_ON("SRC ON"),
-    SOURCE_OFF("SRC OFF");
-
-
-    private final String control;
-
-    MenuControls(String control) {
-        this.control = control;
-    }
-
-    @Override
-    public String toString() {
-        return getControl();
-    }
-
-    public String getControl() {
-        return control;
-    }
+@FunctionalInterface
+public interface CompletionCallback {
+    boolean isComplete(List<Event> recorded);
 }

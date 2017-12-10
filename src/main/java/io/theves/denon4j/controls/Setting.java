@@ -23,41 +23,32 @@ import io.theves.denon4j.DenonReceiver;
 import io.theves.denon4j.net.Event;
 
 /**
- * Switch control like on/off.
+ * Can be used to set different settings of the receiver.
  *
  * @author stheves
  */
-public abstract class SwitchImpl extends AbstractControl implements Switch {
-    protected final SwitchState onValue;
-    protected final SwitchState offValue;
+public class Setting<S extends Enum> extends AbstractControl {
 
-    public SwitchImpl(DenonReceiver receiver, String prefix, SwitchState onValue, SwitchState offValue) {
+    public Setting(DenonReceiver receiver, String prefix) {
         super(receiver, prefix);
-        this.onValue = onValue;
-        this.offValue = offValue;
     }
 
-    @Override
-    public void switchOff() {
-        executeCommand(offValue.get());
+    /**
+     * Sets the given value.
+     *
+     * @param value the value to set.
+     */
+    public void set(S value) {
+        send(value.toString());
     }
 
-    @Override
-    public void switchOn() {
-        executeCommand(onValue.get());
+    /**
+     * The setting`s value.
+     *
+     * @return the value.
+     */
+    public String get() {
+        Event received = sendRequest();
+        return received.asciiValue().substring(2);
     }
-
-    @Override
-    public SwitchState state() {
-        return SwitchState.valueOf(sendRequest().asciiValue().substring(2));
-    }
-
-    private void executeCommand(String param) {
-        send(param);
-    }
-
-    @Override
-    protected void doHandle(Event event) {
-    }
-
 }

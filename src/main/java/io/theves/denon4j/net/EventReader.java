@@ -32,7 +32,7 @@ import java.util.logging.Logger;
 /**
  * @author stheves
  */
-public class EventReader extends Thread {
+class EventReader extends Thread {
 
     private final Logger logger = Logger.getLogger(EventReader.class.getName());
 

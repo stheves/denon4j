@@ -22,7 +22,7 @@ package io.theves.denon4j.controls;
 import io.theves.denon4j.DenonReceiver;
 import io.theves.denon4j.net.Event;
 
-public class Volume extends SliderImpl {
+public class Volume extends Slider {
     private String max;
 
     public Volume(DenonReceiver receiver, String prefix, String up, String down) {

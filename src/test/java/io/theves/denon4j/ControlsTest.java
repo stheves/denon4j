@@ -66,10 +66,10 @@ public class ControlsTest {
 
     @Test
     public void testSelectControl() {
-        Select<InputSource> si = denonAvr192.input();
+        Setting<InputSource> si = denonAvr192.input();
 
         // execute control
-        si.select(InputSource.SAT_CBL);
+        si.set(InputSource.SAT_CBL);
 
         doAnswer(invocationOnMock -> {
             denonAvr192.dispatch(Event.create("SISAT/CBL".getBytes()));
@@ -144,7 +144,7 @@ public class ControlsTest {
 
     @Test
     public void testNetworkControl() {
-        NetUsbIPod selectNetUsb = denonAvr192.netUsb();
+        NetUsbIPodControl selectNetUsb = denonAvr192.netUsb();
         assertThat(selectNetUsb.getCommandPrefix()).isEqualTo("NS");
 
         selectNetUsb.cursorDown();
@@ -161,7 +161,7 @@ public class ControlsTest {
             .containsExactlyInAnyOrder(
                 denonAvr192.getControls()
                     .stream()
-                    .toArray(value -> new Control[denonAvr192.getControls().size()])
+                    .toArray(value -> new AbstractControl[denonAvr192.getControls().size()])
             );
     }
 }

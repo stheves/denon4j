@@ -19,17 +19,38 @@
 
 package io.theves.denon4j.controls;
 
+import io.theves.denon4j.DenonReceiver;
+
+
 /**
- * Slider control.
+ * A slider on the receiver e.g. the master volume slider.
  *
  * @author stheves
  */
-public interface Slider extends Control {
-    void slideUp();
+public class Slider extends AbstractControl {
+    private final String up;
+    private final String down;
 
-    void slideDown();
+    public Slider(DenonReceiver receiver, String prefix, String up, String down) {
+        super(receiver, prefix);
+        this.up = up;
+        this.down = down;
+    }
 
-    String getValue();
+    public void slideUp() {
+        send(up);
+    }
 
-    void set(String value);
+    public void slideDown() {
+        send(down);
+    }
+
+    public String getValue() {
+        // do not return the MAX values
+        return sendRequest(getCommandPrefix() + "\\d\\d\\d?").asciiValue().substring(2);
+    }
+
+    public void set(String value) {
+        send(value);
+    }
 }

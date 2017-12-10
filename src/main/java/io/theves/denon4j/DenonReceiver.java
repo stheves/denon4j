@@ -43,16 +43,16 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
     private final List<EventListener> eventListeners;
     private final Protocol protocol;
 
-    private Collection<Control> controls;
+    private Collection<AbstractControl> controls;
     private Toggle powerToggle;
     private Volume masterSlider;
     private Toggle mainZoneToggle;
     private Toggle muteToggle;
-    private SelectImpl<InputSource> selectInput;
-    private SelectImpl<VideoSource> selectVideo;
-    private NetUsbIPod netUsb;
+    private Setting<InputSource> selectInput;
+    private Setting<VideoSource> selectVideo;
+    private NetUsbIPodControl netUsb;
     private Menu menu;
-    private SelectImpl<SurroundMode> selectSurround;
+    private Setting<SurroundMode> selectSurround;
     private Session session;
     private boolean receiving = false;
     private CompletionCallback callback = null;
@@ -67,7 +67,7 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
     }
 
     public DenonReceiver(String host, int port) {
-        this(new Tcp(host, port));
+        this(Protocol.tcp(host, port));
     }
 
     public DenonReceiver(Protocol protocol) {
@@ -90,9 +90,9 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
         return discovered.iterator().next();
     }
 
-    private void createControls(Collection<? super Control> controls) {
+    private void createControls(Collection<AbstractControl> controls) {
         // power control
-        powerToggle = new ToggleImpl(this, "PW", SwitchState.ON, SwitchState.STANDBY);
+        powerToggle = new Toggle(this, "PW", SwitchState.ON, SwitchState.STANDBY);
         powerToggle.setName("Power Switch");
         controls.add(powerToggle);
 
@@ -102,33 +102,33 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
         controls.add(masterSlider);
 
         // mute control
-        muteToggle = new ToggleImpl(this, "MU", SwitchState.ON, SwitchState.OFF);
+        muteToggle = new Toggle(this, "MU", SwitchState.ON, SwitchState.OFF);
         muteToggle.setName("Mute Toggle");
         controls.add(muteToggle);
 
         // select input
-        selectInput = new SelectImpl<>(this, "SI");
+        selectInput = new Setting<>(this, "SI");
         selectInput.setName("Select INPUT Source");
         controls.add(selectInput);
 
         // select video
-        selectVideo = new SelectImpl<>(this, "SV");
+        selectVideo = new Setting<>(this, "SV");
         selectVideo.setName("Select VIDEO Source");
         controls.add(selectVideo);
 
         // main zone toggle
-        mainZoneToggle = new ToggleImpl(this, "ZM", SwitchState.ON, SwitchState.OFF);
+        mainZoneToggle = new Toggle(this, "ZM", SwitchState.ON, SwitchState.OFF);
         mainZoneToggle.setName("Main Zone Toggle");
         controls.add(mainZoneToggle);
 
         // network audio/usb/ipod DIRECT extended control
-        netUsb = new NetUsbIPod(this, true);
+        netUsb = new NetUsbIPodControl(this, true);
         controls.add(netUsb);
 
         menu = new Menu(this);
         controls.add(menu);
 
-        selectSurround = new SelectImpl<>(this, "MS");
+        selectSurround = new Setting<>(this, "MS");
         selectSurround.setName("Select Surround Mode");
         controls.add(selectSurround);
     }
@@ -145,11 +145,11 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
         }
     }
 
-    private void addToDispatcher(Collection<Control> controls) {
+    private void addToDispatcher(Collection<AbstractControl> controls) {
         controls.forEach(this::addListener);
     }
 
-    public Select<SurroundMode> surroundMode() {
+    public Setting<SurroundMode> surroundMode() {
         return selectSurround;
     }
 
@@ -169,15 +169,15 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
         return muteToggle;
     }
 
-    public Select<InputSource> input() {
+    public Setting<InputSource> input() {
         return selectInput;
     }
 
-    public NetUsbIPod netUsb() {
+    public NetUsbIPodControl netUsb() {
         return netUsb;
     }
 
-    public Select<VideoSource> video() {
+    public Setting<VideoSource> video() {
         return selectVideo;
     }
 
@@ -267,7 +267,7 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
         return callback != null && callback.isComplete(this.response);
     }
 
-    public Collection<Control> getControls() {
+    public Collection<AbstractControl> getControls() {
         return controls;
     }
 

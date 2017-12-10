@@ -31,7 +31,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  *
  * @author stheves
  */
-public class NetUsbIPod extends AbstractControl {
+public class NetUsbIPodControl extends AbstractControl {
     private static final String CURSOR_UP = "90";
     private static final String CURSOR_DOWN = "91";
     private static final String CURSOR_LEFT = "92";
@@ -55,7 +55,7 @@ public class NetUsbIPod extends AbstractControl {
     private OsdInfoList mostRecentOsdInfoList;
     private boolean europeModel;
 
-    public NetUsbIPod(DenonReceiver receiver, boolean europeModel) {
+    public NetUsbIPodControl(DenonReceiver receiver, boolean europeModel) {
         super(receiver, "NS");
         setName("Network Audio/USB /iPod DIRECT Extended Control");
         this.europeModel = europeModel;

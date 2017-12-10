@@ -19,14 +19,24 @@
 
 package io.theves.denon4j.controls;
 
+import io.theves.denon4j.DenonReceiver;
+
 /**
- * Toggle control.
+ * Toggle control implementation.
  *
  * @author stheves
  */
-public interface Toggle extends Switch {
-    /**
-     * Toggles this switch.
-     */
-    void toggle();
+public class Toggle extends Switch {
+
+    public Toggle(DenonReceiver receiver, String prefix, SwitchState on, SwitchState off) {
+        super(receiver, prefix, on, off);
+    }
+
+    public void toggle() {
+        if (onValue.equals(state())) {
+            switchOff();
+        } else {
+            switchOn();
+        }
+    }
 }
