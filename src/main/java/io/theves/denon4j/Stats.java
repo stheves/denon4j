@@ -19,9 +19,16 @@ package io.theves.denon4j;
 
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.time.Duration;
+import java.time.Instant;
 
 public class Stats {
-    private int eventCounter;
+    private int eventCounter = 0;
+    private Instant begin;
+
+    public Stats() {
+        begin = Instant.now();
+    }
 
     public int eventCounter() {
         return eventCounter;
@@ -31,10 +38,15 @@ public class Stats {
         eventCounter++;
     }
 
+    public Duration duration() {
+        return Duration.between(begin, Instant.now());
+    }
+
     public void print(PrintStream out) {
         PrintWriter writer = new PrintWriter(out);
         writer.printf("Session Stats:%n");
         writer.printf(" Events: %d%n", eventCounter);
+        writer.printf(" Time: %s%n", duration());
         writer.flush();
     }
 }

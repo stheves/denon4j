@@ -46,23 +46,22 @@ public class Demo {
                 power.toggle();
             }
 
-//            Slider masterVolume = avr.masterVolume();
-//            masterVolume.slideUp();
-//            System.out.println("MASTER VOL: " + masterVolume.getValue());
-//            masterVolume.set("25");
-//            System.out.println("MASTER VOL: " + masterVolume.getValue());
-//
-//            avr.video().select(VideoSource.SOURCE);
-//            avr.input().select(InputSource.NET_UBS);
-//            avr.netUsb().play();
+            Slider masterVolume = avr.masterVolume();
+            masterVolume.slideUp();
+            System.out.println("MASTER VOL: " + masterVolume.getValue());
+            masterVolume.set("305");
+            System.out.println("MASTER VOL: " + masterVolume.getValue());
+
+            avr.video().select(VideoSource.SOURCE);
+            avr.input().select(InputSource.NET_UBS);
+            avr.netUsb().cursorRight();
 
             System.out.println("Display: ");
             System.out.println(avr.netUsb().getDisplay());
 
-
-//            avr.menu().control(MenuControls.MENU_ON);
-//            avr.menu().control(MenuControls.CURSOR_DOWN);
-//            avr.menu().control(MenuControls.MENU_OFF);
+            avr.menu().control(MenuControls.MENU_ON);
+            avr.menu().control(MenuControls.CURSOR_DOWN);
+            avr.menu().control(MenuControls.MENU_OFF);
 
             System.out.println("Surround Mode: " + avr.surroundMode().get());
 

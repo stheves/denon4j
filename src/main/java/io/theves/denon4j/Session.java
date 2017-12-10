@@ -22,10 +22,11 @@ import io.theves.denon4j.net.EventDispatcher;
 import io.theves.denon4j.net.EventListener;
 
 public class Session implements EventListener {
-    private Stats stats = new Stats();
+    private final Stats stats;
 
     public Session(EventDispatcher dispatcher) {
         dispatcher.addListener(this);
+        stats = new Stats();
     }
 
     @Override

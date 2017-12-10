@@ -25,13 +25,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static java.lang.String.format;
+
 /**
  * Base class for controls that handles requests/responses.
  *
  * @author stheves
  */
 public abstract class AbstractControl implements Control {
-    public static final long READ_TIMEOUT = 5 * 1000;
+    public static final long READ_TIMEOUT = 220; // as of spec 200ms + 20ms overhead
 
     private final String commandPrefix;
     private final DenonReceiver receiver;
@@ -52,14 +54,29 @@ public abstract class AbstractControl implements Control {
     }
 
     protected Event sendRequest() {
-        sendAndReceive("?", () -> response.size() == 1 && response.get(0).startsWith(getCommandPrefix()));
+        List<Event> response = new ArrayList<>();
+        int retries = 0;
+        while (response.isEmpty() && retries < 3) {
+            // do retry - receiver maybe busy to answer
+            response = doSendRequest();
+            retries++;
+
+        }
         if (response.isEmpty()) {
-            throw new TimeoutException("No response received");
+            throw new TimeoutException(
+                format("No response received after %d retries. Maybe receiver is too busy answer.", retries)
+            );
         }
         return response.get(0);
     }
 
-    protected void sendAndReceive(String param, CompletionCallback completionCallback) {
+    private List<Event> doSendRequest() {
+        return sendAndReceive("?",
+            () -> this.response.size() == 1 && this.response.get(0).startsWith(getCommandPrefix())
+        );
+    }
+
+    protected List<Event> sendAndReceive(String param, CompletionCallback completionCallback) {
         synchronized (sendReceiveLock) {
             try {
                 receiving = true;
@@ -67,8 +84,10 @@ public abstract class AbstractControl implements Control {
                 response.clear();
                 send(param);
                 waitForResponse();
+                return new ArrayList<>(this.response);
             } finally {
                 receiving = false;
+                response.clear();
                 callback = null;
             }
         }
