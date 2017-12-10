@@ -46,13 +46,13 @@ public class Demo {
                 power.toggle();
             }
 
-//            Toggle mute = avr.mute();
-//            mute.toggle();
-//            System.out.println("MUTE ON: " + mute.state().get());
-//
-//            Thread.sleep(200);
-//            mute.switchOff();
-//            System.out.println("MUTE OFF: " + mute.state().get());
+            Toggle mute = avr.mute();
+            mute.toggle();
+            System.out.println("MUTE ON: " + mute.state().get());
+
+            Thread.sleep(200);
+            mute.switchOff();
+            System.out.println("MUTE OFF: " + mute.state().get());
 
             Slider masterVolume = avr.masterVolume();
             masterVolume.slideUp();
@@ -60,8 +60,8 @@ public class Demo {
             masterVolume.set("25");
             System.out.println("MASTER VOL: " + masterVolume.getValue());
 
-//            Thread.sleep(200);
-//            avr.video().select(VideoSource.SOURCE);
+            Thread.sleep(200);
+            avr.video().select(VideoSource.SOURCE);
 
             Thread.sleep(200);
             avr.input().select(InputSource.NET_UBS);

@@ -19,7 +19,6 @@ package io.theves.denon4j.controls;
 
 import io.theves.denon4j.DenonReceiver;
 import io.theves.denon4j.net.Event;
-import io.theves.denon4j.net.TimeoutException;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -50,8 +49,6 @@ public class NetUsbIPod extends AbstractControl {
     private static final String SKIP_PLUS = "9D";
     private static final String SKIP_MINUS = "9E";
 
-    private final Object readLock = new Object();
-
     private DisplayInfo mostRecentDisplayInfo;
 
     public NetUsbIPod(DenonReceiver receiver) {
@@ -62,14 +59,10 @@ public class NetUsbIPod extends AbstractControl {
     @Override
     public void doHandle(Event event) {
         if (isDisplayInfoEvent(event)) {
-            synchronized (readLock) {
-                mostRecentDisplayInfo.addEvent(event);
-                if (mostRecentDisplayInfo.isComplete()) {
-                    readLock.notify();
-                }
-            }
+            mostRecentDisplayInfo.addEvent(event);
         }
     }
+
 
     private boolean isDisplayInfoEvent(Event event) {
         return event.startsWith(getCommandPrefix());
@@ -175,16 +168,7 @@ public class NetUsbIPod extends AbstractControl {
     }
 
     private void readOnscreenInfo() {
-        synchronized (readLock) {
-            mostRecentDisplayInfo = new DisplayInfo(UTF_8);
-            send("E");
-            // wait until all events are received
-            try {
-                readLock.wait(READ_TIMEOUT);
-            } catch (InterruptedException e) {
-                throw new TimeoutException("Could not get Onscreen Display Information List");
-            }
-
-        }
+        mostRecentDisplayInfo = new DisplayInfo(UTF_8);
+        sendAndReceive("E", () -> mostRecentDisplayInfo.isComplete());
     }
 }

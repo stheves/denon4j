@@ -21,6 +21,8 @@ import io.theves.denon4j.DenonReceiver;
 import io.theves.denon4j.net.Event;
 import io.theves.denon4j.net.TimeoutException;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Objects;
 
 /**
@@ -35,9 +37,10 @@ public abstract class AbstractControl implements Control {
     private final DenonReceiver receiver;
     private final Object receiveLock = new Object();
 
-    private Event mostRecent;
+    private Collection<Event> response;
     private String name;
     private boolean receiving = false;
+    private CompletionCallback callback;
 
     public AbstractControl(DenonReceiver receiver, String commandPrefix) {
         this.commandPrefix = Objects.requireNonNull(commandPrefix);
@@ -49,19 +52,25 @@ public abstract class AbstractControl implements Control {
     }
 
     protected Event sendRequest() {
+        sendAndReceive("?", () -> response.size() == 1);
+        if (response.isEmpty()) {
+            throw new TimeoutException("No response received");
+        }
+        return response.iterator().next();
+    }
+
+    protected void sendAndReceive(String param, CompletionCallback completionCallback) {
         synchronized (receiveLock) {
             try {
                 receiving = true;
-                receiver.send(commandPrefix + "?");
+                callback = completionCallback;
+                response = new ArrayList<>();
+                send(param);
                 try {
                     receiveLock.wait(READ_TIMEOUT);
                 } catch (InterruptedException e) {
                     // ignore
                 }
-                if (mostRecent == null) {
-                    throw new TimeoutException("No response received within " + READ_TIMEOUT + "ms");
-                }
-                return mostRecent;
             } finally {
                 receiving = false;
             }
@@ -72,11 +81,17 @@ public abstract class AbstractControl implements Control {
     public final void handle(Event event) {
         synchronized (receiveLock) {
             if (receiving) {
-                mostRecent = event;
-                receiveLock.notify();
+                response.add(event);
+                if (isComplete()) {
+                    receiveLock.notify();
+                }
             }
         }
         doHandle(event);
+    }
+
+    private boolean isComplete() {
+        return callback != null && callback.isComplete();
     }
 
     protected abstract void doHandle(Event event);
