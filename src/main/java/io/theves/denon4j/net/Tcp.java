@@ -17,9 +17,6 @@
 
 package io.theves.denon4j.net;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -28,7 +25,10 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Sends the actual bytes of a command to the receiver.
@@ -36,7 +36,7 @@ import java.util.Optional;
  * @author stheves
  */
 public final class Tcp implements Protocol {
-    private final Logger logger = LoggerFactory.getLogger(Tcp.class);
+    private final Logger logger = Logger.getLogger(Tcp.class.getName());
     private final Integer port;
     private final String host;
     private final EventReader eventReader;
@@ -53,10 +53,15 @@ public final class Tcp implements Protocol {
     }
 
     void received(Event event) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Event received: {}", event);
+        if (isDebugEnabled()) {
+            logger.log(Level.FINE, "Event received: {}", event);
         }
         notify(event);
+    }
+
+    private boolean isDebugEnabled() {
+        Level[] debugLevels = new Level[]{Level.FINE, Level.FINER, Level.FINEST};
+        return Arrays.asList(debugLevels).contains(logger.getLevel());
     }
 
     private void notify(Event event) {
@@ -64,7 +69,7 @@ public final class Tcp implements Protocol {
             try {
                 eventDispatcher.dispatch(event);
             } catch (Exception e) {
-                logger.warn("Error invoking callback", e);
+                logger.log(Level.WARNING, "Error invoking callback", e);
             }
         }
     }
@@ -105,7 +110,7 @@ public final class Tcp implements Protocol {
             socket.close();
         } catch (IOException e) {
             // ignore
-            logger.debug("Disconnect failure", e);
+            logger.log(Level.FINE, "Disconnect failure", e);
         }
     }
 

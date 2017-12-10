@@ -17,8 +17,6 @@
 
 package io.theves.denon4j.net;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,13 +24,15 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author stheves
  */
 public class EventReader extends Thread {
 
-    private final Logger logger = LoggerFactory.getLogger(EventReader.class);
+    private final Logger logger = Logger.getLogger(EventReader.class.getName());
 
     private final Socket socket;
     private final Tcp client;
@@ -48,11 +48,11 @@ public class EventReader extends Thread {
     @Override
     public void run() {
         openStream();
-        logger.debug("Listening for events...");
+        logger.log(Level.FINE, "Listening for events...");
         while (!isInterrupted()) {
             next();
         }
-        logger.debug("Stopped.");
+        logger.log(Level.FINE, "Stopped.");
     }
 
     private void openStream() {

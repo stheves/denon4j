@@ -17,11 +17,14 @@
 
 package io.theves.denon4j.net;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Receives events from an AVR and dispatches them to the event listeners.
@@ -31,7 +34,7 @@ import java.util.HashSet;
 public class EventDispatcher {
 
     private final Collection<EventListener> eventListeners;
-    private final Logger log = LoggerFactory.getLogger(EventDispatcher.class);
+    private final Logger log = Logger.getLogger(EventDispatcher.class.getName());
 
     public EventDispatcher() {
         this.eventListeners = new HashSet<>();
@@ -50,15 +53,15 @@ public class EventDispatcher {
     }
 
     public Collection<EventListener> getEventListeners() {
-        return eventListeners;
+        return Collections.unmodifiableCollection(eventListeners);
     }
 
     public void dispatch(Event event) {
-        eventListeners.forEach(ctrl -> {
+        eventListeners.forEach(listener -> {
             try {
-                ctrl.handle(event);
+                listener.handle(event);
             } catch (Exception e) {
-                log.error("Caught exception from listener: " + ctrl, e);
+                log.log(Level.SEVERE, "Caught exception from listener: " + listener, e);
             }
         });
     }
