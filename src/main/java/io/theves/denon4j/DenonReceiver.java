@@ -111,7 +111,7 @@ public class DenonReceiver implements AutoCloseable {
         controls.add(mainZoneToggle);
 
         // network audio/usb/ipod DIRECT extended control
-        netUsb = new NetUsbIPod(this);
+        netUsb = new NetUsbIPod(this, true);
         controls.add(netUsb);
 
         menu = new Menu(this);
@@ -138,7 +138,7 @@ public class DenonReceiver implements AutoCloseable {
         return mainZoneToggle;
     }
 
-    public Slider masterVolume() {
+    public Volume masterVolume() {
         return masterSlider;
     }
 
@@ -178,7 +178,7 @@ public class DenonReceiver implements AutoCloseable {
     public void disconnect() {
         getControls().forEach(eventDispatcher::removeListener);
         protocol.disconnect();
-        session = null;
+        session.finish();
     }
 
     public void connect(int timeout) {

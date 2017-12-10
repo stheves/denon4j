@@ -35,4 +35,8 @@ public class Volume extends SliderImpl {
             max = event.asciiValue().substring(5);
         }
     }
+
+    public String getMax() {
+        return max;
+    }
 }

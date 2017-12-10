@@ -40,4 +40,7 @@ public class Session implements EventListener {
         return stats;
     }
 
+    public void finish() {
+
+    }
 }

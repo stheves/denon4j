@@ -20,7 +20,6 @@
 package io.theves.denon4j.controls;
 
 import io.theves.denon4j.DenonReceiver;
-import io.theves.denon4j.net.Event;
 
 
 /**
@@ -40,25 +39,22 @@ public class SliderImpl extends AbstractControl implements Slider {
 
     @Override
     public void slideUp() {
-        executeCommand(up);
-    }
-
-    private void executeCommand(String param) {
-        send(param);
+        send(up);
     }
 
     @Override
     public void slideDown() {
-        executeCommand(down);
+        send(down);
     }
 
     @Override
     public String getValue() {
-        return sendRequest().asciiValue().substring(2);
+        // do not return the MAX values
+        return sendRequest(getCommandPrefix() + "MV\\d\\d\\d?").asciiValue().substring(2);
     }
 
     @Override
     public void set(String value) {
-        executeCommand(value);
+        send(value);
     }
 }

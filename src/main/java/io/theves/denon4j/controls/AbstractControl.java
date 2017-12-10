@@ -56,11 +56,15 @@ public abstract class AbstractControl implements Control {
     }
 
     final Event sendRequest() {
+        return sendRequest(getCommandPrefix() + ".*");
+    }
+
+    final Event sendRequest(String regex) {
         List<Event> response = new ArrayList<>();
         int retries = 0;
         while (response.isEmpty() && retries < 3) {
             // do retry - receiver is maybe too busy to answer
-            response = doSendRequest();
+            response = doSendRequest(regex);
             retries++;
 
         }
@@ -72,9 +76,9 @@ public abstract class AbstractControl implements Control {
         return response.get(0);
     }
 
-    private List<Event> doSendRequest() {
+    private List<Event> doSendRequest(String regex) {
         return sendAndReceive("?",
-            response -> response.size() == 1 && response.get(0).startsWith(getCommandPrefix())
+            response -> response.size() == 1 && response.get(0).asciiValue().matches(regex)
         );
     }
 

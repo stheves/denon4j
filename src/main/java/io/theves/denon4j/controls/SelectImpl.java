@@ -22,9 +22,6 @@ package io.theves.denon4j.controls;
 import io.theves.denon4j.DenonReceiver;
 import io.theves.denon4j.net.Event;
 
-import java.util.Objects;
-import java.util.stream.Stream;
-
 /**
  * SelectImpl control.
  *

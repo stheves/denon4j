@@ -29,12 +29,12 @@ public class Demo {
             System.exit(1);
         }
         System.out.println(String.format("Starting demo... AVR1912: %s:%s",
-                args[0], args[1]));
+            args[0], args[1]));
         Demo test = new Demo();
         test.demo(args[0], Integer.parseInt(args[1]));
     }
 
-    private void demo(String host, int port) throws Exception {
+    private void demo(String host, int port) {
         System.out.println("------------DEMO START------------");
         try (DenonReceiver avr = new DenonReceiver(host, port)) {
             // establish connection
@@ -48,11 +48,12 @@ public class Demo {
                 power.toggle();
             }
 
-            Slider masterVolume = avr.masterVolume();
+            Volume masterVolume = avr.masterVolume();
             masterVolume.slideUp();
             System.out.println("MASTER VOL: " + masterVolume.getValue());
-            masterVolume.set("305");
+            masterVolume.set("255");
             System.out.println("MASTER VOL: " + masterVolume.getValue());
+            System.out.println("MASTER VOL MAX: " + masterVolume.getMax());
 
             avr.video().select(VideoSource.SOURCE);
             avr.input().select(InputSource.NET_UBS);
