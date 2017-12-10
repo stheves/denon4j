@@ -28,6 +28,8 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static io.theves.denon4j.CompletionCallback.completeWith;
+import static io.theves.denon4j.CompletionCallback.regex;
 import static java.lang.String.format;
 
 /**
@@ -36,7 +38,7 @@ import static java.lang.String.format;
  * @author stheves
  */
 public class DenonReceiver implements AutoCloseable, EventDispatcher {
-    private static final long READ_TIMEOUT = 100;
+    private static final long READ_TIMEOUT = 200;
 
     private final Logger log = Logger.getLogger(DenonReceiver.class.getName());
     private final Object sendReceiveLock = new Object();
@@ -55,7 +57,7 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
     private Setting<SurroundMode> selectSurround;
     private Session session;
     private boolean receiving = false;
-    private CompletionCallback callback = null;
+    private CompletionCallback callback = completeWith(true);
     private List<Event> response = new ArrayList<>();
     private SleepTimer sleepTimer;
 
@@ -202,8 +204,8 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
 
     public final Event sendRequest(String command, String regex) {
         synchronized (sendReceiveLock) {
-            List<Event> received;
             int retries = 0;
+            List<Event> received;
             do {
                 // do retry - receiver is maybe too busy to answer
                 received = doSendRequest(command, regex);
@@ -216,28 +218,29 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
             }
             return received.get(0);
         }
-
     }
 
     private List<Event> doSendRequest(String command, String regex) {
-        return sendAndReceive(command,
-            res -> res.stream().anyMatch(e -> e.asciiValue().matches(regex))
-        );
+        return sendAndReceive(command, regex(regex));
     }
 
     public final List<Event> sendAndReceive(String command, CompletionCallback completionCallback) {
-        // obtain lock to safe state
+        if (command == null || completionCallback == null) {
+            throw new IllegalArgumentException("Arguments must not be null");
+        }
         synchronized (sendReceiveLock) {
             try {
                 receiving = true;
                 callback = completionCallback;
+                // just to make sure we did not left anything in there...
                 response.clear();
                 send(command);
                 waitForResponse();
                 return new ArrayList<>(this.response);
             } finally {
-                receiving = false;
                 response.clear();
+                // at the very end reset the receiving flag
+                receiving = false;
             }
         }
     }
@@ -253,12 +256,12 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
     @Override
     public final void dispatch(Event event) {
         synchronized (sendReceiveLock) {
+            notifyEventListeners(event);
             if (receiving) {
                 response.add(event);
-            }
-            notifyEventListeners(event);
-            if (isComplete(response)) {
-                sendReceiveLock.notify();
+                if (isComplete(response)) {
+                    sendReceiveLock.notify();
+                }
             }
         }
     }
@@ -276,7 +279,7 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
     }
 
     private boolean isComplete(List<Event> received) {
-        return callback != null && callback.isComplete(received);
+        return callback.isComplete(received);
     }
 
     public Collection<AbstractControl> getControls() {

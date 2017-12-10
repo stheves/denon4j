@@ -31,4 +31,12 @@ import java.util.List;
 @FunctionalInterface
 public interface CompletionCallback {
     boolean isComplete(List<Event> recorded);
+
+    static CompletionCallback regex(String regex) {
+        return recorded -> recorded.stream().anyMatch(e -> e.asciiValue().matches(regex));
+    }
+
+    static CompletionCallback completeWith(boolean result) {
+        return recorded -> result;
+    }
 }
