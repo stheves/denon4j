@@ -59,7 +59,7 @@ public abstract class AbstractControl implements Control {
         List<Event> response = new ArrayList<>();
         int retries = 0;
         while (response.isEmpty() && retries < 3) {
-            // do retry - receiver maybe busy to answer
+            // do retry - receiver is maybe too busy to answer
             response = doSendRequest();
             retries++;
 
@@ -79,6 +79,7 @@ public abstract class AbstractControl implements Control {
     }
 
     final List<Event> sendAndReceive(String param, CompletionCallback completionCallback) {
+        // obtain lock to safe state
         synchronized (sendReceiveLock) {
             try {
                 receiving = true;
@@ -123,7 +124,7 @@ public abstract class AbstractControl implements Control {
     }
 
     private boolean isComplete() {
-        return callback != null && callback.isComplete(this.response);
+        return callback == null || callback.isComplete(this.response);
     }
 
     protected void doHandle(Event event) {
