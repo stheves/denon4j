@@ -59,7 +59,7 @@ public abstract class AbstractControl implements Control {
                     // ignore
                 }
                 if (mostRecent == null) {
-                    throw new TimeoutException("No response received within " + READ_TIMEOUT);
+                    throw new TimeoutException("No response received within " + READ_TIMEOUT + "ms");
                 }
                 return mostRecent;
             } finally {
@@ -70,8 +70,8 @@ public abstract class AbstractControl implements Control {
 
     @Override
     public final void handle(Event event) {
-        if (receiving) {
-            synchronized (receiveLock) {
+        synchronized (receiveLock) {
+            if (receiving) {
                 mostRecent = event;
                 receiveLock.notify();
             }
