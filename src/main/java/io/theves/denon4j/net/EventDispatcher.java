@@ -19,52 +19,16 @@
 
 package io.theves.denon4j.net;
 
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 /**
- * Receives events from an AVR and dispatches them to the event listeners.
+ * Invoked by the {@link Protocol} when an {@link Event} was received.
  *
  * @author stheves
  */
-public class EventDispatcher {
-
-    private final Collection<EventListener> eventListeners;
-    private final Logger log = Logger.getLogger(EventDispatcher.class.getName());
-
-    public EventDispatcher() {
-        this.eventListeners = Collections.synchronizedList(new ArrayList<>());
-    }
-
-    public void addListener(EventListener listener) {
-        if (null != listener) {
-            eventListeners.add(listener);
-        }
-    }
-
-    public void removeListener(EventListener eventListener) {
-        if (null != eventListener) {
-            eventListeners.remove(eventListener);
-        }
-    }
-
-    public Collection<EventListener> getEventListeners() {
-        return Collections.unmodifiableCollection(eventListeners);
-    }
-
-    public void dispatch(Event event) {
-        synchronized (eventListeners) {
-            eventListeners.forEach(listener -> {
-                try {
-                    listener.handle(event);
-                } catch (Exception e) {
-                    log.log(Level.SEVERE, "Caught exception from listener: " + listener, e);
-                }
-            });
-        }
-    }
+public interface EventDispatcher {
+    /**
+     * Invoked when an event was received.
+     *
+     * @param event the received event.
+     */
+    void dispatch(Event event);
 }

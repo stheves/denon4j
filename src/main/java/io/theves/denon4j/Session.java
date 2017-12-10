@@ -20,14 +20,13 @@
 package io.theves.denon4j;
 
 import io.theves.denon4j.net.Event;
-import io.theves.denon4j.net.EventDispatcher;
 import io.theves.denon4j.net.EventListener;
 
 public class Session implements EventListener {
     private final Stats stats;
 
-    public Session(EventDispatcher dispatcher) {
-        dispatcher.addListener(this);
+    public Session(DenonReceiver receiver) {
+        receiver.addListener(this);
         stats = new Stats();
     }
 

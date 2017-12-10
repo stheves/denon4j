@@ -21,12 +21,12 @@ package io.theves.denon4j;
 
 import io.theves.denon4j.controls.*;
 import io.theves.denon4j.net.*;
+import io.theves.denon4j.net.EventListener;
 
 import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static java.lang.String.format;
 
@@ -35,19 +35,21 @@ import static java.lang.String.format;
  *
  * @author stheves
  */
-public class DenonReceiver implements AutoCloseable, EventListener {
+public class DenonReceiver implements AutoCloseable, EventDispatcher {
     private static final long READ_TIMEOUT = 220;
-    private final Object sendReceiveLock = new Object();
 
-    private EventDispatcher eventDispatcher;
-    private Protocol protocol;
+    private final Logger log = Logger.getLogger(DenonReceiver.class.getName());
+    private final Object sendReceiveLock = new Object();
+    private final List<EventListener> eventListeners;
+    private final Protocol protocol;
+
     private Collection<Control> controls;
     private Toggle powerToggle;
     private Volume masterSlider;
     private Toggle mainZoneToggle;
     private Toggle muteToggle;
-    private Select<InputSource> selectInput;
-    private Select<VideoSource> selectVideo;
+    private SelectImpl<InputSource> selectInput;
+    private SelectImpl<VideoSource> selectVideo;
     private NetUsbIPod netUsb;
     private Menu menu;
     private SelectImpl<SurroundMode> selectSurround;
@@ -70,10 +72,9 @@ public class DenonReceiver implements AutoCloseable, EventListener {
 
     public DenonReceiver(Protocol protocol) {
         this.protocol = Objects.requireNonNull(protocol);
-        this.eventDispatcher = new EventDispatcher();
-        this.eventDispatcher.addListener(this);
+        this.eventListeners = Collections.synchronizedList(new ArrayList<>());
         this.controls = new ArrayList<>();
-        this.protocol.setDispatcher(eventDispatcher);
+        this.protocol.setDispatcher(this);
 
         createControls(this.controls);
         addToDispatcher(this.controls);
@@ -132,8 +133,20 @@ public class DenonReceiver implements AutoCloseable, EventListener {
         controls.add(selectSurround);
     }
 
+    public void addListener(EventListener listener) {
+        if (null != listener) {
+            eventListeners.add(listener);
+        }
+    }
+
+    public void removeListener(EventListener eventListener) {
+        if (null != eventListener) {
+            eventListeners.remove(eventListener);
+        }
+    }
+
     private void addToDispatcher(Collection<Control> controls) {
-        controls.forEach(eventDispatcher::addListener);
+        controls.forEach(this::addListener);
     }
 
     public Select<SurroundMode> surroundMode() {
@@ -226,14 +239,27 @@ public class DenonReceiver implements AutoCloseable, EventListener {
     }
 
     @Override
-    public final void handle(Event event) {
+    public final void dispatch(Event event) {
         synchronized (sendReceiveLock) {
             if (receiving) {
                 response.add(event);
             }
+            notifyEventListeners(event);
             if (isComplete()) {
                 sendReceiveLock.notify();
             }
+        }
+    }
+
+    private void notifyEventListeners(Event event) {
+        synchronized (eventListeners) {
+            eventListeners.forEach(listener -> {
+                try {
+                    listener.handle(event);
+                } catch (Exception e) {
+                    log.log(Level.SEVERE, "Caught exception from listener: " + listener, e);
+                }
+            });
         }
     }
 
@@ -251,13 +277,13 @@ public class DenonReceiver implements AutoCloseable, EventListener {
     }
 
     public void disconnect() {
-        getControls().forEach(eventDispatcher::removeListener);
+        getControls().forEach(this::removeListener);
         protocol.disconnect();
         session.finish();
     }
 
     public void connect(int timeout) {
-        session = new Session(eventDispatcher);
+        session = new Session(this);
         protocol.establishConnection(timeout);
     }
 
@@ -269,11 +295,7 @@ public class DenonReceiver implements AutoCloseable, EventListener {
         return protocol.isConnected();
     }
 
-    public Collection<EventListener> getEventListeners() {
-        return eventDispatcher.getEventListeners();
-    }
-
-    EventDispatcher getEventDispatcher() {
-        return eventDispatcher;
+    public List<EventListener> getEventListeners() {
+        return Collections.unmodifiableList(eventListeners);
     }
 }

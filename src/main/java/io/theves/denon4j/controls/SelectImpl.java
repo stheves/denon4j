@@ -23,7 +23,7 @@ import io.theves.denon4j.DenonReceiver;
 import io.theves.denon4j.net.Event;
 
 /**
- * SelectImpl control.
+ * Represents different settings of the receiver.
  *
  * @author stheves
  */
