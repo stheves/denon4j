@@ -20,34 +20,30 @@
 package io.theves.denon4j.controls;
 
 import io.theves.denon4j.DenonReceiver;
-import io.theves.denon4j.net.Event;
 
 import static java.lang.String.format;
 
-public class Volume extends Slider {
-    public static final String REGEX = "\\d\\d\\d?";
-    private String max;
+public class SleepTimer extends AbstractControl {
+    private static final String REGEX = "\\d{3}";
+    private static final String SLP = "SLP";
+    private static final String OFF = "OFF";
 
-    public Volume(DenonReceiver receiver, String prefix, String up, String down) {
-        super(receiver, prefix, up, down);
+    public SleepTimer(DenonReceiver receiver) {
+        super(receiver, SLP);
     }
 
-    @Override
-    public void set(String value) {
-        if (value == null || !value.matches(REGEX)) {
-            throw new IllegalArgumentException(format("Value must match '%s'", REGEX));
+    public String getTimer() {
+        return sendRequest().asciiValue().substring(3);
+    }
+
+    public void off() {
+        send(OFF);
+    }
+
+    public void timer(String timer) {
+        if (timer == null || !timer.matches(REGEX)) {
+            throw new IllegalArgumentException(format("Timer must match '%s'", REGEX));
         }
-        super.set(value);
-    }
-
-    @Override
-    public void doHandle(Event event) {
-        if (event.startsWith(getCommandPrefix()) && event.asciiValue().contains("MAX")) {
-            max = event.asciiValue().substring(5);
-        }
-    }
-
-    public String getMax() {
-        return max;
+        send(timer);
     }
 }

@@ -27,7 +27,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 
 /**
- * Class description.
+ * Network Audio/USB /iPod DIRECT Extended Control.
  *
  * @author stheves
  */
@@ -55,10 +55,10 @@ public class NetUsbIPodControl extends AbstractControl {
     private OsdInfoList mostRecentOsdInfoList;
     private boolean europeModel;
 
-    public NetUsbIPodControl(DenonReceiver receiver, boolean europeModel) {
+    public NetUsbIPodControl(DenonReceiver receiver, boolean europeanModel) {
         super(receiver, "NS");
         setName("Network Audio/USB /iPod DIRECT Extended Control");
-        this.europeModel = europeModel;
+        this.europeModel = europeanModel;
     }
 
     @Override
@@ -133,16 +133,13 @@ public class NetUsbIPodControl extends AbstractControl {
         send(SHUFFLE_ON);
     }
 
-
     public void shuffleOff() {
         send(SHUFFLE_OFF);
     }
 
-
     public void mode() {
         send(MODE);
     }
-
 
     public void repeatOne() {
         send(REPEAT_ONE);
@@ -152,21 +149,17 @@ public class NetUsbIPodControl extends AbstractControl {
         send(REPEAT_ALL);
     }
 
-
     public void repeatOff() {
         send(REPEAT_OFF);
     }
-
 
     public void partyMode() {
         send(PARTY_MODE);
     }
 
-
     public void skipPlus() {
         send(SKIP_PLUS);
     }
-
 
     public void skipMinus() {
         send(SKIP_MINUS);
@@ -174,6 +167,6 @@ public class NetUsbIPodControl extends AbstractControl {
 
     private void readOnscreenInfo() {
         mostRecentOsdInfoList = new OsdInfoList(europeModel ? UTF_8 : US_ASCII);
-        sendAndReceive(europeModel ? "E" : "A", res -> res.size() == 9);
+        sendAndReceive(europeModel ? "E" : "A", res -> res.stream().filter(e -> e.startsWith("NS")).count() == 9);
     }
 }

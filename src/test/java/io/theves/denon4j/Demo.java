@@ -66,6 +66,11 @@ public class Demo {
             avr.menu().control(MenuNavigation.CURSOR_DOWN);
             avr.menu().control(MenuNavigation.MENU_OFF);
 
+            System.out.println("SLEEP TIMER: " + avr.sleepTimer().getTimer());
+            avr.sleepTimer().timer("027");
+            System.out.println("SLEEP TIMER: " + avr.sleepTimer().getTimer());
+            avr.sleepTimer().off();
+
             System.out.println("Surround Mode: " + avr.surroundMode().get());
 
             avr.getSession().stats().print(System.out);

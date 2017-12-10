@@ -36,7 +36,7 @@ import static java.lang.String.format;
  * @author stheves
  */
 public class DenonReceiver implements AutoCloseable, EventDispatcher {
-    private static final long READ_TIMEOUT = 220;
+    private static final long READ_TIMEOUT = 100;
 
     private final Logger log = Logger.getLogger(DenonReceiver.class.getName());
     private final Object sendReceiveLock = new Object();
@@ -57,6 +57,7 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
     private boolean receiving = false;
     private CompletionCallback callback = null;
     private List<Event> response = new ArrayList<>();
+    private SleepTimer sleepTimer;
 
     /**
      * Starts auto discovery and chooses first receiver found.
@@ -125,12 +126,22 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
         netUsb = new NetUsbIPodControl(this, true);
         controls.add(netUsb);
 
+        // main menu
         menu = new Menu(this);
         controls.add(menu);
 
+        // surround mode settings
         selectSurround = new Setting<>(this, "MS");
         selectSurround.setName("Select Surround Mode");
         controls.add(selectSurround);
+
+        sleepTimer = new SleepTimer(this);
+        sleepTimer.setName("Main Zone Sleep Timer setting");
+        controls.add(sleepTimer);
+    }
+
+    public SleepTimer sleepTimer() {
+        return sleepTimer;
     }
 
     public void addListener(EventListener listener) {
@@ -190,20 +201,22 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
     }
 
     public final Event sendRequest(String command, String regex) {
-        List<Event> response;
-        int retries = 0;
-        do {
-            // do retry - receiver is maybe too busy to answer
-            response = doSendRequest(command, regex);
-            retries++;
-        } while (!isComplete() && retries < 3);
-
-        if (response.isEmpty()) {
-            throw new TimeoutException(
-                format("No response received after %d retries. Maybe receiver is too busy answer.", retries)
-            );
+        synchronized (sendReceiveLock) {
+            List<Event> received;
+            int retries = 0;
+            do {
+                // do retry - receiver is maybe too busy to answer
+                received = doSendRequest(command, regex);
+                retries++;
+            } while (!isComplete(received) && retries < 3);
+            if (received.isEmpty()) {
+                throw new TimeoutException(
+                    format("No response received after %d retries. Maybe receiver is too busy answer.", retries)
+                );
+            }
+            return received.get(0);
         }
-        return response.get(0);
+
     }
 
     private List<Event> doSendRequest(String command, String regex) {
@@ -225,7 +238,6 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
             } finally {
                 receiving = false;
                 response.clear();
-                callback = null;
             }
         }
     }
@@ -245,7 +257,7 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
                 response.add(event);
             }
             notifyEventListeners(event);
-            if (isComplete()) {
+            if (isComplete(response)) {
                 sendReceiveLock.notify();
             }
         }
@@ -263,8 +275,8 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
         }
     }
 
-    private boolean isComplete() {
-        return callback != null && callback.isComplete(this.response);
+    private boolean isComplete(List<Event> received) {
+        return callback != null && callback.isComplete(received);
     }
 
     public Collection<AbstractControl> getControls() {
