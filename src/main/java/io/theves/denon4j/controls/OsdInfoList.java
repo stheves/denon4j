@@ -1,4 +1,6 @@
 /*
+ * Copyright 2017 Sascha Theves
+ *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -47,7 +49,7 @@ public class OsdInfoList {
         return lines.get(index);
     }
 
-    public Line getCursor() {
+    public Line cursorLine() {
         return lines.values().stream().filter(Line::isCursorSelect).findFirst().orElse(null);
     }
 
@@ -62,9 +64,5 @@ public class OsdInfoList {
         List<Line> lines = new ArrayList<>(this.lines.values());
         Collections.sort(lines);
         return lines;
-    }
-
-    public boolean isComplete() {
-        return lines.size() == 9;
     }
 }

@@ -1,4 +1,6 @@
 /*
+ * Copyright 2017 Sascha Theves
+ *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -19,6 +21,8 @@ package io.theves.denon4j.controls;
 
 import io.theves.denon4j.DenonReceiver;
 import io.theves.denon4j.net.Event;
+
+import java.util.List;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -169,6 +173,6 @@ public class NetUsbIPod extends AbstractControl {
 
     private void readOnscreenInfo() {
         mostRecentOsdInfoList = new OsdInfoList(UTF_8);
-        sendAndReceive("E", () -> mostRecentOsdInfoList.isComplete());
+        List<Event> response = sendAndReceive("E", res -> res.size() == 9);
     }
 }

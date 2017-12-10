@@ -1,4 +1,6 @@
 /*
+ * Copyright 2017 Sascha Theves
+ *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -33,7 +35,7 @@ import static java.lang.String.format;
  * @author stheves
  */
 public abstract class AbstractControl implements Control {
-    public static final long READ_TIMEOUT = 220; // as of spec 200ms + 20ms overhead
+    private static final long READ_TIMEOUT = 220; // as of spec 200ms + 20ms delay
 
     private final String commandPrefix;
     private final DenonReceiver receiver;
@@ -49,11 +51,11 @@ public abstract class AbstractControl implements Control {
         this.receiver = receiver;
     }
 
-    protected void send(String param) {
+    protected final void send(String param) {
         receiver.send(commandPrefix + param);
     }
 
-    protected Event sendRequest() {
+    final Event sendRequest() {
         List<Event> response = new ArrayList<>();
         int retries = 0;
         while (response.isEmpty() && retries < 3) {
@@ -72,11 +74,11 @@ public abstract class AbstractControl implements Control {
 
     private List<Event> doSendRequest() {
         return sendAndReceive("?",
-            () -> this.response.size() == 1 && this.response.get(0).startsWith(getCommandPrefix())
+            response -> response.size() == 1 && response.get(0).startsWith(getCommandPrefix())
         );
     }
 
-    protected List<Event> sendAndReceive(String param, CompletionCallback completionCallback) {
+    final List<Event> sendAndReceive(String param, CompletionCallback completionCallback) {
         synchronized (sendReceiveLock) {
             try {
                 receiving = true;
@@ -116,12 +118,12 @@ public abstract class AbstractControl implements Control {
         }
     }
 
-    protected boolean shouldHandle(Event event) {
+    private boolean shouldHandle(Event event) {
         return event.startsWith(getCommandPrefix());
     }
 
     private boolean isComplete() {
-        return callback != null && callback.isComplete();
+        return callback != null && callback.isComplete(this.response);
     }
 
     protected void doHandle(Event event) {

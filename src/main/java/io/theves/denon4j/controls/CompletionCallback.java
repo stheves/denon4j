@@ -1,4 +1,6 @@
 /*
+ * Copyright 2017 Sascha Theves
+ *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -17,7 +19,16 @@
 
 package io.theves.denon4j.controls;
 
+import io.theves.denon4j.net.Event;
+
+import java.util.List;
+
+/**
+ * Used to check if a response is completely received.
+ *
+ * @author stheves
+ */
 @FunctionalInterface
 public interface CompletionCallback {
-    boolean isComplete();
+    boolean isComplete(List<Event> recorded);
 }
