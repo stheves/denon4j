@@ -60,14 +60,14 @@ public abstract class AbstractControl implements Control {
     }
 
     final Event sendRequest(String regex) {
-        List<Event> response = new ArrayList<>();
+        List<Event> response;
         int retries = 0;
-        while (response.isEmpty() && retries < 3) {
+        do {
             // do retry - receiver is maybe too busy to answer
             response = doSendRequest(regex);
             retries++;
+        } while (!isComplete() && retries < 3);
 
-        }
         if (response.isEmpty()) {
             throw new TimeoutException(
                 format("No response received after %d retries. Maybe receiver is too busy answer.", retries)
@@ -78,7 +78,7 @@ public abstract class AbstractControl implements Control {
 
     private List<Event> doSendRequest(String regex) {
         return sendAndReceive("?",
-            response -> response.size() == 1 && response.get(0).asciiValue().matches(regex)
+            response -> !response.isEmpty() && response.get(0).asciiValue().matches(regex)
         );
     }
 
@@ -128,7 +128,7 @@ public abstract class AbstractControl implements Control {
     }
 
     private boolean isComplete() {
-        return callback == null || callback.isComplete(this.response);
+        return callback != null && callback.isComplete(this.response);
     }
 
     protected void doHandle(Event event) {

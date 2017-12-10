@@ -47,8 +47,8 @@ public class Stats {
     public void print(PrintStream out) {
         PrintWriter writer = new PrintWriter(out);
         writer.printf("Session Stats:%n");
-        writer.printf(" Events: %d%n", eventCounter);
-        writer.printf(" Time: %s%n", duration());
+        writer.printf(" Events: %-20d%n", eventCounter);
+        writer.printf(" Time:   %-20s%n", duration().toString());
         writer.flush();
     }
 }

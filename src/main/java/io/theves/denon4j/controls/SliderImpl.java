@@ -50,7 +50,7 @@ public class SliderImpl extends AbstractControl implements Slider {
     @Override
     public String getValue() {
         // do not return the MAX values
-        return sendRequest(getCommandPrefix() + "MV\\d\\d\\d?").asciiValue().substring(2);
+        return sendRequest(getCommandPrefix() + "\\d\\d\\d?").asciiValue().substring(2);
     }
 
     @Override
