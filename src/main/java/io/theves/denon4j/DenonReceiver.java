@@ -217,13 +217,12 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
         }
 
         synchronized (sendReceiveLock) {
+            checkResponse(currentContext);
+            // check for given condition but return after RETRIES or RECV_TIMEOUT to make sure this method returns
+            condition = anyMatch(c, retries(RETRIES), duration(ofMillis(RECV_TIMEOUT)));
             try {
-                // check for given condition but return after RETRIES or RECV_TIMEOUT to make sure this method returns
-                condition = anyMatch(c, retries(RETRIES), duration(ofMillis(RECV_TIMEOUT)));
-                checkResponse(currentContext);
                 currentContext.beginReceive();
                 do {
-                    currentContext.incrementCounter();
                     send(command);
                     // wait for response
                     try {
@@ -231,6 +230,7 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
                     } catch (InterruptedException e) {
                         log.log(Level.FINEST, "Got interruption while waiting for response", e);
                     }
+                    currentContext.incrementCounter();
                 } while (!condition.fulfilled(currentContext));
 
                 // copy result
