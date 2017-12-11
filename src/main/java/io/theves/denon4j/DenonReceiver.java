@@ -312,7 +312,7 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
 
     public Event sendRequest(String command, String regex) {
         return sendAndReceive(command, Condition.regex(regex)).stream().findFirst().orElseThrow(() -> new TimeoutException(
-            format("No response received after %s milliseconds. Receiver may be too busy answer.", RECV_TIMEOUT)
+            format("No response received after %s milliseconds. Receiver may be too busy to answer.", RECV_TIMEOUT)
         ));
     }
 }
