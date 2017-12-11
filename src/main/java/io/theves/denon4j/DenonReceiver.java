@@ -19,18 +19,41 @@
 
 package io.theves.denon4j;
 
-import io.theves.denon4j.controls.*;
-import io.theves.denon4j.net.*;
+import io.theves.denon4j.controls.AbstractControl;
+import io.theves.denon4j.controls.InputSource;
+import io.theves.denon4j.controls.Menu;
+import io.theves.denon4j.controls.NetUsbIPodControl;
+import io.theves.denon4j.controls.Setting;
+import io.theves.denon4j.controls.SleepTimer;
+import io.theves.denon4j.controls.SurroundMode;
+import io.theves.denon4j.controls.SwitchState;
+import io.theves.denon4j.controls.Toggle;
+import io.theves.denon4j.controls.VideoSource;
+import io.theves.denon4j.controls.Volume;
+import io.theves.denon4j.net.AutoDiscovery;
+import io.theves.denon4j.net.Command;
+import io.theves.denon4j.net.ConnectionException;
+import io.theves.denon4j.net.Event;
+import io.theves.denon4j.net.EventDispatcher;
 import io.theves.denon4j.net.EventListener;
+import io.theves.denon4j.net.Protocol;
+import io.theves.denon4j.net.TimeoutException;
 
 import java.net.InetAddress;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static io.theves.denon4j.CompletionCallback.completeWith;
-import static io.theves.denon4j.CompletionCallback.regex;
+import static io.theves.denon4j.Condition.anyMatch;
+import static io.theves.denon4j.Condition.bool;
+import static io.theves.denon4j.Condition.duration;
+import static io.theves.denon4j.Condition.retries;
 import static java.lang.String.format;
+import static java.time.Duration.ofMillis;
 
 /**
  * Implementation of the Denon AVR 1912 protocol spec.
@@ -38,7 +61,8 @@ import static java.lang.String.format;
  * @author stheves
  */
 public class DenonReceiver implements AutoCloseable, EventDispatcher {
-    private static final long READ_TIMEOUT = 200;
+    private static final long RECV_TIMEOUT = 5 * 1000L;
+    private static final int RETRIES = 5;
 
     private final Logger log = Logger.getLogger(DenonReceiver.class.getName());
     private final Object sendReceiveLock = new Object();
@@ -56,9 +80,8 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
     private Menu menu;
     private Setting<SurroundMode> selectSurround;
     private Session session;
-    private boolean receiving = false;
-    private CompletionCallback callback = completeWith(true);
-    private List<Event> response = new ArrayList<>();
+    private Condition condition = bool(true);
+    private RequestContext currentContext = new RequestContext();
     private SleepTimer sleepTimer;
 
     /**
@@ -202,54 +225,50 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
         protocol.send(Command.createCommand(command));
     }
 
-    public final Event sendRequest(String command, String regex) {
-        synchronized (sendReceiveLock) {
-            int retries = 0;
-            List<Event> received;
-            do {
-                // do retry - receiver is maybe too busy to answer
-                received = doSendRequest(command, regex);
-                retries++;
-            } while (!isComplete(received) && retries < 3);
-            if (received.isEmpty()) {
-                throw new TimeoutException(
-                    format("No response received after %d retries. Maybe receiver is too busy answer.", retries)
-                );
-            }
-            return received.get(0);
-        }
-    }
 
-    private List<Event> doSendRequest(String command, String regex) {
-        return sendAndReceive(command, regex(regex));
-    }
-
-    public final List<Event> sendAndReceive(String command, CompletionCallback completionCallback) {
-        if (command == null || completionCallback == null) {
+    /**
+     * Send the command to the receiver and waits for the response until the <code>condition</code> is fulfilled.
+     *
+     * @param command the command to send.
+     * @param c       the condition.
+     * @return the received response.
+     */
+    public final List<Event> sendAndReceive(String command, Condition c) {
+        if (command == null || c == null) {
             throw new IllegalArgumentException("Arguments must not be null");
         }
-        synchronized (sendReceiveLock) {
-            try {
-                receiving = true;
-                callback = completionCallback;
-                // just to make sure we did not left anything in there...
-                response.clear();
-                send(command);
-                waitForResponse();
-                return new ArrayList<>(this.response);
-            } finally {
-                response.clear();
-                // at the very end reset the receiving flag
-                receiving = false;
-            }
-        }
-    }
 
-    private void waitForResponse() {
-        try {
-            sendReceiveLock.wait(READ_TIMEOUT);
-        } catch (InterruptedException e) {
-            // ignore
+        synchronized (sendReceiveLock) {
+            // check for given condition but return after RETRIES or RECV_TIMEOUT to makre sure this method returns
+            condition = anyMatch(c, retries(RETRIES), duration(ofMillis(RECV_TIMEOUT)));
+            currentContext.beginReceive();
+            List<Event> response = currentContext.received();
+            try {
+                do {
+                    if (!response.isEmpty()) {
+                        log.log(Level.WARNING, "Attempt to send new request on unfinished response.");
+                        // just to make sure we did not left anything in there...
+                        response.clear();
+                    }
+                    send(command);
+                    try {
+                        // wait for response
+                        sendReceiveLock.wait(100);
+                    }
+                    catch (InterruptedException e) {
+                        log.log(Level.FINEST, "Got interruption while waiting for response", e);
+                    }
+
+                    currentContext.incrementCounter();
+
+                } while (!condition.fullfilled(currentContext));
+
+                // copy result
+                return new ArrayList<>(response);
+            }
+            finally {
+                currentContext.endReceive();
+            }
         }
     }
 
@@ -257,9 +276,9 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
     public final void dispatch(Event event) {
         synchronized (sendReceiveLock) {
             notifyEventListeners(event);
-            if (receiving) {
-                response.add(event);
-                if (isComplete(response)) {
+            if (currentContext.isReceiving()) {
+                currentContext.received().add(event);
+                if (condition.fullfilled(currentContext)) {
                     sendReceiveLock.notify();
                 }
             }
@@ -271,15 +290,12 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
             eventListeners.forEach(listener -> {
                 try {
                     listener.handle(event);
-                } catch (Exception e) {
+                }
+                catch (Exception e) {
                     log.log(Level.SEVERE, "Caught exception from listener: " + listener, e);
                 }
             });
         }
-    }
-
-    private boolean isComplete(List<Event> received) {
-        return callback.isComplete(received);
     }
 
     public Collection<AbstractControl> getControls() {
@@ -310,7 +326,13 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
         return protocol.isConnected();
     }
 
-    public List<EventListener> getEventListeners() {
+    List<EventListener> getEventListeners() {
         return Collections.unmodifiableList(eventListeners);
+    }
+
+    public Event sendRequest(String command, String regex) {
+        return sendAndReceive(command, Condition.regex(regex)).stream().findFirst().orElseThrow(() -> new TimeoutException(
+            format("No response received after %s milliseconds. Receiver may be too busy answer.", RECV_TIMEOUT)
+        ));
     }
 }

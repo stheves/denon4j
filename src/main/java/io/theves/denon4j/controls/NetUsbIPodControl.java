@@ -22,6 +22,8 @@ package io.theves.denon4j.controls;
 import io.theves.denon4j.DenonReceiver;
 import io.theves.denon4j.net.Event;
 
+import java.util.List;
+
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -60,14 +62,6 @@ public class NetUsbIPodControl extends AbstractControl {
         setName("Network Audio/USB /iPod DIRECT Extended Control");
         this.europeModel = europeanModel;
     }
-
-    @Override
-    public void doHandle(Event event) {
-        if (isDisplayInfoEvent(event)) {
-            mostRecentOsdInfoList.addEvent(event);
-        }
-    }
-
 
     private boolean isDisplayInfoEvent(Event event) {
         return event.startsWith(getCommandPrefix());
@@ -167,6 +161,11 @@ public class NetUsbIPodControl extends AbstractControl {
 
     private void readOnscreenInfo() {
         mostRecentOsdInfoList = new OsdInfoList(europeModel ? UTF_8 : US_ASCII);
-        sendAndReceive(europeModel ? "E" : "A", res -> res.stream().filter(e -> e.startsWith("NS")).count() == 9);
+        List<Event> received = sendAndReceive(europeModel ? "E" : "A", context -> context.received().stream().filter(e -> e.startsWith("NS")).count() == 9);
+        received.forEach(e -> {
+            if (isDisplayInfoEvent(e)) {
+                mostRecentOsdInfoList.addEvent(e);
+            }
+        });
     }
 }

@@ -19,7 +19,7 @@
 
 package io.theves.denon4j.controls;
 
-import io.theves.denon4j.CompletionCallback;
+import io.theves.denon4j.Condition;
 import io.theves.denon4j.DenonReceiver;
 import io.theves.denon4j.net.Event;
 import io.theves.denon4j.net.EventListener;
@@ -35,7 +35,6 @@ import java.util.Objects;
 public abstract class AbstractControl implements EventListener {
     private final String commandPrefix;
     private final DenonReceiver receiver;
-
     private String name;
 
     public AbstractControl(DenonReceiver receiver, String commandPrefix) {
@@ -55,8 +54,8 @@ public abstract class AbstractControl implements EventListener {
         return sendRequest(getCommandPrefix() + ".*");
     }
 
-    final List<Event> sendAndReceive(String param, CompletionCallback completionCallback) {
-        return receiver.sendAndReceive(getCommandPrefix() + param, completionCallback);
+    final List<Event> sendAndReceive(String param, Condition condition) {
+        return receiver.sendAndReceive(getCommandPrefix() + param, condition);
     }
 
     @Override
