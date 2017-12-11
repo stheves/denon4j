@@ -36,7 +36,7 @@ public interface Condition {
      * @param ctx the request context.
      * @return <code>true</code> if fulfilled.
      */
-    boolean fullfilled(RequestContext ctx);
+    boolean fulfilled(RecvContext ctx);
 
     /**
      * Condition that is fullfilled if the given regex matches any of the received events.
@@ -45,7 +45,9 @@ public interface Condition {
      * @return the regex condition.
      */
     static Condition regex(String regex) {
-        return context -> context.received().stream().anyMatch(e -> e.asciiValue().matches(regex));
+        return context ->
+            context.received().stream()
+                .anyMatch(e -> e.asciiValue().matches(regex));
     }
 
     /**
@@ -58,15 +60,55 @@ public interface Condition {
         return context -> result;
     }
 
+    /**
+     * Returns <code>true</code> if the given amount of retries has been reached.
+     *
+     * @param retries the amount of retries to check.
+     * @return the condition.
+     */
     static Condition retries(int retries) {
-        return context -> context.counter() < retries;
+        return context -> context.counter() > retries;
     }
 
+    /**
+     * Is fulfilled when the duration elapsed.
+     *
+     * @param duration the duration.
+     * @return the condition.
+     */
     static Condition duration(Duration duration) {
-        return context -> Duration.between(context.start(), Instant.now()).compareTo(duration) > 0;
+        return context ->
+            Duration.between(context.start(), Instant.now())
+                .compareTo(duration) > 0;
     }
 
-    static Condition anyMatch(Condition... children) {
-        return ctx -> Stream.of(children).anyMatch(c -> c.fullfilled(ctx));
+    /**
+     * Is fulfilled if the response has the given <code>size</code>.
+     *
+     * @param size the size to check.
+     * @return the condition.
+     */
+    static Condition size(int size) {
+        return ctx -> ctx.received().size() >= size;
+    }
+
+    /**
+     * Matches any of the given conditions.
+     *
+     * @param conditions the conditions to match.
+     * @return the condition.
+     */
+    static Condition anyMatch(Condition... conditions) {
+        return ctx -> Stream.of(conditions).anyMatch(c -> c.fulfilled(ctx));
+    }
+
+    /**
+     * Matches all of the given <code>conditions</code>.
+     *
+     * @param conditions the conditions to match.
+     * @return the condition.
+     */
+    static Condition allMatch(Condition... conditions) {
+        return ctx -> Stream.of(conditions).allMatch(c -> c.fulfilled(ctx));
     }
 }

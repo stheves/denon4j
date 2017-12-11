@@ -19,39 +19,16 @@
 
 package io.theves.denon4j;
 
-import io.theves.denon4j.controls.AbstractControl;
-import io.theves.denon4j.controls.InputSource;
-import io.theves.denon4j.controls.Menu;
-import io.theves.denon4j.controls.NetUsbIPodControl;
-import io.theves.denon4j.controls.Setting;
-import io.theves.denon4j.controls.SleepTimer;
-import io.theves.denon4j.controls.SurroundMode;
-import io.theves.denon4j.controls.SwitchState;
-import io.theves.denon4j.controls.Toggle;
-import io.theves.denon4j.controls.VideoSource;
-import io.theves.denon4j.controls.Volume;
-import io.theves.denon4j.net.AutoDiscovery;
-import io.theves.denon4j.net.Command;
-import io.theves.denon4j.net.ConnectionException;
-import io.theves.denon4j.net.Event;
-import io.theves.denon4j.net.EventDispatcher;
+import io.theves.denon4j.controls.*;
+import io.theves.denon4j.net.*;
 import io.theves.denon4j.net.EventListener;
-import io.theves.denon4j.net.Protocol;
-import io.theves.denon4j.net.TimeoutException;
 
 import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static io.theves.denon4j.Condition.anyMatch;
-import static io.theves.denon4j.Condition.bool;
-import static io.theves.denon4j.Condition.duration;
-import static io.theves.denon4j.Condition.retries;
+import static io.theves.denon4j.Condition.*;
 import static java.lang.String.format;
 import static java.time.Duration.ofMillis;
 
@@ -62,7 +39,8 @@ import static java.time.Duration.ofMillis;
  */
 public class DenonReceiver implements AutoCloseable, EventDispatcher {
     private static final long RECV_TIMEOUT = 5 * 1000L;
-    private static final int RETRIES = 5;
+    private static final int RETRIES = 3;
+    private static final long WAIT_TIMEOUT = 250L;
 
     private final Logger log = Logger.getLogger(DenonReceiver.class.getName());
     private final Object sendReceiveLock = new Object();
@@ -81,7 +59,7 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
     private Setting<SurroundMode> selectSurround;
     private Session session;
     private Condition condition = bool(true);
-    private RequestContext currentContext = new RequestContext();
+    private RecvContext currentContext = new RecvContext();
     private SleepTimer sleepTimer;
 
     /**
@@ -239,46 +217,49 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
         }
 
         synchronized (sendReceiveLock) {
-            // check for given condition but return after RETRIES or RECV_TIMEOUT to makre sure this method returns
-            condition = anyMatch(c, retries(RETRIES), duration(ofMillis(RECV_TIMEOUT)));
-            currentContext.beginReceive();
-            List<Event> response = currentContext.received();
             try {
+                // check for given condition but return after RETRIES or RECV_TIMEOUT to make sure this method returns
+                condition = anyMatch(c, retries(RETRIES), duration(ofMillis(RECV_TIMEOUT)));
+                checkResponse(currentContext);
+                currentContext.beginReceive();
                 do {
-                    if (!response.isEmpty()) {
-                        log.log(Level.WARNING, "Attempt to send new request on unfinished response.");
-                        // just to make sure we did not left anything in there...
-                        response.clear();
-                    }
+                    currentContext.incrementCounter();
                     send(command);
+                    // wait for response
                     try {
-                        // wait for response
-                        sendReceiveLock.wait(100);
-                    }
-                    catch (InterruptedException e) {
+                        sendReceiveLock.wait(WAIT_TIMEOUT);
+                    } catch (InterruptedException e) {
                         log.log(Level.FINEST, "Got interruption while waiting for response", e);
                     }
-
-                    currentContext.incrementCounter();
-
-                } while (!condition.fullfilled(currentContext));
+                } while (!condition.fulfilled(currentContext));
 
                 // copy result
-                return new ArrayList<>(response);
-            }
-            finally {
+                return new ArrayList<>(currentContext.received());
+            } finally {
                 currentContext.endReceive();
             }
         }
     }
 
+    private void checkResponse(RecvContext ctx) {
+        if (!ctx.received().isEmpty()) {
+            log.log(Level.WARNING, "Attempt to send new request on unfinished response.");
+            // just to make sure we did not left anything in there...
+            ctx.received().clear();
+        }
+    }
+
     @Override
     public final void dispatch(Event event) {
+        recv(event);
+        notifyEventListeners(event);
+    }
+
+    private void recv(Event event) {
         synchronized (sendReceiveLock) {
-            notifyEventListeners(event);
             if (currentContext.isReceiving()) {
                 currentContext.received().add(event);
-                if (condition.fullfilled(currentContext)) {
+                if (condition.fulfilled(currentContext)) {
                     sendReceiveLock.notify();
                 }
             }
@@ -290,8 +271,7 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
             eventListeners.forEach(listener -> {
                 try {
                     listener.handle(event);
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     log.log(Level.SEVERE, "Caught exception from listener: " + listener, e);
                 }
             });

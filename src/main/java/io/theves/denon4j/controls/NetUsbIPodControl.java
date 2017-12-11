@@ -24,6 +24,7 @@ import io.theves.denon4j.net.Event;
 
 import java.util.List;
 
+import static io.theves.denon4j.Condition.*;
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -54,7 +55,6 @@ public class NetUsbIPodControl extends AbstractControl {
     private static final String SKIP_PLUS = "9D";
     private static final String SKIP_MINUS = "9E";
 
-    private OsdInfoList mostRecentOsdInfoList;
     private boolean europeModel;
 
     public NetUsbIPodControl(DenonReceiver receiver, boolean europeanModel) {
@@ -63,13 +63,8 @@ public class NetUsbIPodControl extends AbstractControl {
         this.europeModel = europeanModel;
     }
 
-    private boolean isDisplayInfoEvent(Event event) {
-        return event.startsWith(getCommandPrefix());
-    }
-
     public OsdInfoList getDisplay() {
-        readOnscreenInfo();
-        return mostRecentOsdInfoList;
+        return readOnscreenInfo();
     }
 
 
@@ -159,13 +154,16 @@ public class NetUsbIPodControl extends AbstractControl {
         send(SKIP_MINUS);
     }
 
-    private void readOnscreenInfo() {
-        mostRecentOsdInfoList = new OsdInfoList(europeModel ? UTF_8 : US_ASCII);
-        List<Event> received = sendAndReceive(europeModel ? "E" : "A", context -> context.received().stream().filter(e -> e.startsWith("NS")).count() == 9);
-        received.forEach(e -> {
-            if (isDisplayInfoEvent(e)) {
-                mostRecentOsdInfoList.addEvent(e);
-            }
-        });
+    private OsdInfoList readOnscreenInfo() {
+        OsdInfoList osdInfoList = new OsdInfoList(europeModel ? UTF_8 : US_ASCII);
+        List<Event> received = sendAndReceive(model(),
+            // match by regex and response size
+            allMatch(regex("NS" + model() + ".*"), size(9)));
+        received.forEach(osdInfoList::addEvent);
+        return osdInfoList;
+    }
+
+    private String model() {
+        return europeModel ? "E" : "A";
     }
 }

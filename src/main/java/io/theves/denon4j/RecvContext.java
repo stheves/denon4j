@@ -6,13 +6,19 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RequestContext {
+/**
+ * Context when receiving a response.
+ * Clients get this when {@link Condition#fulfilled(RecvContext)} is called.
+ *
+ * @author stheves
+ */
+public class RecvContext {
     private int counter;
     private Instant start;
     private List<Event> received;
     private boolean receiving;
 
-    public RequestContext() {
+    public RecvContext() {
         this.counter = 0;
         this.start = Instant.now();
         this.received = new ArrayList<>();

@@ -46,6 +46,7 @@ public class Event {
         return raw;
     }
 
+    // TODO delete this
     public boolean startsWith(String prefix) {
         return this.prefix.equals(prefix);
     }

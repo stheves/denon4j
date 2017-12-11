@@ -41,7 +41,7 @@ public class OsdInfoList {
 
     public void addEvent(Event event) {
         Line line = new Line(event, charset);
-        lines.put(line.getIndex(), line);
+        lines.put(lines.size(), line);
 
     }
 
@@ -50,7 +50,8 @@ public class OsdInfoList {
     }
 
     public Line cursorLine() {
-        return lines.values().stream().filter(Line::isCursorSelect).findFirst().orElse(null);
+        return lines.values().stream()
+            .filter(Line::isCursorSelect).findFirst().orElse(null);
     }
 
     @Override
