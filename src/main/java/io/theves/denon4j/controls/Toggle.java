@@ -28,7 +28,7 @@ import io.theves.denon4j.DenonReceiver;
  */
 public class Toggle extends Switch {
 
-    public Toggle(DenonReceiver receiver, String prefix, SwitchState on, SwitchState off) {
+    public Toggle(DenonReceiver receiver, String prefix, String on, String off) {
         super(receiver, prefix, on, off);
     }
 

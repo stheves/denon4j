@@ -42,8 +42,8 @@ public class Demo {
 
             // power control
             Toggle power = avr.power();
-            System.out.println("PWON: " + power.state().get());
-            if (power.state() != SwitchState.ON) {
+            System.out.println("PWON: " + power.state());
+            if (power.state() != "ON") {
                 // powering on
                 power.toggle();
             }

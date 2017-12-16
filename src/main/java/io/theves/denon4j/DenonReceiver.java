@@ -96,7 +96,7 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
 
     private void createControls(Collection<AbstractControl> controls) {
         // power control
-        powerToggle = new Toggle(this, "PW", SwitchState.ON, SwitchState.STANDBY);
+        powerToggle = new Toggle(this, "PW", "ON", "STANDBY");
         powerToggle.setName("Power Switch");
         controls.add(powerToggle);
 
@@ -106,7 +106,7 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
         controls.add(masterSlider);
 
         // mute control
-        muteToggle = new Toggle(this, "MU", SwitchState.ON, SwitchState.OFF);
+        muteToggle = new Toggle(this, "MU", "ON", "OFF");
         muteToggle.setName("Mute Toggle");
         controls.add(muteToggle);
 
@@ -121,7 +121,7 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
         controls.add(selectVideo);
 
         // main zone toggle
-        mainZoneToggle = new Toggle(this, "ZM", SwitchState.ON, SwitchState.OFF);
+        mainZoneToggle = new Toggle(this, "ZM", "ON", "OFF");
         mainZoneToggle.setName("Main Zone Toggle");
         controls.add(mainZoneToggle);
 

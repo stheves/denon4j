@@ -27,25 +27,25 @@ import io.theves.denon4j.DenonReceiver;
  * @author stheves
  */
 public abstract class Switch extends AbstractControl {
-    protected final SwitchState onValue;
-    protected final SwitchState offValue;
+    protected final String onValue;
+    protected final String offValue;
 
-    public Switch(DenonReceiver receiver, String prefix, SwitchState onValue, SwitchState offValue) {
+    public Switch(DenonReceiver receiver, String prefix, String onValue, String offValue) {
         super(receiver, prefix);
         this.onValue = onValue;
         this.offValue = offValue;
     }
 
     public void switchOff() {
-        executeCommand(offValue.get());
+        executeCommand(offValue);
     }
 
     public void switchOn() {
-        executeCommand(onValue.get());
+        executeCommand(onValue);
     }
 
-    public SwitchState state() {
-        return SwitchState.valueOf(sendRequest().asciiValue().substring(2));
+    public String state() {
+        return sendRequest().asciiValue().substring(2);
     }
 
     private void executeCommand(String param) {
