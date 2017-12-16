@@ -97,15 +97,11 @@ public class ControlsTest {
         assertThat(power.state()).isEqualTo("STANDBY");
 
         doAnswer(invocationOnMock -> {
-            denonAvr192.dispatch(Event.create("PWON".getBytes()));
-            return null;
-        }).when(protocol).send(cmd("PWON"));
-        doAnswer(invocationOnMock -> {
-            denonAvr192.dispatch(Event.create("PWON".getBytes()));
+            denonAvr192.dispatch(Event.create("PWSTANDBY".getBytes()));
             return null;
         }).when(protocol).send(cmd("PW?"));
         power.toggle();
-        assertThat(power.state()).isEqualTo("ON");
+        verify(protocol).send(cmd("PWON"));
     }
 
     @Test
