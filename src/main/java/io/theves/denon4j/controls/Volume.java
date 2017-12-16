@@ -25,19 +25,18 @@ import io.theves.denon4j.net.Event;
 import static java.lang.String.format;
 
 public class Volume extends Slider {
-    public static final String REGEX = "\\d\\d\\d?";
+    private static final String REGEX = "\\d\\d\\d?";
     private String max;
 
     public Volume(DenonReceiver receiver, String prefix, String up, String down) {
         super(receiver, prefix, up, down);
     }
 
-    @Override
     public void set(String value) {
         if (value == null || !value.matches(REGEX)) {
             throw new IllegalArgumentException(format("Value must match '%s'", REGEX));
         }
-        super.set(value);
+        send(value);
     }
 
     @Override

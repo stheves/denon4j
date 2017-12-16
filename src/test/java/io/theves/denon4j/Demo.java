@@ -43,7 +43,7 @@ public class Demo {
             // power control
             Toggle power = avr.power();
             System.out.println("PWON: " + power.state());
-            if (power.state() != "ON") {
+            if (!power.state().equals("ON")) {
                 // powering on
                 power.toggle();
             }
@@ -51,7 +51,7 @@ public class Demo {
             Volume masterVolume = avr.masterVolume();
             masterVolume.slideUp();
             System.out.println("MASTER VOL: " + masterVolume.getValue());
-            masterVolume.set("255");
+            masterVolume.set("55");
             System.out.println("MASTER VOL: " + masterVolume.getValue());
             System.out.println("MASTER VOL MAX: " + masterVolume.getMax());
 

@@ -49,7 +49,7 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
 
     private Collection<AbstractControl> controls;
     private Toggle powerToggle;
-    private Volume masterSlider;
+    private Volume masterVolume;
     private Toggle mainZoneToggle;
     private Toggle muteToggle;
     private Setting<InputSource> selectInput;
@@ -61,6 +61,7 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
     private Condition condition = bool(true);
     private RecvContext currentContext;
     private SleepTimer sleepTimer;
+    private Volume subwooferVolume;
 
     /**
      * Starts auto discovery and chooses first receiver found.
@@ -101,9 +102,18 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
         controls.add(powerToggle);
 
         // master vol. control
-        masterSlider = new Volume(this, "MV", "UP", "DOWN");
-        masterSlider.setName("Master Volume");
-        controls.add(masterSlider);
+        masterVolume = new Volume(this, "MV", "UP", "DOWN");
+        masterVolume.setName("Master Volume");
+        controls.add(masterVolume);
+
+        subwooferVolume = new Volume(this, "CV", "SW UP", "SW DOWN") {
+            @Override
+            public void set(String value) {
+                super.set("SW " + value);
+            }
+        };
+        subwooferVolume.setName("Subwoofer Volume");
+        controls.add(subwooferVolume);
 
         // mute control
         muteToggle = new Toggle(this, "MU", "ON", "OFF");
@@ -176,7 +186,11 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
     }
 
     public Volume masterVolume() {
-        return masterSlider;
+        return masterVolume;
+    }
+
+    public Volume subwooferVolume() {
+        return subwooferVolume;
     }
 
     public Toggle mute() {

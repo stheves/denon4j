@@ -50,7 +50,4 @@ public class Slider extends AbstractControl {
         return sendRequest(getCommandPrefix() + "\\d\\d\\d?").asciiValue().substring(2);
     }
 
-    public void set(String value) {
-        send(value);
-    }
 }
