@@ -59,7 +59,7 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
     private Setting<SurroundMode> selectSurround;
     private Session session;
     private Condition condition = bool(true);
-    private RecvContext currentContext = new RecvContext();
+    private RecvContext currentContext;
     private SleepTimer sleepTimer;
 
     /**
@@ -217,7 +217,7 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
         }
 
         synchronized (sendReceiveLock) {
-            checkResponse(currentContext);
+            currentContext = new RecvContext();
             // check for given condition but return after RETRIES or RECV_TIMEOUT to make sure this method returns
             condition = anyMatch(c, retries(RETRIES), duration(ofMillis(RECV_TIMEOUT)));
             try {
@@ -241,14 +241,6 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
         }
     }
 
-    private void checkResponse(RecvContext ctx) {
-        if (!ctx.received().isEmpty()) {
-            log.log(Level.WARNING, "Attempt to send new request on unfinished response.");
-            // just to make sure we did not left anything in there...
-            ctx.received().clear();
-        }
-    }
-
     @Override
     public final void dispatch(Event event) {
         recv(event);
@@ -257,13 +249,17 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
 
     private void recv(Event event) {
         synchronized (sendReceiveLock) {
-            if (currentContext.isReceiving()) {
+            if (isReceiving()) {
                 currentContext.received().add(event);
                 if (condition.fulfilled(currentContext)) {
                     sendReceiveLock.notify();
                 }
             }
         }
+    }
+
+    private boolean isReceiving() {
+        return currentContext != null && currentContext.isReceiving();
     }
 
     private void notifyEventListeners(Event event) {
