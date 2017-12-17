@@ -84,6 +84,16 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
         this(Protocol.tcp(host, port));
     }
 
+    private static InetAddress autoDiscover(String subnet) {
+        AutoDiscovery autoDiscovery = new AutoDiscovery();
+        autoDiscovery.setSubnet(subnet);
+        Collection<InetAddress> discovered = autoDiscovery.discover(1);
+        if (discovered.isEmpty()) {
+            throw new ConnectionException("No receivers found");
+        }
+        return discovered.iterator().next();
+    }
+
     public DenonReceiver(Protocol protocol) {
         this.protocol = Objects.requireNonNull(protocol);
         this.eventListeners = Collections.synchronizedList(new ArrayList<>());
@@ -93,20 +103,6 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
         createControls(this.controls);
         addToDispatcher(this.controls);
         initLogging();
-    }
-
-    private void initLogging() {
-        new LoggingSystem().initialize();
-    }
-
-    private static InetAddress autoDiscover(String subnet) {
-        AutoDiscovery autoDiscovery = new AutoDiscovery();
-        autoDiscovery.setSubnet(subnet);
-        Collection<InetAddress> discovered = autoDiscovery.discover(1);
-        if (discovered.isEmpty()) {
-            throw new ConnectionException("No receivers found");
-        }
-        return discovered.iterator().next();
     }
 
     private void createControls(Collection<AbstractControl> controls) {
@@ -257,6 +253,14 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
         controls.add(sleepTimer);
     }
 
+    private void addToDispatcher(Collection<AbstractControl> controls) {
+        controls.forEach(this::addListener);
+    }
+
+    private void initLogging() {
+        new LoggingSystem().initialize();
+    }
+
     public Volume frontLeftVolume() {
         return frontLeftVolume;
     }
@@ -321,10 +325,6 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
         }
     }
 
-    private void addToDispatcher(Collection<AbstractControl> controls) {
-        controls.forEach(this::addListener);
-    }
-
     public Setting<SurroundMode> surroundMode() {
         return selectSurround;
     }
@@ -357,12 +357,72 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
         return menu;
     }
 
-    public void send(String command) {
+    @Override
+    public final void dispatch(Event event) {
+        recv(event);
+        notifyEventListeners(event);
+    }
+
+    private void recv(Event event) {
         synchronized (sendReceiveLock) {
-            protocol.send(Command.createCommand(command));
+            if (isReceiving()) {
+                currentContext.received().add(event);
+                if (currentContext.fulfilled()) {
+                    sendReceiveLock.notify();
+                }
+            }
         }
     }
 
+    private void notifyEventListeners(Event event) {
+        synchronized (eventListeners) {
+            eventListeners.forEach(listener -> {
+                try {
+                    listener.handle(event);
+                } catch (Exception e) {
+                    log.log(Level.SEVERE, "Caught exception from listener: " + listener, e);
+                }
+            });
+        }
+    }
+
+    private boolean isReceiving() {
+        return currentContext != null && currentContext.isReceiving();
+    }
+
+    @Override
+    public void close() {
+        disconnect();
+    }
+
+    public void disconnect() {
+        getControls().forEach(this::removeListener);
+        protocol.disconnect();
+        session.finish();
+    }
+
+    public Collection<AbstractControl> getControls() {
+        return controls;
+    }
+
+    public void connect(int timeout) {
+        session = new Session(this);
+        protocol.establishConnection(timeout);
+    }
+
+    public Session getSession() {
+        return session;
+    }
+
+    public boolean isConnected() {
+        return protocol.isConnected();
+    }
+
+    public Event sendRequest(String command, String regex) {
+        return sendAndReceive(command, Condition.regex(regex)).stream().findFirst().orElseThrow(() -> new TimeoutException(
+            format("No response received after %s milliseconds. Receiver may be too busy to respond.", RECV_TIMEOUT)
+        ));
+    }
 
     /**
      * Send the command to the receiver and waits for the response until the <code>condition</code> is fulfilled.
@@ -381,12 +441,16 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
             try {
                 currentContext.beginReceive();
                 while (!currentContext.fulfilled()) {
-                    send(command);
+                    protocol.send(Command.createCommand(command));
+                    // check if we can return immediately
+                    if (currentContext.fulfilled()) {
+                        return currentContext.received();
+                    }
                     // wait for response
                     try {
                         sendReceiveLock.wait(RECV_TIMEOUT);
                     } catch (InterruptedException e) {
-                        log.log(Level.FINEST, "Got interruption while waiting for response", e);
+                        log.log(Level.FINEST, "Interrupted while waiting for response", e);
                     }
                     currentContext.incrementCounter();
                 }
@@ -400,75 +464,11 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
         }
     }
 
-    @Override
-    public final void dispatch(Event event) {
-        recv(event);
-        notifyEventListeners(event);
-    }
-
-    private void recv(Event event) {
-        synchronized (sendReceiveLock) {
-            if (isReceiving()) {
-                currentContext.received().add(event);
-                if (currentContext.fulfilled()) {
-                    sendReceiveLock.notify();
-                    currentContext.endReceive();
-                }
-            }
-        }
-    }
-
-    private boolean isReceiving() {
-        return currentContext != null && currentContext.isReceiving();
-    }
-
-    private void notifyEventListeners(Event event) {
-        synchronized (eventListeners) {
-            eventListeners.forEach(listener -> {
-                try {
-                    listener.handle(event);
-                } catch (Exception e) {
-                    log.log(Level.SEVERE, "Caught exception from listener: " + listener, e);
-                }
-            });
-        }
-    }
-
-    public Collection<AbstractControl> getControls() {
-        return controls;
-    }
-
-    @Override
-    public void close() {
-        disconnect();
-    }
-
-    public void disconnect() {
-        getControls().forEach(this::removeListener);
-        protocol.disconnect();
-        session.finish();
-    }
-
-    public void connect(int timeout) {
-        session = new Session(this);
-        protocol.establishConnection(timeout);
-    }
-
-    public Session getSession() {
-        return session;
-    }
-
-    public boolean isConnected() {
-        return protocol.isConnected();
+    public void send(String command) {
+        sendAndReceive(command, Condition.bool(true));
     }
 
     List<EventListener> getEventListeners() {
         return Collections.unmodifiableList(eventListeners);
-    }
-
-    public Event sendRequest(String command, String regex) {
-        return sendAndReceive(command, Condition.regex(regex)).stream().findFirst().orElseThrow(() -> new TimeoutException(
-            format("No response received after %s milliseconds. Receiver may be too busy to respond.", RECV_TIMEOUT)
-        ));
     }
 }
