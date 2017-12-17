@@ -57,7 +57,7 @@ public class RecvContext {
     }
 
     public boolean isReceiving() {
-        return receiving && !condition.fulfilled(this);
+        return receiving;
     }
 
     public boolean fulfilled() {

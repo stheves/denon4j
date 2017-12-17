@@ -29,6 +29,8 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static io.theves.denon4j.Condition.anyMatch;
+import static io.theves.denon4j.Condition.retries;
 import static java.lang.String.format;
 
 /**
@@ -216,7 +218,9 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
     }
 
     public void send(String command) {
-        protocol.send(Command.createCommand(command));
+        synchronized (sendReceiveLock) {
+            protocol.send(Command.createCommand(command));
+        }
     }
 
 
@@ -233,10 +237,10 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
         }
 
         synchronized (sendReceiveLock) {
-            currentContext = new RecvContext(c);
+            currentContext = new RecvContext(anyMatch(c, retries(RETRIES)));
             try {
                 currentContext.beginReceive();
-                while (currentContext.isReceiving()) {
+                while (!currentContext.fulfilled()) {
                     send(command);
                     // wait for response
                     try {
