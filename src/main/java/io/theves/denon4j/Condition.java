@@ -61,28 +61,6 @@ public interface Condition {
     }
 
     /**
-     * Returns <code>true</code> if the given amount of retries has been reached.
-     *
-     * @param retries the amount of retries to check.
-     * @return the condition.
-     */
-    static Condition retries(int retries) {
-        return context -> context.counter() > retries;
-    }
-
-    /**
-     * Is fulfilled when the duration elapsed.
-     *
-     * @param duration the duration.
-     * @return the condition.
-     */
-    static Condition duration(Duration duration) {
-        return context ->
-            Duration.between(context.start(), Instant.now())
-                .compareTo(duration) > 0;
-    }
-
-    /**
      * Is fulfilled if the response has the given <code>size</code>.
      *
      * @param size the size to check.

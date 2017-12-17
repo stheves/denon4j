@@ -46,7 +46,7 @@ public class Volume extends Slider {
 
     @Override
     public void doHandle(Event event) {
-        if (event.startsWith(getCommandPrefix()) && event.asciiValue().contains("MAX")) {
+        if (event.asciiValue().startsWith(getCommandPrefix()) && event.asciiValue().contains("MAX")) {
             max = event.asciiValue().substring(5);
         }
     }

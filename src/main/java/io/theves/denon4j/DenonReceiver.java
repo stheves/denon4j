@@ -29,8 +29,6 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static io.theves.denon4j.Condition.anyMatch;
-import static io.theves.denon4j.Condition.retries;
 import static java.lang.String.format;
 
 /**
@@ -40,7 +38,6 @@ import static java.lang.String.format;
  */
 public class DenonReceiver implements AutoCloseable, EventDispatcher {
     private static final long RECV_TIMEOUT = 10 * 1000L;
-    private static final int RETRIES = 3;
 
     private final Logger log = Logger.getLogger(DenonReceiver.class.getName());
     private final Object sendReceiveLock = new Object();
@@ -437,22 +434,19 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
         }
 
         synchronized (sendReceiveLock) {
-            currentContext = new RecvContext(anyMatch(c, retries(RETRIES)));
             try {
+                currentContext = new RecvContext(c);
                 currentContext.beginReceive();
-                while (!currentContext.fulfilled()) {
-                    protocol.send(Command.createCommand(command));
-                    // check if we can return immediately
-                    if (currentContext.fulfilled()) {
-                        return currentContext.received();
-                    }
-                    // wait for response
-                    try {
-                        sendReceiveLock.wait(RECV_TIMEOUT);
-                    } catch (InterruptedException e) {
-                        log.log(Level.FINEST, "Interrupted while waiting for response", e);
-                    }
-                    currentContext.incrementCounter();
+                protocol.send(Command.createCommand(command));
+                // check if we can return immediately
+                if (currentContext.fulfilled()) {
+                    return currentContext.received();
+                }
+                // wait for response
+                try {
+                    sendReceiveLock.wait(RECV_TIMEOUT);
+                } catch (InterruptedException e) {
+                    log.log(Level.FINEST, "Interrupted while waiting for response", e);
                 }
 
                 // copy result

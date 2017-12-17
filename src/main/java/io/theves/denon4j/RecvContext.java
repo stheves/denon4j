@@ -14,44 +14,31 @@ import java.util.List;
  * @author stheves
  */
 public class RecvContext {
-    public static final Duration NOT_STARTED = Duration.ofMillis(0L);
-    private int counter;
+    private static final Duration NOT_STARTED = Duration.ofMillis(0L);
+
     private Instant start;
     private Instant end;
     private List<Event> received;
     private boolean receiving;
     private Condition condition;
 
-    public RecvContext(Condition condition) {
-        this.counter = 0;
+    RecvContext(Condition condition) {
         this.start = Instant.now();
         this.received = new ArrayList<>();
         this.condition = condition;
-    }
-
-    public int counter() {
-        return counter;
-    }
-
-    public Instant start() {
-        return start;
     }
 
     public List<Event> received() {
         return received;
     }
 
-    public void incrementCounter() {
-        counter++;
-    }
 
-    public void endReceive() {
-        counter = 0;
+    void endReceive() {
         receiving = false;
         end = Instant.now();
     }
 
-    public void beginReceive() {
+    void beginReceive() {
         receiving = true;
         start = Instant.now();
     }
@@ -70,5 +57,4 @@ public class RecvContext {
         }
         return NOT_STARTED;
     }
-
 }

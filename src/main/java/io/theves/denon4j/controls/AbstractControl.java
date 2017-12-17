@@ -66,7 +66,7 @@ public abstract class AbstractControl implements EventListener {
     }
 
     private boolean shouldHandle(Event event) {
-        return event.startsWith(getCommandPrefix());
+        return event.asciiValue().startsWith(getCommandPrefix());
     }
 
     protected void doHandle(Event event) {
