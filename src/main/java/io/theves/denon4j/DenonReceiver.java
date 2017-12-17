@@ -68,6 +68,9 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
     private Volume surroundBackVolume;
     private Volume frontHeightLeftVolume;
     private Volume frontHeightRightVolume;
+    private Slider tunerFrequency;
+    private Slider tunerPreset;
+    private Setting tunerMode;
 
     /**
      * Starts auto discovery and chooses first receiver found.
@@ -108,7 +111,7 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
         powerToggle.setName("Power Switch");
         controls.add(powerToggle);
 
-        // master vol. control
+        // vol. control
         masterVolume = new Volume(this, "MV", "UP", "DOWN");
         masterVolume.setName("Master Volume");
         controls.add(masterVolume);
@@ -245,9 +248,36 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
         selectSurround.setName("Select Surround Mode");
         controls.add(selectSurround);
 
+        // sleep timer
         sleepTimer = new SleepTimer(this);
         sleepTimer.setName("Main Zone Sleep Timer setting");
         controls.add(sleepTimer);
+
+        // analog tuner control
+        tunerFrequency = new Slider(this, "TFAN", "UP", "DOWN");
+        tunerFrequency.setName("Tuner Frequency");
+        controls.add(tunerFrequency);
+
+        tunerPreset = new Slider(this, "TPAN", "UP", "DOWN");
+        tunerPreset.setName("Tuner Preset");
+        controls.add(tunerPreset);
+        // TODO tuner preset memory
+
+        tunerMode = new Setting(this, "TMAN");
+        tunerMode.setName("Tuner Band/Mode");
+        controls.add(tunerMode);
+    }
+
+    public Setting tunerMode() {
+        return tunerMode;
+    }
+
+    public Slider tunerFrequency() {
+        return tunerFrequency;
+    }
+
+    public Slider tunerPreset() {
+        return tunerPreset;
     }
 
     private void addToDispatcher(Collection<AbstractControl> controls) {
