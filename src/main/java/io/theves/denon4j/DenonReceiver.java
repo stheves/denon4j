@@ -20,6 +20,7 @@
 package io.theves.denon4j;
 
 import io.theves.denon4j.controls.*;
+import io.theves.denon4j.logging.LoggingSystem;
 import io.theves.denon4j.net.*;
 import io.theves.denon4j.net.EventListener;
 
@@ -28,9 +29,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static io.theves.denon4j.Condition.*;
 import static java.lang.String.format;
-import static java.time.Duration.ofMillis;
 
 /**
  * Implementation of the Denon AVR 1912 protocol spec.
@@ -81,6 +80,11 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
 
         createControls(this.controls);
         addToDispatcher(this.controls);
+        initLogging();
+    }
+
+    private void initLogging() {
+        new LoggingSystem().initialize();
     }
 
     private static InetAddress autoDiscover(String subnet) {
@@ -247,6 +251,7 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
                 return new ArrayList<>(currentContext.received());
             } finally {
                 currentContext.endReceive();
+                log.log(Level.FINE, "Send/Recv took: " + currentContext.duration().toString());
             }
         }
     }

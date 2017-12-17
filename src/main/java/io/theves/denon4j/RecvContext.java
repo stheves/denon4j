@@ -2,6 +2,7 @@ package io.theves.denon4j;
 
 import io.theves.denon4j.net.Event;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,8 +14,10 @@ import java.util.List;
  * @author stheves
  */
 public class RecvContext {
+    public static final Duration NOT_STARTED = Duration.ofMillis(0L);
     private int counter;
     private Instant start;
+    private Instant end;
     private List<Event> received;
     private boolean receiving;
     private Condition condition;
@@ -45,6 +48,7 @@ public class RecvContext {
     public void endReceive() {
         counter = 0;
         receiving = false;
+        end = Instant.now();
     }
 
     public void beginReceive() {
@@ -58,6 +62,13 @@ public class RecvContext {
 
     public boolean fulfilled() {
         return condition.fulfilled(this);
+    }
+
+    public Duration duration() {
+        if (end != null && start != null) {
+            return Duration.between(start, end);
+        }
+        return NOT_STARTED;
     }
 
 }

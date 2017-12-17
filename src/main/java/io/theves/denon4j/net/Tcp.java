@@ -27,7 +27,6 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -47,7 +46,7 @@ final class Tcp implements Protocol {
     private Socket socket;
     private Writer writer;
 
-    public Tcp(String host, Integer port) {
+    Tcp(String host, Integer port) {
         this.host = Optional.ofNullable(host).orElse("127.0.0.1");
         this.port = Optional.ofNullable(port).orElse(23);
         socket = new Socket();
@@ -55,15 +54,8 @@ final class Tcp implements Protocol {
     }
 
     void received(Event event) {
-        if (isDebugEnabled()) {
-            logger.log(Level.FINE, "Event received: {}", event);
-        }
+        logger.log(Level.FINE, "Event received: %s", event);
         notify(event);
-    }
-
-    private boolean isDebugEnabled() {
-        Level[] debugLevels = new Level[]{Level.FINE, Level.FINER, Level.FINEST};
-        return Arrays.asList(debugLevels).contains(logger.getLevel());
     }
 
     private void notify(Event event) {
@@ -139,6 +131,7 @@ final class Tcp implements Protocol {
             try {
                 writer.write(command.signature() + PAUSE);
                 writer.flush();
+                logger.log(Level.FINE, "Command sent: " + command.signature());
             } catch (Exception e) {
                 throw new ConnectionException("Communication failure.", e);
             }
