@@ -38,9 +38,8 @@ import static java.time.Duration.ofMillis;
  * @author stheves
  */
 public class DenonReceiver implements AutoCloseable, EventDispatcher {
-    private static final long RECV_TIMEOUT = 5 * 1000L;
+    private static final long RECV_TIMEOUT = 10 * 1000L;
     private static final int RETRIES = 3;
-    private static final long WAIT_TIMEOUT = 250L;
 
     private final Logger log = Logger.getLogger(DenonReceiver.class.getName());
     private final Object sendReceiveLock = new Object();
@@ -230,16 +229,14 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
         }
 
         synchronized (sendReceiveLock) {
-            // check for given condition but return after RETRIES or RECV_TIMEOUT to make sure this method returns
-            Condition condition = anyMatch(c, retries(RETRIES), duration(ofMillis(RECV_TIMEOUT)));
-            currentContext = new RecvContext(condition);
+            currentContext = new RecvContext(c);
             try {
                 currentContext.beginReceive();
                 while (currentContext.isReceiving()) {
                     send(command);
                     // wait for response
                     try {
-                        sendReceiveLock.wait(WAIT_TIMEOUT);
+                        sendReceiveLock.wait(RECV_TIMEOUT);
                     } catch (InterruptedException e) {
                         log.log(Level.FINEST, "Got interruption while waiting for response", e);
                     }

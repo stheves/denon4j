@@ -31,18 +31,17 @@ import java.util.*;
  * @author stheves
  */
 public class OsdInfoList {
-    private final Map<Integer, Line> lines;
+    private final List<Line> lines;
     private final Charset charset;
 
     public OsdInfoList(Charset charset) {
-        this.lines = new LinkedHashMap<>();
+        this.lines = new ArrayList<>();
         this.charset = charset;
     }
 
     public void addEvent(Event event) {
         Line line = new Line(event, charset);
-        lines.put(lines.size(), line);
-
+        lines.add(line.getIndex(), line);
     }
 
     public Line lineAt(int index) {
@@ -50,7 +49,7 @@ public class OsdInfoList {
     }
 
     public Line cursorLine() {
-        return lines.values().stream()
+        return lines.stream()
             .filter(Line::isCursorSelect).findFirst().orElse(null);
     }
 
@@ -62,7 +61,7 @@ public class OsdInfoList {
     }
 
     public List<Line> getLines() {
-        List<Line> lines = new ArrayList<>(this.lines.values());
+        List<Line> lines = new ArrayList<>(this.lines);
         Collections.sort(lines);
         return lines;
     }
