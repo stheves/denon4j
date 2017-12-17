@@ -40,6 +40,11 @@ public class Volume extends Slider {
     }
 
     @Override
+    public String getValue() {
+        return sendRequest(getCommandPrefix() + "\\d\\d\\d?").asciiValue().substring(2);
+    }
+
+    @Override
     public void doHandle(Event event) {
         if (event.startsWith(getCommandPrefix()) && event.asciiValue().contains("MAX")) {
             max = event.asciiValue().substring(5);

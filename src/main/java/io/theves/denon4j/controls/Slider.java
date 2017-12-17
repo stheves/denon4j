@@ -46,8 +46,7 @@ public class Slider extends AbstractControl {
     }
 
     public String getValue() {
-        // do not return the MAX values
-        return sendRequest(getCommandPrefix() + "\\d\\d\\d?").asciiValue().substring(2);
+        return sendRequest(getCommandPrefix()).asciiValue().substring(2);
     }
 
 }
