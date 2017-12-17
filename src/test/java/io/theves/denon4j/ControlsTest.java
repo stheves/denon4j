@@ -66,10 +66,10 @@ public class ControlsTest {
 
     @Test
     public void testSelectControl() {
-        Setting<InputSource> si = denonAvr192.input();
+        Setting si = denonAvr192.input();
 
         // execute control
-        si.set(InputSource.SAT_CBL);
+        si.set(InputSource.SAT_CBL.getInputSource());
 
         doAnswer(invocationOnMock -> {
             denonAvr192.dispatch(Event.create("SISAT/CBL".getBytes()));
@@ -111,7 +111,7 @@ public class ControlsTest {
             denonAvr192.dispatch(Event.create("MV45".getBytes()));
             return null;
         }).when(protocol).send(cmd("MV?"));
-        assertThat(slider.getValue()).isEqualTo("45");
+        assertThat(slider.get()).isEqualTo("45");
 
         doAnswer(invocationOnMock -> {
             denonAvr192.dispatch(Event.create("MV455".getBytes()));
@@ -123,7 +123,7 @@ public class ControlsTest {
             return null;
         }).when(protocol).send(cmd("MV?"));
         slider.slideUp();
-        assertThat(slider.getValue()).isEqualTo("455");
+        assertThat(slider.get()).isEqualTo("455");
 
         doAnswer(invocationOnMock -> {
             denonAvr192.dispatch(Event.create("MV45".getBytes()));
@@ -135,7 +135,7 @@ public class ControlsTest {
             return null;
         }).when(protocol).send(cmd("MV?"));
         slider.slideDown();
-        assertThat(slider.getValue()).isEqualTo("45");
+        assertThat(slider.get()).isEqualTo("45");
     }
 
     @Test

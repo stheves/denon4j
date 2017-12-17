@@ -27,7 +27,7 @@ import io.theves.denon4j.net.Event;
  *
  * @author stheves
  */
-public class Setting<S extends Enum> extends AbstractControl {
+public class Setting extends AbstractControl {
 
     public Setting(DenonReceiver receiver, String prefix) {
         super(receiver, prefix);
@@ -38,8 +38,8 @@ public class Setting<S extends Enum> extends AbstractControl {
      *
      * @param value the value to set.
      */
-    public void set(S value) {
-        send(value.toString());
+    public void set(String value) {
+        send(value);
     }
 
     /**

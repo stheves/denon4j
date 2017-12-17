@@ -49,11 +49,11 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
     private Volume masterVolume;
     private Toggle mainZoneToggle;
     private Toggle muteToggle;
-    private Setting<InputSource> selectInput;
-    private Setting<VideoSource> selectVideo;
+    private Setting selectInput;
+    private Setting selectVideo;
     private NetUsbIPodControl netUsb;
     private Menu menu;
-    private Setting<SurroundMode> selectSurround;
+    private Setting selectSurround;
     private Session session;
     private RecvContext currentContext;
     private SleepTimer sleepTimer;
@@ -218,12 +218,12 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
         controls.add(muteToggle);
 
         // select input
-        selectInput = new Setting<>(this, "SI");
+        selectInput = new Setting(this, "SI");
         selectInput.setName("Select INPUT Source");
         controls.add(selectInput);
 
         // select video
-        selectVideo = new Setting<>(this, "SV");
+        selectVideo = new Setting(this, "SV");
         selectVideo.setName("Select VIDEO Source");
         controls.add(selectVideo);
 
@@ -241,7 +241,7 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
         controls.add(menu);
 
         // surround mode settings
-        selectSurround = new Setting<>(this, "MS");
+        selectSurround = new Setting(this, "MS");
         selectSurround.setName("Select Surround Mode");
         controls.add(selectSurround);
 
@@ -322,7 +322,7 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
         }
     }
 
-    public Setting<SurroundMode> surroundMode() {
+    public Setting surroundMode() {
         return selectSurround;
     }
 
@@ -338,7 +338,7 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
         return muteToggle;
     }
 
-    public Setting<InputSource> input() {
+    public Setting input() {
         return selectInput;
     }
 
@@ -346,7 +346,7 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
         return netUsb;
     }
 
-    public Setting<VideoSource> video() {
+    public Setting video() {
         return selectVideo;
     }
 

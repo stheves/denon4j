@@ -27,7 +27,7 @@ import io.theves.denon4j.DenonReceiver;
  *
  * @author stheves
  */
-public class Slider extends AbstractControl {
+public class Slider extends Setting {
     private final String up;
     private final String down;
 
@@ -44,9 +44,4 @@ public class Slider extends AbstractControl {
     public void slideDown() {
         send(down);
     }
-
-    public String getValue() {
-        return sendRequest(getCommandPrefix()).asciiValue().substring(2);
-    }
-
 }

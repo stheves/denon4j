@@ -40,8 +40,8 @@ public class Volume extends Slider {
     }
 
     @Override
-    public String getValue() {
-        return sendRequest(getCommandPrefix() + "\\d\\d\\d?").asciiValue().substring(2);
+    public String get() {
+        return sendRequest(getCommandPrefix() + REGEX).asciiValue().substring(2);
     }
 
     @Override
