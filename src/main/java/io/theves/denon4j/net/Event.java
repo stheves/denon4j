@@ -32,10 +32,12 @@ import static java.nio.charset.StandardCharsets.US_ASCII;
 public class Event {
     private final byte[] raw;
     private final String prefix;
+    private String asciiValue;
 
     private Event(byte[] raw) {
         this.raw = raw;
         this.prefix = new String(Arrays.copyOfRange(raw, 0, 2), US_ASCII);
+        asciiValue = new String(raw, US_ASCII);
     }
 
     public static Event create(byte[] event) {
@@ -52,6 +54,13 @@ public class Event {
     }
 
     public String asciiValue() {
-        return new String(raw, US_ASCII);
+        return asciiValue;
+    }
+
+    @Override
+    public String toString() {
+        return "Event{" +
+            "asciiValue='" + asciiValue + '\'' +
+            '}';
     }
 }

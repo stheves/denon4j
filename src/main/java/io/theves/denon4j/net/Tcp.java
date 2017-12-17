@@ -54,7 +54,7 @@ final class Tcp implements Protocol {
     }
 
     void received(Event event) {
-        logger.log(Level.FINE, "Event received: %s", event);
+        logger.log(Level.FINE, "Event received: {0}", event);
         notify(event);
     }
 
@@ -131,7 +131,7 @@ final class Tcp implements Protocol {
             try {
                 writer.write(command.signature() + PAUSE);
                 writer.flush();
-                logger.log(Level.FINE, "Command sent: " + command.signature());
+                logger.log(Level.FINE, "Command sent: {0}", command.signature());
             } catch (Exception e) {
                 throw new ConnectionException("Communication failure.", e);
             }
