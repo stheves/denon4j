@@ -61,6 +61,16 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
     private RecvContext currentContext;
     private SleepTimer sleepTimer;
     private Volume subwooferVolume;
+    private Volume centerVolume;
+    private Volume frontLeftVolume;
+    private Volume frontRightVolume;
+    private Volume surroundLeftVolume;
+    private Volume surroundRightVolume;
+    private Volume surroundBackRightVolume;
+    private Volume surroundBackLeftVolume;
+    private Volume surroundBackVolume;
+    private Volume frontHeightLeftVolume;
+    private Volume frontHeightRightVolume;
 
     /**
      * Starts auto discovery and chooses first receiver found.
@@ -119,6 +129,96 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
         subwooferVolume.setName("Subwoofer Volume");
         controls.add(subwooferVolume);
 
+        centerVolume = new Volume(this, "CV", "C UP", "C DOWN") {
+            @Override
+            public void set(String value) {
+                super.set("C " + value);
+            }
+        };
+        centerVolume.setName("Center Volume");
+        controls.add(centerVolume);
+
+        frontLeftVolume = new Volume(this, "CV", "FL UP", "FL DOWN") {
+            @Override
+            public void set(String value) {
+                super.set("FL " + value);
+            }
+        };
+        frontLeftVolume.setName("Front Left Volume");
+        controls.add(frontLeftVolume);
+
+        frontRightVolume = new Volume(this, "CV", "FR UP", "FR DOWN") {
+            @Override
+            public void set(String value) {
+                super.set("FR " + value);
+            }
+        };
+        frontRightVolume.setName("Front Right Volume");
+        controls.add(frontRightVolume);
+
+        surroundLeftVolume = new Volume(this, "CV", "SL UP", "SL DOWN") {
+            @Override
+            public void set(String value) {
+                super.set("SL " + value);
+            }
+        };
+        surroundLeftVolume.setName("Surround Left Volume");
+        controls.add(surroundLeftVolume);
+
+        surroundRightVolume = new Volume(this, "CV", "SR UP", "SR DOWN") {
+            @Override
+            public void set(String value) {
+                super.set("SR " + value);
+            }
+        };
+        surroundRightVolume.setName("Surround Right Volume");
+        controls.add(surroundRightVolume);
+
+        surroundBackRightVolume = new Volume(this, "CV", "SBR UP", "SBR DOWN") {
+            @Override
+            public void set(String value) {
+                super.set("SBR " + value);
+            }
+        };
+        surroundBackRightVolume.setName("Surround Back Right Volume");
+        controls.add(surroundBackRightVolume);
+
+        surroundBackLeftVolume = new Volume(this, "CV", "SBL UP", "SBL DOWN") {
+            @Override
+            public void set(String value) {
+                super.set("SBL " + value);
+            }
+        };
+        surroundBackLeftVolume.setName("Surround Back Left Volume");
+        controls.add(surroundBackLeftVolume);
+
+        surroundBackVolume = new Volume(this, "CV", "SB UP", "SB DOWN") {
+            @Override
+            public void set(String value) {
+                super.set("SB " + value);
+            }
+        };
+        surroundBackVolume.setName("Surround Back Volume");
+        controls.add(surroundBackVolume);
+
+        frontHeightLeftVolume = new Volume(this, "CV", "FHL UP", "FHL DOWN") {
+            @Override
+            public void set(String value) {
+                super.set("FHL " + value);
+            }
+        };
+        frontHeightLeftVolume.setName("Front Height Left Volume");
+        controls.add(frontHeightLeftVolume);
+
+        frontHeightRightVolume = new Volume(this, "CV", "FHR UP", "FHR DOWN") {
+            @Override
+            public void set(String value) {
+                super.set("FHR " + value);
+            }
+        };
+        frontHeightRightVolume.setName("Front Height Right Volume");
+        controls.add(frontHeightRightVolume);
+
         // mute control
         muteToggle = new Toggle(this, "MU", "ON", "OFF");
         muteToggle.setName("Mute Toggle");
@@ -157,6 +257,54 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
         controls.add(sleepTimer);
     }
 
+    public Volume frontLeftVolume() {
+        return frontLeftVolume;
+    }
+
+    public Volume frontRightVolume() {
+        return frontRightVolume;
+    }
+
+    public Volume surroundLeftVolume() {
+        return surroundLeftVolume;
+    }
+
+    public Volume surroundRightVolume() {
+        return surroundRightVolume;
+    }
+
+    public Volume surroundBackRightVolume() {
+        return surroundBackRightVolume;
+    }
+
+    public Volume surroundBackLeftVolume() {
+        return surroundBackLeftVolume;
+    }
+
+    public Volume surroundBackVolume() {
+        return surroundBackVolume;
+    }
+
+    public Volume frontHeightLeftVolume() {
+        return frontHeightLeftVolume;
+    }
+
+    public Volume frontHeightRightVolume() {
+        return frontHeightRightVolume;
+    }
+
+    public Volume centerVolume() {
+        return centerVolume;
+    }
+
+    public Volume masterVolume() {
+        return masterVolume;
+    }
+
+    public Volume subwooferVolume() {
+        return subwooferVolume;
+    }
+
     public SleepTimer sleepTimer() {
         return sleepTimer;
     }
@@ -187,14 +335,6 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
 
     public Toggle mainZone() {
         return mainZoneToggle;
-    }
-
-    public Volume masterVolume() {
-        return masterVolume;
-    }
-
-    public Volume subwooferVolume() {
-        return subwooferVolume;
     }
 
     public Toggle mute() {
