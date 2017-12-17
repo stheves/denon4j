@@ -58,7 +58,6 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
     private Menu menu;
     private Setting<SurroundMode> selectSurround;
     private Session session;
-    private Condition condition = bool(true);
     private RecvContext currentContext;
     private SleepTimer sleepTimer;
     private Volume subwooferVolume;
@@ -231,12 +230,12 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
         }
 
         synchronized (sendReceiveLock) {
-            currentContext = new RecvContext();
             // check for given condition but return after RETRIES or RECV_TIMEOUT to make sure this method returns
-            condition = anyMatch(c, retries(RETRIES), duration(ofMillis(RECV_TIMEOUT)));
+            Condition condition = anyMatch(c, retries(RETRIES), duration(ofMillis(RECV_TIMEOUT)));
+            currentContext = new RecvContext(condition);
             try {
                 currentContext.beginReceive();
-                do {
+                while (currentContext.isReceiving()) {
                     send(command);
                     // wait for response
                     try {
@@ -245,7 +244,7 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
                         log.log(Level.FINEST, "Got interruption while waiting for response", e);
                     }
                     currentContext.incrementCounter();
-                } while (!condition.fulfilled(currentContext));
+                }
 
                 // copy result
                 return new ArrayList<>(currentContext.received());
@@ -265,8 +264,9 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
         synchronized (sendReceiveLock) {
             if (isReceiving()) {
                 currentContext.received().add(event);
-                if (condition.fulfilled(currentContext)) {
+                if (currentContext.fulfilled()) {
                     sendReceiveLock.notify();
+                    currentContext.endReceive();
                 }
             }
         }

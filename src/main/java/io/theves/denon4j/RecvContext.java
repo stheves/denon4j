@@ -17,11 +17,13 @@ public class RecvContext {
     private Instant start;
     private List<Event> received;
     private boolean receiving;
+    private Condition condition;
 
-    public RecvContext() {
+    public RecvContext(Condition condition) {
         this.counter = 0;
         this.start = Instant.now();
         this.received = new ArrayList<>();
+        this.condition = condition;
     }
 
     public int counter() {
@@ -42,7 +44,6 @@ public class RecvContext {
 
     public void endReceive() {
         counter = 0;
-        received.clear();
         receiving = false;
     }
 
@@ -52,6 +53,11 @@ public class RecvContext {
     }
 
     public boolean isReceiving() {
-        return receiving;
+        return receiving && !condition.fulfilled(this);
     }
+
+    public boolean fulfilled() {
+        return condition.fulfilled(this);
+    }
+
 }
