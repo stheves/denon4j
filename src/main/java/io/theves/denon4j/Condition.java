@@ -19,8 +19,6 @@
 
 package io.theves.denon4j;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.util.stream.Stream;
 
 /**

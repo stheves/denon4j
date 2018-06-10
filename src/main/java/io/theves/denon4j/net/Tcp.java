@@ -63,7 +63,7 @@ final class Tcp implements Protocol {
             try {
                 eventDispatcher.dispatch(event);
             } catch (Exception e) {
-                logger.log(Level.WARNING, "Error invoking callback", e);
+                logger.log(Level.WARNING, "Error while invoking event dispatcher", e);
             }
         }
     }

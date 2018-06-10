@@ -23,7 +23,9 @@ package io.theves.denon4j.controls;
 import io.theves.denon4j.net.Event;
 
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Represents the Onscreen Display Information List that is sent back for 'NSE' and 'NSA' commands.

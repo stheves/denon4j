@@ -26,8 +26,8 @@ package io.theves.denon4j.controls;
  */
 public enum VideoSource {
     DVD("DVD"), BD("BD"), TV("TV"), SAT_CBL("SAT/CBL"), GAME(
-            "GAME"), GAME2("GAME2"), AUX("V.AUX"), DOCK("DOCK"), SOURCE(
-            "SOURCE");
+        "GAME"), GAME2("GAME2"), AUX("V.AUX"), DOCK("DOCK"), SOURCE(
+        "SOURCE");
 
     private String source;
 

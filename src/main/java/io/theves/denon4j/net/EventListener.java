@@ -25,5 +25,5 @@ public interface EventListener {
      *
      * @param event the event that was received.
      */
-    void handle(Event event);
+    void received(Event event);
 }

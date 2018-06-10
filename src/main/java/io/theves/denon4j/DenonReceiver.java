@@ -254,6 +254,7 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
         controls.add(sleepTimer);
 
         // analog tuner control
+        // TODO check for valid freq values
         tunerFrequency = new Slider(this, "TFAN", "UP", "DOWN");
         tunerFrequency.setName("Tuner Frequency");
         controls.add(tunerFrequency);
@@ -405,7 +406,7 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
         synchronized (eventListeners) {
             eventListeners.forEach(listener -> {
                 try {
-                    listener.handle(event);
+                    listener.received(event);
                 } catch (Exception e) {
                     log.log(Level.SEVERE, "Caught exception from listener: " + listener, e);
                 }
@@ -445,8 +446,8 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
         return protocol.isConnected();
     }
 
-    public Event sendRequest(String command, String regex) {
-        return sendAndReceive(command, Condition.regex(regex)).stream().findFirst().orElseThrow(() -> new TimeoutException(
+    public Event send(String command, String regex) {
+        return send(command, Condition.regex(regex)).stream().findFirst().orElseThrow(() -> new TimeoutException(
             format("No response received after %s milliseconds. Receiver may be too busy to respond.", RECV_TIMEOUT)
         ));
     }
@@ -458,7 +459,7 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
      * @param c       the condition.
      * @return the received response.
      */
-    public final List<Event> sendAndReceive(String command, Condition c) {
+    public final List<Event> send(String command, Condition c) {
         if (command == null || c == null) {
             throw new IllegalArgumentException("Arguments must not be null");
         }
@@ -489,7 +490,7 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
     }
 
     public void send(String command) {
-        sendAndReceive(command, Condition.bool(true));
+        send(command, Condition.bool(true));
     }
 
     List<EventListener> getEventListeners() {

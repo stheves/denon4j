@@ -47,7 +47,7 @@ public abstract class AbstractControl implements EventListener {
     }
 
     protected final Event sendRequest(String regex) {
-        return receiver.sendRequest(getCommandPrefix() + "?", regex);
+        return receiver.send(getCommandPrefix() + "?", regex);
     }
 
     protected final Event sendRequest() {
@@ -55,11 +55,11 @@ public abstract class AbstractControl implements EventListener {
     }
 
     final List<Event> sendAndReceive(String param, Condition condition) {
-        return receiver.sendAndReceive(getCommandPrefix() + param, condition);
+        return receiver.send(getCommandPrefix() + param, condition);
     }
 
     @Override
-    public final void handle(Event event) {
+    public final void received(Event event) {
         if (shouldHandle(event)) {
             doHandle(event);
         }

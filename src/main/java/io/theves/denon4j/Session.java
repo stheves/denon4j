@@ -31,7 +31,7 @@ public class Session implements EventListener {
     }
 
     @Override
-    public void handle(Event event) {
+    public void received(Event event) {
         stats.incrementEvents();
     }
 
