@@ -14,6 +14,8 @@ Contributions and feedback are very welcome!
 # Features
 
 - High level API and strong domain model
+- Blocking and non-blocking request/response
+- Auto-discovery of receivers found in LAN
 - Lightweight and pure Java (no other dependencies needed)
 - Works out-of-the-box with your denon receiver
 - Available on Maven central
