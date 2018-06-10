@@ -50,13 +50,13 @@ public class Demo {
 
             Volume masterVolume = avr.masterVolume();
             masterVolume.slideUp();
-            System.out.println("MASTER VOL: " + masterVolume.getValue());
+            System.out.println("MASTER VOL: " + masterVolume.get());
             masterVolume.set("55");
-            System.out.println("MASTER VOL: " + masterVolume.getValue());
+            System.out.println("MASTER VOL: " + masterVolume.get());
             System.out.println("MASTER VOL MAX: " + masterVolume.getMax());
 
-            avr.video().set(VideoSource.SOURCE);
-            avr.input().set(InputSource.NET_UBS);
+            avr.video().set(VideoSource.SOURCE.getSource());
+            avr.input().set(InputSource.NET_UBS.getInputSource());
             avr.netUsb().cursorRight();
 
             System.out.println("Display: ");
