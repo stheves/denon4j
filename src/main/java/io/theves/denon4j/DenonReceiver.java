@@ -28,6 +28,7 @@ import java.net.InetAddress;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
@@ -446,10 +447,14 @@ public class DenonReceiver implements AutoCloseable, EventDispatcher {
         return protocol.isConnected();
     }
 
-    public Event send(String command, String regex) {
-        return send(command, Condition.regex(regex)).stream().findFirst().orElseThrow(() -> new TimeoutException(
-            format("No response received after %s milliseconds. Receiver may be too busy to respond.", RECV_TIMEOUT)
-        ));
+    public Event send(final String command,final String regex) {
+
+        return send(command, Condition.regex(regex))
+            .stream()
+            .filter(event -> event.asciiValue().matches(regex))
+            .findFirst().orElseThrow(() -> new TimeoutException(
+              format("No response received after %s milliseconds. Receiver may be too busy to respond.", RECV_TIMEOUT)
+            ));
     }
 
     /**
